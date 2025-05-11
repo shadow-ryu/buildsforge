@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://www.buildsforge.com
+
+# Sitemaps
+Sitemap: https://www.buildsforge.com/sitemap.xml
