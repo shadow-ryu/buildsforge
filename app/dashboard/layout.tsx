@@ -1,4 +1,4 @@
-import { Avatar } from "@/components/ui/avatar";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {  Bell, Settings } from "lucide-react";
@@ -103,11 +103,11 @@ function Sidebar() {
           </Button>
         </div>
         <div className="flex items-center gap-2 mt-6">
-          <Avatar
+          {/* <Avatar
             src="https://randomuser.me/api/portraits/men/32.jpg"
             alt="profile"
             size="sm"
-          />
+          /> */}
           <div>
             <div className="text-sm font-semibold text-white">
               alex@buildsforge.com
@@ -123,11 +123,11 @@ function Header() {
   return (
     <header className="flex items-center justify-between px-8 pt-8 pb-4">
       <div className="flex items-center gap-4">
-        <Avatar
+        {/* <Avatar
           src="https://randomuser.me/api/portraits/men/32.jpg"
           alt="profile"
           size="md"
-        />
+        /> */}
         <div className="flex flex-col gap-0.5">
           <span className="text-sm text-[#A1A1AA]">alex@buildsforge.com</span>
         </div>

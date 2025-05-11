@@ -33,7 +33,7 @@ export function BuildLogDisplay({
                   {new Date(log.logDate).toDateString()}
                 </span>
                 <Badge
-                  variant="secondary"
+                  variant="default"
                   className="text-xs text-[#A1A1AA] bg-[#23262F]"
                 >
                   Generated {new Date(log.generatedAt).toLocaleTimeString()}

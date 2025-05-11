@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     // For now, use hardcoded user
     const user = await prisma.user.findFirst({ where: { clerkId: "user_clerk_123456" } });
