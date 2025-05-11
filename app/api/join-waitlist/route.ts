@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json(
-        { success: true, message: " user has joined waiting list already " },
+        { success: true, message: " you has joined waiting list already " },
         { status: 201 }
       );
     }
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "user has joined waiting list",
+      message: "you have joined waiting list",
     });
   } catch (error) {
     console.error("Error in /api/products/create:", error);
