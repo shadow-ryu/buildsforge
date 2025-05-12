@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { Resend } from "resend";
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,6 +36,23 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    await resend.emails.send({
+      from: "BuildsForge <noreply@buildsforge.com>",
+      to: sanitizedEmail,
+      subject: "Thanks for waiting!",
+      html: `
+          <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
+            <p>Hi ${"there"},</p>
+            <p>Thank you for waiting. We truly appreciate your patience and support as we build great things at <strong>BuildsForge</strong>.</p>
+            <p>🚀 Keep building,<br/>The BuildsForge Team</p>
+            <hr style="margin-top: 30px;"/>
+            <small>This email was sent by BuildsForge. If you have questions, contact us at support@buildsforge.com.</small>
+          </div>
+        `,
+      text: `Hi ${"there"},\n\nThank you for waiting. We appreciate your patience.\n\n- The BuildsForge Team`,
+    });
     return NextResponse.json({
       success: true,
       message: "you have joined waiting list",
