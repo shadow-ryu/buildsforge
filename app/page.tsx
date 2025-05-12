@@ -46,7 +46,7 @@ export default function LandingPage() {
       <header className="w-full py-6 px-6 border-b border-gray-800">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
          <div className="flex items-center gap-2">
-          <Image src="/build-forge.png" alt="Logo" width={30} height={30} />
+          <Image src="/builds-forge.png" className="w-6 h-8" alt="Logo" width={24} height={24} />
           <div className="text-2xl font-bold text-white">BuildsForge</div>
          </div>
           <nav className="space-x-4 text-sm text-gray-300">
@@ -90,8 +90,8 @@ export default function LandingPage() {
               className="bg-white text-black w-full sm:w-80"
             />
             <Button
-              variant="primary"
-              className="px-6 py-3 font-semibold rounded-lg"
+              variant="default"
+              className="px-6 py-3 font-semibold rounded-lg bg-[#00CFFF] text-black"
               onClick={handleSubmit}
               disabled={loading}
             >
@@ -207,8 +207,8 @@ export default function LandingPage() {
           day after day.
         </p>
         <Button
-          variant="primary"
-          className="px-8 py-4 text-md rounded-xl font-semibold"
+          variant="default"
+          className="px-8 py-4 text-sm rounded-xl font-semibold bg-[#00CFFF] text-gray-800"
           onClick={focusEmailInput}
         >
           Join the Waiting List Now

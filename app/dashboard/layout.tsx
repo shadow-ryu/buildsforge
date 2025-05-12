@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {  Bell, Settings } from "lucide-react";
 import React from "react";
+import { redirect } from "next/navigation";
+
 function RocketIcon() {
   return (
     <svg
@@ -145,6 +147,10 @@ function Header() {
 }
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+  // Check if the app is live, otherwise redirect to /coming_soon
+  if (process.env.IS_LIVE !== "true") {
+    redirect("/coming_soon");
+  }
   return (
     <div className="flex min-h-screen bg-[#181A20] text-[#F4F4F5]">
       <Sidebar />
