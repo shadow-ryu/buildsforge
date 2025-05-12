@@ -45,10 +45,16 @@ export default function LandingPage() {
     <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-6 ">
       <header className="w-full py-6 px-6 border-b border-gray-800">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
-         <div className="flex items-center gap-2">
-          <Image src="/builds-forge.png" className="w-6 h-8" alt="Logo" width={24} height={24} />
-          <div className="text-2xl font-bold text-white">BuildsForge</div>
-         </div>
+          <div className="flex items-center gap-2">
+            <Image
+              src="/builds-forge.png"
+              className="w-6 h-8"
+              alt="Logo"
+              width={24}
+              height={24}
+            />
+            <div className="text-2xl font-bold text-white">BuildsForge</div>
+          </div>
           <nav className="space-x-4 text-sm text-gray-300">
             <a href="#features" className="hover:text-white">
               Features
@@ -91,7 +97,7 @@ export default function LandingPage() {
             />
             <Button
               variant="default"
-              className="px-6 py-3 font-semibold rounded-lg bg-[#00CFFF] text-black"
+              className="px-6 py-3 text-base font-semibold rounded-2xl bg-[#009FCC] text-white transition-colors duration-300 hover:bg-[#00CFFF] focus:ring-2 focus:ring-[#00CFFF] focus:outline-none"
               onClick={handleSubmit}
               disabled={loading}
             >
@@ -208,11 +214,12 @@ export default function LandingPage() {
         </p>
         <Button
           variant="default"
-          className="px-8 py-4 text-sm rounded-xl font-semibold bg-[#00CFFF] text-gray-800"
           onClick={focusEmailInput}
+          className="px-6 py-3 text-base font-semibold rounded-2xl bg-[#009FCC] text-white transition-colors duration-300 hover:bg-[#00CFFF] focus:ring-2 focus:ring-[#00CFFF] focus:outline-none"
         >
           Join the Waiting List Now
         </Button>
+
         <p className="text-xs text-zinc-600">
           © {new Date().getFullYear()} BuildsForge. All rights reserved.
         </p>
