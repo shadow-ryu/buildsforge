@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Analytics } from '@vercel/analytics/next';
+import { Analytics } from "@vercel/analytics/next";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -17,16 +17,34 @@ export const metadata: Metadata = {
   description:
     "BuildsForge helps solo founders and indie hackers build and launch SaaS MVPs using AI. Auto-generate product roadmaps, track progress daily, stay consistent, and ship with confidence.",
   keywords: [
-    "AI SaaS Builder",
-    "AI MVP Planner",
-    "Build SaaS with AI",
-    "Solo founder productivity",
-    "Build log generator",
-    "Streak tracker for founders",
-    "SaaS roadmap generator",
-    "AI cofounder",
-    "Indie hacker tools",
-    "Launch faster with AI",
+    "AI MVP planner for SaaS",
+    "build SaaS MVP with AI",
+    "solo founder productivity tool",
+    "indie hacker build tracker",
+    "automated SaaS roadmap generator",
+    "daily progress tracker for founders",
+    "AI-powered product planning",
+    "launch SaaS product with AI",
+    "founder streak tracker",
+    "AI tools for indie hackers",
+    "startup MVP planning app",
+    "build log tool for developers",
+    "AI cofounder for solopreneurs",
+    "launch faster with AI SaaS builder",
+    "founder productivity app",
+    "SaaS builder for solo founders",
+    "indie maker planning tools",
+    "AI startup idea execution",
+    "MVP roadmap automation",
+    "plan and launch SaaS with AI",
+    "daily SaaS build logging",
+    "founder consistency tracker",
+    "founder-focused product roadmap",
+    "build in public tools",
+    "ship startup ideas faster",
+    "launch tracker for indie devs",
+    "zero-to-one SaaS planner",
+    "solo developer productivity tool",
   ],
   openGraph: {
     title: "BuildsForge – AI-powered MVP Planner for Solo SaaS Founders",
