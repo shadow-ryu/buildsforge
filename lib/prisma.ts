@@ -1,5 +1,7 @@
 /* eslint-disable no-var */
-import { PrismaClient } from "@prisma/client";
+
+import { PrismaClient } from '../generated/prisma'
+
 
 // Augment the global object type to include Prisma
 declare global {

@@ -1,12 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "./node_modules/@prisma/client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -14,23 +8,60 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AccessTier {
+  BETA
+  PRELAUNCH
+  NORMAL
+  BASE
+  PRO
+}
+
 model User {
-  id        String    @id @default(cuid())
-  clerkId   String    @unique
-  email     String    @unique
-  name      String?
-  createdAt DateTime  @default(now())
+  id       String  @id @default(cuid())
+  clerkId  String  @unique
+  email    String  @unique
+  name     String
+  username String? @unique
+
+  discovery         String?  @default("none")
+  role              String?  @default("founder")
+  bestStreakOverall Int      @default(0)
+  activeProjectId   String?
+  activeProject     Product? @relation("ActiveProject", fields: [activeProjectId], references: [id])
+  createdAt         DateTime @default(now())
+
   products  Product[]
-  // snapshots Snapshot[]
+  buildLogs BuildLog[]
+  dailyLogs DailyLog[]
+  trial     Trial?
+  streaks   Streak[]
+}
 
-  BuildLog BuildLog[]
+model EarlyAccess {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  tier      AccessTier @default(NORMAL)
+  invited   Boolean    @default(false)
+  claimed   Boolean    @default(false)
+  claimedAt DateTime?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now())
+}
 
-  DailyLog DailyLog[]
+model Trial {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id])
+  plan      AccessTier @default(NORMAL)
+  startDate DateTime
+  endDate   DateTime
+  expired   Boolean    @default(false)
 }
 
 model Product {
-  id                 String    @id @default(cuid())
-  name               String
+  id   String @id @default(cuid())
+  name String 
+
   description        String
   problemStatement   String
   targetAudience     String
@@ -42,15 +73,16 @@ model Product {
   deadline           DateTime
   dailyCommitmentHrs Float
   userId             String
-  user               User      @relation(fields: [userId], references: [id])
+  user               User       @relation(fields: [userId], references: [id])
   roadmap            Roadmap?
   features           Feature[]
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  buildLogs          BuildLog[]
+  dailyLogs          DailyLog[]
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  streaks            Streak[]
 
-  BuildLog BuildLog[]
-
-  DailyLog DailyLog[]
+  User User[] @relation("ActiveProject")
 }
 
 model Roadmap {
@@ -85,45 +117,50 @@ model DayTask {
   id          String   @id @default(cuid())
   taskId      String   @unique
   task        Task     @relation(fields: [taskId], references: [id])
-  dayIndex    Int // Day 1, 2, 3...
+  dayIndex    Int
   dueDate     DateTime
   category    String
   description String
-  status      String   @default("backlog") // backlog / in_progress / done
+  status      String   @default("backlog")
 }
 
-
 model DailyLog {
-  id              String   @id @default(cuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id])
-  projectId       String
-  project         Product  @relation(fields: [projectId], references: [id])
-  date            DateTime
-  completedTasks  Json
-  notes           String?
-  createdAt       DateTime @default(now())
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  projectId      String
+  project        Product  @relation(fields: [projectId], references: [id])
+  date           DateTime
+  completedTasks Json
+  notes          String?
+  createdAt      DateTime @default(now())
 }
 
 model BuildLog {
-  id            String   @id @default(cuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id])
-  projectId     String
-  project       Product  @relation(fields: [projectId], references: [id])
-  logDate       DateTime
-  tweet         String?
-  belongsToDay  Int @default(1)
-  summary       String
-  sourceTasks   Json
-  generatedAt   DateTime @default(now())
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  projectId   String
+  project     Product  @relation(fields: [projectId], references: [id])
+  logDate     DateTime
+  tweet       String?
+  dayIndex    Int      @default(1)
+  summary     String
+  sourceTasks Json
+  generatedAt DateTime @default(now())
 }
 
+model Streak {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  productId      String
+  product        Product  @relation(fields: [productId], references: [id])
+  currentStreak  Int      @default(0)
+  bestStreak     Int      @default(0)
+  lastActiveDate DateTime
+  streakStart    DateTime
+  updatedAt      DateTime @updatedAt
 
-model EarlyAccess {
-  id String @id @default(cuid())
-  email String @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now())
+  @@unique([userId, productId])
 }
-  

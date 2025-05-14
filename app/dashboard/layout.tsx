@@ -1,9 +1,11 @@
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {  Bell, Settings } from "lucide-react";
+import { Bell, Settings } from "lucide-react";
 import React from "react";
 import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
+import { SignedIn, UserButton } from "@clerk/nextjs";
+import Link from "next/link";
 
 function RocketIcon() {
   return (
@@ -54,10 +56,15 @@ const navItems = [
         </svg>
       </span>
     ),
+    href: "/",
   },
-  { label: "Products", icon: <RocketIcon /> },
-  { label: "Analytics", icon: <AnalyticsIcon /> },
-  { label: "Settings", icon: <Settings className="w-5 h-5" /> },
+  { label: "Products", icon: <RocketIcon />, href: "/products" },
+  { label: "Analytics", icon: <AnalyticsIcon />, href: "/analytics" },
+  {
+    label: "Settings",
+    icon: <Settings className="w-5 h-5" />,
+    href: "/settings",
+  },
 ];
 
 function Sidebar() {
@@ -73,49 +80,17 @@ function Sidebar() {
           </Badge>
         </div>
         <nav className="flex flex-col gap-1">
-          {navItems.map((item, idx) => (
-            <Button
-              key={item.label}
-              variant={idx === 0 ? "default" : "ghost"}
-              className={`justify-start gap-3 w-full px-3 py-2 mb-1 ${
-                idx === 0
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "text-[#A1A1AA] hover:bg-[#23262F]"
-              }`}
-            >
-              {item.icon} {item.label}
-            </Button>
+          {navItems.map((item) => (
+            <Link key={item.label} href={item.href}>
+              <Button
+                key={item.label}
+                className={`justify-start gap-3 w-full px-3 py-2 mb-1 ${"text-[#A1A1AA] hover:bg-[#23262F]"}`}
+              >
+                {item.icon} {item.label}
+              </Button>
+            </Link>
           ))}
         </nav>
-      </div>
-      <div>
-        <div className="mb-4">
-          <div className="text-xs text-[#71717A] mb-1">Themes</div>
-          <div className="flex items-center gap-2">
-            <span className="text-blue-400 font-bold">Neo&apos;s Noir</span>
-            <span className="text-xs bg-blue-900 text-blue-400 rounded px-2 py-0.5">
-              ✔
-            </span>
-          </div>
-        </div>
-        <div className="bg-[#1A1A1D] rounded-xl p-3 mb-3">
-          <div className="text-xs mb-1 text-[#A1A1AA]">Need help?</div>
-          <Button className="w-full bg-blue-600 text-white rounded font-semibold text-sm hover:bg-blue-700">
-            Talk to a professional
-          </Button>
-        </div>
-        <div className="flex items-center gap-2 mt-6">
-          {/* <Avatar
-            src="https://randomuser.me/api/portraits/men/32.jpg"
-            alt="profile"
-            size="sm"
-          /> */}
-          <div>
-            <div className="text-sm font-semibold text-white">
-              alex@buildsforge.com
-            </div>
-          </div>
-        </div>
       </div>
     </aside>
   );
@@ -130,26 +105,28 @@ function Header() {
           alt="profile"
           size="md"
         /> */}
-        <div className="flex flex-col gap-0.5">
-          <span className="text-sm text-[#A1A1AA]">alex@buildsforge.com</span>
-        </div>
       </div>
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" className="rounded-full">
           <Bell className="w-5 h-5 text-[#A1A1AA]" />
         </Button>
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <Settings className="w-5 h-5 text-[#A1A1AA]" />
-        </Button>
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
       </div>
     </header>
   );
 }
 
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
   // Check if the app is live, otherwise redirect to /coming_soon
   if (process.env.IS_LIVE !== "true") {
     redirect("/coming_soon");
+  }
+  const { sessionClaims } = await auth();
+
+  if (!sessionClaims?.metadata?.onboardingComplete) {
+    redirect("/onboarding");
   }
   return (
     <div className="flex min-h-screen bg-[#181A20] text-[#F4F4F5]">

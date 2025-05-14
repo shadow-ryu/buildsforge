@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { redirect } from "next/navigation";
 
 // import { format } from "date-fns";
 // import { CalendarIcon } from "lucide-react";
@@ -70,7 +71,6 @@ export default function ProductForm() {
     };
     console.log("SaaSInput data:", data);
 
-
     const response = await fetch("/api/products/create", {
       method: "POST",
       headers: {
@@ -82,73 +82,72 @@ export default function ProductForm() {
     console.log("Result from /api/products/create:", result);
     if (result.success) {
       console.log("MVP generated successfully!");
+      redirect(`/products/${result.productId}`);
     } else {
       console.error("Failed to generate MVP:", result.error);
     }
   };
 
   return (
-    <div className="flex items-center justify-center w-full min-h-screen bg-[#181A20] px-2 py-6">
-      <Card className="w-full max-w-full  bg-[#181A20] text-white shadow-xl border-0">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl md:text-2xl lg:text-3xl">
-            Start Your Product Journey
-          </CardTitle>
-        </CardHeader>
+    <div className="flex flex-col items-center justify-center w-full min-h-screen bg-[#181A20] px-2 py-6">
+      <CardHeader className=" flex items-center justify-between w-full">
+        <CardTitle className="text-xl md:text-2xl lg:text-3xl">
+          Start Your Product Journey
+        </CardTitle>
+        <div className=" flex justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            className="mb-2 text-black border-blue-600 hover:bg-blue-100"
+            onClick={() => {
+              // Example test data
+              const testData = {
+                app_name: "BuildsForge",
+                problem_statement:
+                  "Solo founders struggle to stay accountable and track their daily progress when building products alone.",
+                target_audience:
+                  "Indie hackers and solo startup founders working on side projects or MVPs.",
+                user_goals:
+                  "Track progress, generate build logs, stay accountable, and maintain consistency.",
+                unique_value_proposition:
+                  "Combines AI task generation with habit tracking and visual progress for product builders.",
+                initial_features: [
+                  "Daily task log",
+                  "AI-generated MVP roadmap",
+                  "Streak tracker",
+                  "Project dashboard",
+                ],
+                inspiration_apps: [
+                  "WIP.co",
+                  "Trello",
+                  "Product Hunt",
+                  "BuildStreak",
+                ],
+                tech_stack: "Next.js, Supabase, OpenAI API,Gemini",
+              };
+              form.setValue("app_name", testData.app_name);
+              form.setValue("problem_statement", testData.problem_statement);
+              form.setValue("target_audience", testData.target_audience);
+              form.setValue("user_goals", testData.user_goals);
+              form.setValue(
+                "unique_value_proposition",
+                testData.unique_value_proposition
+              );
+              form.setValue("tech_stack", testData.tech_stack);
+              // Set state for multi-inputs
+              setInspirationApps(testData.inspiration_apps);
+              setFeatures(testData.initial_features);
+            }}
+          >
+            Load Test Data
+          </Button>
+        </div>
+      </CardHeader>
+      <div className="w-full max-w-7xl bg-[#181A20] text-white border-0">
         <CardContent className="p-4 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Test Data Loader Button */}
-            <div className="w-full flex justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                className="mb-2 text-black border-blue-600 hover:bg-blue-100"
-                onClick={() => {
-                  // Example test data
-                  const testData = {
-                    app_name: "BuildsForge",
-                    problem_statement:
-                      "Solo founders struggle to stay accountable and track their daily progress when building products alone.",
-                    target_audience:
-                      "Indie hackers and solo startup founders working on side projects or MVPs.",
-                    user_goals:
-                      "Track progress, generate build logs, stay accountable, and maintain consistency.",
-                    unique_value_proposition:
-                      "Combines AI task generation with habit tracking and visual progress for product builders.",
-                    initial_features: [
-                      "Daily task log",
-                      "AI-generated MVP roadmap",
-                      "Streak tracker",
-                      "Project dashboard",
-                    ],
-                    inspiration_apps: [
-                      "WIP.co",
-                      "Trello",
-                      "Product Hunt",
-                      "BuildStreak",
-                    ],
-                    tech_stack: "Next.js, Supabase, OpenAI API,Gemini",
-                  };
-                  form.setValue("app_name", testData.app_name);
-                  form.setValue(
-                    "problem_statement",
-                    testData.problem_statement
-                  );
-                  form.setValue("target_audience", testData.target_audience);
-                  form.setValue("user_goals", testData.user_goals);
-                  form.setValue(
-                    "unique_value_proposition",
-                    testData.unique_value_proposition
-                  );
-                  form.setValue("tech_stack", testData.tech_stack);
-                  // Set state for multi-inputs
-                  setInspirationApps(testData.inspiration_apps);
-                  setFeatures(testData.initial_features);
-                }}
-              >
-                Load Test Data
-              </Button>
-            </div>
+
             <div className="space-y-2 flex flex-col items-start gap-2 w-full">
               <label className="text-sm md:text-base">Product Name</label>
               <Input
@@ -330,7 +329,7 @@ export default function ProductForm() {
             </div>
           </form>
         </CardContent>
-      </Card>
+      </div>
     </div>
   );
 }

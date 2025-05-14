@@ -1,12 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, ArrowLeft } from "lucide-react";
+import { CheckCircle, ArrowLeft, Flame, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
+import { ScrollArea } from "@radix-ui/react-scroll-area";
 function RoadmapDisplay({
   days,
   onTaskComplete,
@@ -29,85 +28,170 @@ function RoadmapDisplay({
   id: string;
   onShowBuildLog: (dayIndex: number) => void;
 }) {
+  const totalCompleted = days.reduce(
+    (acc, day) => acc + day.tasks.filter((task) => task.completed).length,
+    0
+  );
+
+  const today = new Date().toDateString();
+  const todaysTasks = days
+    .flatMap((day, dayIdx) =>
+      day.tasks.map((task) => ({ ...task, dayIndex: day.dayIndex, dayIdx }))
+    )
+    .filter((task) => {
+      const taskDate = days.find((d) => d.dayIndex === task.dayIndex)?.dueDate;
+      return new Date(taskDate || today).toDateString() === today;
+    });
+
+  const restOfRoadmap = days.filter(
+    (day) => new Date(day.dueDate).toDateString() !== today
+  );
+
   return (
-    <div className=" mx-auto py-8 px-2 md:px-0">
-      <div className="flex items-center justify-start gap-2 text-center">
-        <Link href={`/dashboard/products/${id}`}>
-          <Button variant="ghost" className="rounded-full">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-        </Link>
-        <h2 className="text-3xl font-bold text-[#F4F4F5]"> Roadmap</h2>
+    <div className="mx-auto py-8 px-4 md:px-6">
+      <div className="flex items-center justify-between text-center mb-6">
+        <div className="flex items-center gap-2">
+          <Link href={`/dashboard/products/${id}`}>
+            <Button variant="ghost" className="rounded-full">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          </Link>
+          <h2 className="text-3xl font-bold text-[#F4F4F5]">Project Roadmap</h2>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-[#FBBF24] font-medium">
+          <Flame className="w-4 h-4" />
+          <span>{totalCompleted} Tasks Completed</span>
+        </div>
       </div>
-      <div className="space-y-6">
-        {days.map((day, dayIdx) => (
-          <Card
-            key={day.dayIndex}
-            className="bg-[#181A20] border-0 rounded-2xl shadow-sm"
-          >
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg text-[#F4F4F5] flex items-center justify-between">
-                <span>
-                  Day {day.dayIndex}{" "}
-                  <span className="text-sm text-[#A1A1AA] ml-2">
-                    ({new Date(day.dueDate).toDateString()})
-                  </span>
-                </span>
-                <Badge
-                  variant="outline"
-                  className="text-xs text-[#A1F59F] border-[#A1F59F]"
-                >
-                  Focus
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <ul className="space-y-3 mt-2">
-                {day.tasks.map((task, idx) => (
-                  <li
-                    key={idx}
-                    className="flex flex-col gap-1 p-3 rounded-lg bg-[#23262F] border border-[#2A2D36]"
-                  >
-                    <div className="flex items-center justify-between">
-                      <p className="text-[#F4F4F5] font-medium text-sm flex items-center gap-2">
-                        <CheckCircle size={16} className="text-[#A1F59F]" />{" "}
+
+      {/* Today’s Tasks Section */}
+      {todaysTasks.length > 0 && (
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold text-[#A1F59F] mb-4">
+            Today&apos;s Focus
+          </h3>
+          <ul className="space-y-4">
+            {todaysTasks.map((task, idx) => (
+              <li
+                key={idx}
+                className="p-3 rounded-xl bg-[#1C1C1F] border border-[#2D2F36] hover:border-[#A1F59F] transition"
+              >
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle
+                      size={18}
+                      className={
+                        task.completed ? "text-[#A1F59F]" : "text-gray-500"
+                      }
+                    />
+                    <div>
+                      <p className="text-sm font-medium text-[#F4F4F5]">
                         {task.title}
                       </p>
-                      <div className="flex items-center gap-2">
-                        <Badge className="text-xs bg-[#181A20] text-[#A1A1AA] border-[#2A2D36]">
-                          {task.category}
-                        </Badge>
-                        <button
-                          className={`ml-2 px-3 py-1 rounded bg-[#A1F59F] text-[#181A20] font-semibold text-xs hover:bg-[#8be58c] transition ${
-                            task.status === "completed"
-                              ? "opacity-60 cursor-not-allowed"
-                              : ""
-                          }`}
-                          disabled={task.status === "completed"}
-                          onClick={() => onTaskComplete(dayIdx, task?.id)}
-                        >
-                          {task.status === "completed"
-                            ? "Completed"
-                            : "Complete"}
-                        </button>
+                      <p className="text-xs text-[#A1A1AA] mt-1">
+                        {task.description}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge className="text-xs bg-[#23262F] text-[#A1A1AA] border border-[#333]">
+                      {task.category}
+                    </Badge>
+                    <Button
+                      size="sm"
+                      className="text-xs font-semibold px-3 py-1 bg-[#A1F59F] text-[#181A20] hover:bg-[#8be58c]"
+                      disabled={task.completed}
+                      onClick={() => {
+                        console.log(task.id);
+                        onTaskComplete(task.dayIdx, task.id);
+                      }}
+                    >
+                      {task.completed ? "Done" : "Mark Done"}
+                    </Button>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Rest of Roadmap */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {restOfRoadmap.map((day, dayIdx) => (
+          <div
+            key={day.dayIndex}
+            className="bg-gradient-to-br from-[#1F1F22] to-[#121316] p-4 rounded-2xl border border-[#2A2D36] shadow-sm hover:shadow-md transition duration-300"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-semibold text-[#F4F4F5]">
+                Day {day.dayIndex} – {new Date(day.dueDate).toDateString()}
+              </h3>
+              <Badge
+                variant="outline"
+                className="text-xs text-[#A1F59F] border-[#A1F59F]"
+              >
+                {day.tasks.some((task) => task.completed)
+                  ? "In Progress"
+                  : "Upcoming"}
+              </Badge>
+            </div>
+            <ul className="space-y-4">
+              {day.tasks.map((task, idx) => (
+                <li
+                  key={idx}
+                  className="p-3 rounded-xl bg-[#1C1C1F] border border-[#2D2F36] hover:border-[#A1F59F] transition"
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle
+                        size={18}
+                        className={
+                          task.completed ? "text-[#A1F59F]" : "text-gray-500"
+                        }
+                      />
+                      <div>
+                        <p className="text-sm font-medium text-[#F4F4F5]">
+                          {task.title}
+                        </p>
+                        <p className="text-xs text-[#A1A1AA] mt-1">
+                          {task.description}
+                        </p>
                       </div>
                     </div>
-                    <p className="text-sm text-[#A1A1AA] mt-1 ml-6">
-                      {task.description}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-              <div className="flex justify-end mt-4">
-                <button
-                  className="px-4 py-2 rounded bg-[#23262F] border border-[#FBBF24] text-[#FBBF24] font-semibold text-sm hover:bg-[#FBBF24]/10 transition"
-                  onClick={() => onShowBuildLog(day.dayIndex)}
-                >
-                  Build Log
-                </button>
-              </div>
-            </CardContent>
-          </Card>
+                    <div className="flex items-center gap-2">
+                      <Badge className="text-xs bg-[#23262F] text-[#A1A1AA] border border-[#333]">
+                        {task.category}
+                      </Badge>
+                      <Button
+                        size="sm"
+                        className="text-xs font-semibold px-3 py-1 bg-[#A1F59F] text-[#181A20] hover:bg-[#8be58c]"
+                        disabled={task.completed}
+                        onClick={() => onTaskComplete(dayIdx, task.id)}
+                      >
+                        {task.completed ? "Done" : "Mark Done"}
+                      </Button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="flex justify-between items-center mt-4">
+              <Button
+                variant="ghost"
+                className="text-xs  flex items-center gap-1"
+                onClick={() => onShowBuildLog(day.dayIndex)}
+              >
+                Generate Build Log
+              </Button>
+              <Button
+                variant="ghost"
+                className="text-xs  flex items-center gap-1"
+              >
+                <RefreshCcw size={14} /> Revise Roadmap
+              </Button>
+            </div>
+          </div>
         ))}
       </div>
     </div>
@@ -158,9 +242,10 @@ export default function ProductDetailPage({
 
   // Local handler for marking a task as complete (UI only)
   async function onTaskComplete(dayIdx: number, taskIdx: number) {
+    console.log(dayIdx, taskIdx, "onTaskComplete", id);
     // Get the task object using dayIdx and taskIdx from your state/data structure
     const task = days[dayIdx].tasks[taskIdx];
-    if (!task || task.completed) return;
+    // if (!task || task.completed) return;
 
     // Replace these with actual values from your app's context/state // e.g. from session or props
     const projectId = id; // e.g. from route or props

@@ -3,16 +3,23 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  CheckCircle,
-  Calendar as CalendarIcon,
-  Clock,
-} from "lucide-react";
+import { CheckCircle } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import { EditProductDetails } from "@/components/products/product-details-edit";
 import { EditFeatureModal } from "@/components/products/product-feature-task-edit";
 import { useRouter } from "next/navigation";
+
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 type Task = { id?: string; title: string };
 type Feature = {
@@ -51,7 +58,6 @@ async function generateRoadmap(productId: string, startDate: string) {
   return data;
 }
 
-
 export default function ProductDetailPage({
   params,
 }: {
@@ -61,7 +67,11 @@ export default function ProductDetailPage({
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter()  ;
+  const [newDeadline, setNewDeadline] = useState<string | null>(null);
+  const [newDailyCommitmentHrs, setNewDailyCommitmentHrs] = useState<
+    number | null
+  >(null);
+  const router = useRouter();
 
   useEffect(() => {
     setLoading(true);
@@ -72,6 +82,8 @@ export default function ProductDetailPage({
         if (!data.success)
           throw new Error(data.error || "Failed to fetch product");
         setProduct(data.product);
+        setNewDeadline(data.product.deadline);
+        setNewDailyCommitmentHrs(data.product.dailyCommitmentHrs);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -119,16 +131,15 @@ export default function ProductDetailPage({
         .filter(Boolean)
     : [];
 
+  const handleSubmit = async () => {
+    try {
+      await generateRoadmap(id, newDeadline || "");
+      router.push(`/dashboard/products/${id}/roadmap`);
+    } catch (err) {
+      console.error("Error generating roadmap:", err);
+    }
+  };
 
-    const handleSubmit = async () => {
-      try {
-        await generateRoadmap(id, Date.now().toString());
-
-      } catch (err) {
-        console.error("Error generating roadmap:", err);
-      }
-    };
-    
   return (
     <div className="max-w-4xl mx-auto py-12 px-2 md:px-0">
       {/* Product Overview */}
@@ -138,7 +149,7 @@ export default function ProductDetailPage({
             {product.name}
           </h1>
           <div className="flex flex-row gap-2 mt-2 md:mt-0">
-            <Button
+            {/* <Button
               variant="secondary"
               className="bg-[#23262F] border border-[#2563eb] text-[#2563eb] hover:bg-[#2563eb]/10 font-semibold px-4 py-2 rounded-md"
               onClick={() => router.push(`/dashboard/products/${id}/roadmap`)}
@@ -148,15 +159,14 @@ export default function ProductDetailPage({
             <Button
               variant="secondary"
               className="bg-[#23262F] border border-[#FBBF24] text-[#FBBF24] hover:bg-[#FBBF24]/10 font-semibold px-4 py-2 rounded-md"
-              onClick={() => alert('Build Logs (coming soon)')}
+              onClick={() => alert("Build Logs (coming soon)")}
             >
               Build Logs
-            </Button>
+            </Button> */}
           </div>
         </div>
         <p className="text-lg text-[#A1A1AA] mb-2">{product.description}</p>
       </div>
-
       {/* Project Info */}
       <Card className="mb-8 rounded-2xl shadow-sm bg-[#23262F] border-0">
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
@@ -166,7 +176,6 @@ export default function ProductDetailPage({
             </CardTitle>
           </div>
           <EditProductDetails
-          // @ts-expect-error unknown type
             product={product}
             onSave={(data) => console.log("Saved data:", data)}
           />
@@ -214,7 +223,6 @@ export default function ProductDetailPage({
           </div>
         </CardContent>
       </Card>
-
       {/* MVP Features */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-[#F4F4F5] mb-4">MVP Features</h2>
@@ -251,58 +259,64 @@ export default function ProductDetailPage({
           ))}
         </div>
       </div>
+      <Dialog>
+        <DialogTrigger>Continue to Roadmap Setup</DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Plan Your Launch Timeline</DialogTitle>
+            <DialogDescription>
+              Pick your launch date and daily commitment. We’ll craft your
+              step-by-step build roadmap.
+            </DialogDescription>
+            <DialogContent>
+              <form className="space-y-4 mt-4">
+                <div>
+                  <label className="block text-sm text-[#A1A1AA] mb-1">
+                    Launch deadline
+                  </label>
+                  <Input
+                    type="date"
+                    value={newDeadline || ""}
+                    onChange={(e) => setNewDeadline(e.target.value)}
+                    className="w-full bg-[#23262F] border border-[#3F3F46] text-white px-3 py-2 rounded-lg outline-none"
+                  />
+                </div>
 
-      {/* Ready to Launch */}
-      <Card className="rounded-2xl shadow-sm bg-[#23262F] border-0">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg text-[#F4F4F5] flex items-center gap-2">
-            <CalendarIcon size={20} className="text-[#FBBF24]" /> Ready to
-            launch?
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form className="flex flex-col md:flex-row items-center gap-4">
-            <div className="flex flex-col gap-1 w-full md:w-1/2">
-              <label
-                className="text-sm text-[#F4F4F5] flex items-center gap-2"
-                htmlFor="launch-date"
-              >
-                <CalendarIcon size={16} /> Select your launch date
-              </label>
-              <Input
-                id="launch-date"
-                type="date"
-                className="rounded-md bg-[#181A20] border-[#23262F] text-[#F4F4F5]"
-                value={product.deadline ? product.deadline.slice(0, 10) : ""}
-                readOnly
-              />
-            </div>
-            <div className="flex flex-col gap-1 w-full md:w-1/2">
-              <label
-                className="text-sm text-[#F4F4F5] flex items-center gap-2"
-                htmlFor="daily-commitment"
-              >
-                <Clock size={16} /> Daily commitment (hours)
-              </label>
-              <Input
-                id="daily-commitment"
-                type="number"
-                min={1}
-                className="rounded-md bg-[#181A20] border-[#23262F] text-[#F4F4F5]"
-                value={product.dailyCommitmentHrs}
-                readOnly
-              />
-            </div>
-            <Button
-              type="button"
-              onClick={handleSubmit}
-              className="mt-4 md:mt-7 w-full md:w-auto bg-[#2563eb] text-white font-semibold rounded-md shadow-sm px-6 py-2 flex items-center gap-2"
-            >
-              <span>🚀</span> Generate Roadmap
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+                <div>
+                  <label className="block text-sm text-[#A1A1AA] mb-1">
+                    Daily focus hours
+                  </label>
+                  <Input
+                    type="number"
+                    min="1"
+                    value={newDailyCommitmentHrs || ""}
+                    onChange={(e) =>
+                      setNewDailyCommitmentHrs(Number(e.target.value))
+                    }
+                    className="w-full bg-[#23262F] border border-[#3F3F46] text-white px-3 py-2 rounded-lg outline-none"
+                    placeholder="e.g. 2"
+                  />
+                </div>
+
+                <DialogFooter>
+                  <DialogClose>Close</DialogClose>
+                  <Button
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleSubmit();
+                    }}
+                    className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 w-full"
+                  >
+                    🚀 Generate Roadmap
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+      aƒ
     </div>
   );
 }

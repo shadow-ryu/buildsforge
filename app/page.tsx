@@ -109,6 +109,7 @@ export default function LandingPage() {
           Early access. No spam. Just a better way to finish what you start.
         </p>
       </motion.section>
+
       <section className="mt-28 w-full max-w-5xl mx-auto text-center">
         <h2 className="text-3xl font-bold mb-12">
           How BuildsForge helps you launch

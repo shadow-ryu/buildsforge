@@ -21,6 +21,8 @@ export async function POST(req: NextRequest) {
     const existingUser = await prisma.earlyAccess.findFirst({
       where: {
         email: sanitizedEmail,
+        invited: true,
+        tier: "BETA",
       },
     });
 
