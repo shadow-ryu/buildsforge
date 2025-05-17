@@ -10,9 +10,9 @@ import Header from "@/components/header";
 
 const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
   // Check if the app is live, otherwise redirect to /coming_soon
-  if (process.env.IS_LIVE !== "true") {
-    redirect("/coming_soon");
-  }
+  // if (process.env.IS_LIVE !== "true") {
+  //   redirect("/coming_soon");
+  // }
   const { userId } = await auth();
   if (!userId) {
     redirect("/sign-in");
