@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Home, Rocket, CalendarCheck2, Settings, Zap } from "lucide-react";
+import { Home, Rocket, Settings, Zap } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import {
@@ -30,15 +30,15 @@ const buildsForgeNav = {
         { title: "New Project", url: "/dashboard/products/new" },
       ],
     },
-    {
-      title: "Build Logs",
-      url: "/dashboard/build-logs",
-      icon: CalendarCheck2,
-      items: [
-        { title: "All Logs", url: "/dashboard/build-logs" },
-        { title: "New Log", url: "/dashboard/build-logs/new" },
-      ],
-    },
+    // {
+    //   title: "Build Logs",
+    //   url: "/dashboard/build-logs",
+    //   icon: CalendarCheck2,
+    //   items: [
+    //     { title: "All Logs", url: "/dashboard/build-logs" },
+    //     { title: "New Log", url: "/dashboard/build-logs/new" },
+    //   ],
+    // },
     {
       title: "Settings",
       url: "/dashboard/settings",

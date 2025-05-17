@@ -57,7 +57,7 @@ export default function BuildLogsPage() {
           No build logs found yet.
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-6 flex flex-col gap-2">
           {logs?.map((log) => (
             <Link
               key={log.id}
