@@ -346,7 +346,7 @@ const config = {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://vishnukulkarni:@localhost:5432/buildsforge?schema=public"
+        "value": "postgresql://neondb_owner:npg_apj6vVhIYT1L@ep-solitary-boat-a4kqlkqj-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require"
       }
     }
   },
