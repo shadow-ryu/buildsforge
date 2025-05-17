@@ -35,11 +35,17 @@ export async function generateWithGemini({
   });
 
   let fullText = "";
+  let usageMetadata = null;
 
   for await (const chunk of stream) {
     const part = chunk?.candidates?.[0]?.content?.parts?.[0];
     if (typeof part?.text === "string") {
       fullText += part.text;
+    }
+
+    // Future support: capture token metadata if Gemini includes it in any chunk
+    if (!usageMetadata && chunk?.usageMetadata) {
+      usageMetadata = chunk.usageMetadata;
     }
   }
 
@@ -50,7 +56,7 @@ export async function generateWithGemini({
   try {
     const cleaned = fullText
       .trim()
-      .replace(/^```json\\s*/, "")
+      .replace(/^```json\s*/, "")
       .replace(/```$/, "");
     parsed = JSON.parse(cleaned);
   } catch (err) {
@@ -58,12 +64,16 @@ export async function generateWithGemini({
     throw new Error("Invalid JSON from Gemini response");
   }
 
-  // ✅ Return result first
+  // ✅ Return parsed result first
   const result = parsed;
 
-  // 🔥 Background logging
   void (async () => {
     try {
+      const estimatedTokens =
+        // @ts-expect-error Gemini types are not yet defined
+        usageMetadata?.totalTokens ??
+        Math.ceil(prompt.length / 4) + Math.ceil(fullText.length / 4);
+
       await prisma.aiLog.create({
         data: {
           userId,
@@ -74,9 +84,6 @@ export async function generateWithGemini({
           output: result,
         },
       });
-
-      const estimatedTokens =
-        Math.ceil(prompt.length / 4) + Math.ceil(fullText.length / 4);
 
       await prisma.tokenUsage.create({
         data: {

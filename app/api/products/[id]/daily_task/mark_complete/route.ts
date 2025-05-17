@@ -84,6 +84,14 @@ export async function POST(req: NextRequest) {
               hasBuildLog: false,
             },
           });
+          await prisma.product.update({
+            where: { id: productId },
+            data: {
+              currentStreak: {
+                increment: 1,
+              },
+            },
+          });
         }
       } catch (err) {
         console.error("Background streak update failed:", err);

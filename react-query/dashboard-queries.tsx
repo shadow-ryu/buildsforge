@@ -1,3 +1,4 @@
+import { DayTask, Product, Trial, User } from "@/generated/prisma";
 import { useQuery } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 
@@ -16,10 +17,12 @@ export type DashboardData = {
     updated: string | null;
   }>;
   streak: number;
+  trial: Trial | null;
   todayTasks: Array<object>;
-  shippedProducts: Array<object>;
-  activeProject: object;
-  user: object;
+  shippedProducts: Array<DayTask>;
+  pendingTasks: Array<DayTask>;
+  activeProject: Product | null;
+  user: User;
 };
 
 type RedirectError = {

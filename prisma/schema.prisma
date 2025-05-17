@@ -1,8 +1,8 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
+  output        = "../generated/prisma"
 }
-
 
 datasource db {
   provider = "postgresql"
@@ -84,6 +84,8 @@ model Product {
   isRoadmapGenerated Boolean  @default(false)
   currentStreak      Int      @default(0)
   AllTimeBestStreak  Int      @default(0)
+  losingStreak       Boolean  @default(false)
+  reviseRoadmap      Boolean  @default(false)
   active             Boolean  @default(false)
   techStack          String?
   inspirationApps    String?
@@ -205,18 +207,17 @@ model Settings {
   twitter      String? @default("")
 }
 
-
 model Subscription {
-  id                   String   @id @default(cuid())
-  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId               String   @unique
+  id     String @id @default(cuid())
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
 
-  stripeCustomerId     String   @unique
-  stripeSubscriptionId String   @unique
-  status               String   // e.g. 'trialing', 'active', 'canceled'
-  planName             String   // e.g. 'starter', 'pro'
+  stripeCustomerId     String    @unique
+  stripeSubscriptionId String    @unique
+  status               String // e.g. 'trialing', 'active', 'canceled'
+  planName             String // e.g. 'starter', 'pro'
   currentPeriodEnd     DateTime
   trialEndsAt          DateTime?
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 }

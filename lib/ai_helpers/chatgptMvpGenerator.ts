@@ -31,7 +31,6 @@ export async function generateWithChatGPT({
 
   // Normalize and strip markdown code fences
   content = content.trim();
-
   if (content.startsWith("```json") || content.startsWith("```")) {
     content = content
       .replace(/^```(?:json)?\s*/, "")
@@ -39,9 +38,24 @@ export async function generateWithChatGPT({
       .trim();
   }
 
+  // Attempt to parse the output JSON
+  let parsed;
+  try {
+    parsed = JSON.parse(content);
+  } catch (err) {
+    console.error("Failed to parse GPT response as JSON", err);
+    throw new Error("Invalid JSON from GPT response");
+  }
+
+  console.log("Parsed GPT Output:\n", parsed);
+
   // 🔥 Background DB log
   void (async () => {
     try {
+      const tokenUsage =
+        response.usage?.total_tokens ??
+        Math.ceil(prompt.length / 4 + content.length / 4);
+
       await prisma.aiLog.create({
         data: {
           userId,
@@ -49,35 +63,21 @@ export async function generateWithChatGPT({
           type,
           ai_model: "gpt-4",
           input: { prompt },
-          output: result,
+          output: content,
         },
       });
-
-      const promptTokens = prompt.length / 4;
-      const responseTokens = content.length / 4;
-      const totalTokens = Math.ceil(promptTokens + responseTokens);
 
       await prisma.tokenUsage.create({
         data: {
           userId,
           purpose: type,
-          tokens: totalTokens,
+          tokens: tokenUsage,
         },
       });
     } catch (err) {
       console.error("GPT DB logging failed:", err);
     }
   })();
-
-  let parsed;
-
-  try {
-    parsed = JSON.parse(content);
-  } catch (err) {
-    console.error("Failed to parse GPT response as JSON", err);
-    throw new Error("Invalid JSON from GPT response");
-  }
-  console.log(content, "Parsed GPT Output:\n", parsed);
 
   return parsed;
 }

@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { generateRoadmapPrompt } from "@/lib/ai_helpers/generate-prompts";
-import { generateMvpWithChatGPT } from "@/lib/ai_helpers/chatgptMvpGenerator";
+import { generateWithChatGPT } from "@/lib/ai_helpers/chatgptMvpGenerator";
+
 // import { generateWithGemini } from "@/lib/ai_helpers/geminiMvpGenerator";
 
 export async function POST(req: NextRequest) {
@@ -36,6 +37,23 @@ export async function POST(req: NextRequest) {
         { success: false, error: "Missing required fields" },
         { status: 400 }
       );
+    }
+    const existingProduct = await prisma.product.findFirst({
+      where: {
+        userId: user.id,
+        active: true,
+        isRoadmapGenerated: true,
+        id: {
+          not: productId,
+        },
+      },
+    });
+
+    if (existingProduct) {
+      await prisma.product.update({
+        where: { id: existingProduct.id },
+        data: { active: false, reviseRoadmap: true },
+      });
     }
 
     const product = await prisma.product.update({
@@ -78,7 +96,12 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const roadmap = await generateMvpWithChatGPT(prompt);
+    const roadmap = await generateWithChatGPT({
+      prompt,
+      userId: user.id,
+      productId: product.id,
+      type: "roadmap",
+    });
 
     const existingTasksMap = new Map(flatTasks.map((t) => [t.id, t]));
     const featureMap = new Map(
@@ -96,6 +119,7 @@ export async function POST(req: NextRequest) {
           let feature = featureMap.get(categoryKey);
 
           if (!feature) {
+            // @ts-expect-error readonly
             feature = await prisma.feature.create({
               data: {
                 name: task.category,
@@ -104,6 +128,7 @@ export async function POST(req: NextRequest) {
                 productId: product.id,
               },
             });
+            // @ts-expect-error readonly
             featureMap.set(categoryKey, feature);
           }
 
@@ -137,7 +162,7 @@ export async function POST(req: NextRequest) {
 
     await prisma.product.update({
       where: { id: productId },
-      data: { isRoadmapGenerated: true },
+      data: { isRoadmapGenerated: true, active: true },
     });
 
     return NextResponse.json({

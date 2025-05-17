@@ -10,6 +10,8 @@ import { Progress } from "@/components/ui/progress";
 import GlassCard from "@/components/ui/glass-card";
 import { useDashboardData } from "@/react-query/dashboard-queries";
 import { LoadingScreen } from "@/components/loading-screen";
+import TrialStatusCard from "@/components/dashbord/trial-status-card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function DashboardPage() {
   const { data, isLoading, error } = useDashboardData({});
@@ -26,8 +28,15 @@ export default function DashboardPage() {
 
   if (error) return <div>Error: {error.message}</div>;
 
-  const { streak, todayTasks, shippedProducts, activeProject, user } =
-    data || {};
+  const {
+    streak,
+    todayTasks,
+    shippedProducts,
+    activeProject,
+    user,
+    trial,
+    pendingTasks,
+  } = data || {};
 
   return (
     <div className="p-6 md:p-10 bg-[#0f0f11] min-h-screen space-y-10">
@@ -36,13 +45,14 @@ export default function DashboardPage() {
         <h1 className="text-3xl md:text-4xl font-extrabold text-white">
           Welcome back, <span className="text-purple-400">{user?.name}</span>
         </h1>
-        {streak > 1 && (
+        {(streak || 0) > 1 && (
           <Badge className="bg-purple-900 text-purple-300 px-4 py-2 rounded-full">
             🔥 {streak} day streak — Keep going!
           </Badge>
         )}
       </div>
 
+      {/* @ts-expect-error isNewUser */}
       {user?.isNewUser && (
         <GlassCard className="bg-[#181A20] border border-purple-900 rounded-2xl px-6 py-5">
           <div className="flex gap-4 items-center">
@@ -70,12 +80,15 @@ export default function DashboardPage() {
 
       {/* Stats and Focus */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <GlassCard className="bg-[#181A20] border border-purple-900/20 p-6">
+        {/*  @ts-expect-error TrialStatusCard */}
+        {trial && <TrialStatusCard trial={trial} />}
+
+        <GlassCard className="bg-[#181A20] border-none p-6">
           <CardTitle className="text-white text-lg mb-2">
             Streak Stats
           </CardTitle>
           <div className="text-2xl font-semibold text-white mb-1">
-            🔥 {(user?.bestStreakOverall ?? 0)} days
+            🔥 {user?.bestStreakOverall ?? 0} days
           </div>
           <p className="text-sm text-gray-400 mb-3">
             Your personal best streak
@@ -87,47 +100,10 @@ export default function DashboardPage() {
           <Progress value={90} className="h-2 bg-purple-900" /> */}
         </GlassCard>
 
-        <GlassCard className="bg-[#181A20] border border-purple-900/20 p-6">
-          <CardTitle className="text-white text-lg mb-4">
-            Today&apos;s Focus
-          </CardTitle>
-          <div className="space-y-3">
-            {todayTasks && todayTasks?.length > 0 ? (
-              todayTasks.map((task: any, i: number) => (
-                <div
-                  key={i}
-                  className="bg-[#0f0f11] border border-purple-900/30 p-4 rounded-lg flex flex-col gap-1"
-                >
-                  <div className="flex justify-between items-center">
-                    <Badge
-                      variant="default"
-                      className="bg-purple-700 text-white text-xs"
-                    >
-                      {task.status}
-                    </Badge>
-                    <span className="text-xs text-gray-400">
-                      Due: {task.due}
-                    </span>
-                  </div>
-                  <p className="text-sm text-white font-medium">{task.title}</p>
-                  <Link
-                    href={task.link}
-                    className="text-xs text-purple-400 hover:underline inline-flex items-center gap-1"
-                  >
-                    View Task <ArrowUpRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No tasks today</p>
-            )}
-          </div>
-        </GlassCard>
-
-        <GlassCard className="bg-[#181A20] border border-purple-900/20 p-6">
-          <CardTitle className="text-white text-lg mb-4">
+        <GlassCard className="bg-[#181A20] border-none p-6">
+          <CardTitle className="text-white text-lg mb-2">
             Active Project
-          </CardTitle>
+          </CardTitle>{" "}
           {activeProject ? (
             <Card className="bg-[#181A20] p-4">
               <div className="flex justify-between items-center">
@@ -155,14 +131,92 @@ export default function DashboardPage() {
             <p className="text-sm text-gray-500">No active project</p>
           )}
         </GlassCard>
+
+        <GlassCard className="bg-[#181A20] border-none p-6">
+          <CardTitle className="text-white text-lg mb-2">
+            Today&apos;s Focus
+          </CardTitle>
+          <div className="w-full">
+            <ScrollArea className=" h-[400px] w-full p-2">
+              {todayTasks && todayTasks?.length > 0 ? (
+                todayTasks.map((task: any, i: number) => (
+                  <div
+                    key={i}
+                    className="bg-[#0f0f11] border border-purple-900 p-4 rounded-lg flex flex-col gap-1"
+                  >
+                    <div className="flex justify-between items-center">
+                      <Badge
+                        variant="default"
+                        className="bg-purple-700 text-white text-xs"
+                      >
+                        {task.status}
+                      </Badge>
+                      <span className="text-xs text-gray-400">
+                        Due: {task.due}
+                      </span>
+                    </div>
+                    <p className="text-sm text-white font-medium">
+                      {task.title}
+                    </p>
+                    <Link
+                      href={task.link}
+                      className="text-xs text-purple-400 hover:underline inline-flex items-center gap-1"
+                    >
+                      View Task <ArrowUpRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">No tasks today</p>
+              )}
+            </ScrollArea>
+          </div>
+        </GlassCard>
+        <GlassCard className="bg-[#181A20] border-none p-6">
+          <CardTitle className="text-white text-lg mb-4">
+            Pending Tasks
+          </CardTitle>
+          <ScrollArea className=" h-[400px] w-full p-4">
+            {pendingTasks && pendingTasks.length > 0 ? (
+              pendingTasks.map((task: any, i: number) => (
+                <div
+                  key={i}
+                  className="bg-[#0f0f11] border border-purple-900 p-4 rounded-lg flex flex-col gap-1 my-2"
+                >
+                  <div className="flex justify-between items-center">
+                    <Badge
+                      variant="default"
+                      className="bg-yellow-600 text-white text-xs"
+                    >
+                      {task.status}
+                    </Badge>
+                    <span className="text-xs text-gray-400">
+                      Due: {task.due}
+                    </span>
+                  </div>
+                  <p className="text-sm text-white font-medium">{task.title}</p>
+                  <Link
+                    href={task.link}
+                    className="text-xs text-purple-400 hover:underline inline-flex items-center gap-1"
+                  >
+                    View Task <ArrowUpRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">No pending tasks</p>
+            )}
+          </ScrollArea>
+        </GlassCard>
       </div>
 
       {/* Shipped Products */}
-      <div className="bg-[#181A20] border border-purple-900/20 p-6 rounded-xl">
-        <CardTitle className="text-white text-lg mb-4">
-          Shipped Products
-        </CardTitle>
-        {shippedProducts?.length ? (
+      {shippedProducts?.length ? (
+        <div className="bg-[#181A20] border border-purple-900/20 p-6 rounded-xl">
+          <CardTitle className="text-white text-lg mb-4">
+            Shipped Products
+          </CardTitle>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {shippedProducts.map((prod: any) => (
               <Card key={prod.name} className="bg-[#181A20] p-4">
@@ -179,10 +233,8 @@ export default function DashboardPage() {
               </Card>
             ))}
           </div>
-        ) : (
-          <p className="text-sm text-gray-500">No products shipped yet</p>
-        )}
-      </div>
+        </div>
+      ) : null}
     </div>
   );
 }
