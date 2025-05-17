@@ -45,6 +45,8 @@ model User {
   tokenUsages TokenUsage[]
 
   settings Settings?
+
+  Subscription Subscription?
 }
 
 model EarlyAccess {
@@ -200,4 +202,20 @@ model Settings {
   slug         String? @unique
   bio          String? @default("")
   twitter      String? @default("")
+}
+
+
+model Subscription {
+  id                   String   @id @default(cuid())
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId               String   @unique
+
+  stripeCustomerId     String   @unique
+  stripeSubscriptionId String   @unique
+  status               String   // e.g. 'trialing', 'active', 'canceled'
+  planName             String   // e.g. 'starter', 'pro'
+  currentPeriodEnd     DateTime
+  trialEndsAt          DateTime?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 }

@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       where: { email },
     });
 
-    await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
         clerkId: user.id,
         email,
@@ -60,15 +60,25 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // await prisma.trial.create({
-      //   data: {
-      //     userId: newUser.id,
-      //     plan: "BETA",
-      //     startDate: new Date(),
-      //     endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days later
-      //   },
-      // });
+      await prisma.trial.create({
+        data: {
+          userId: newUser.id,
+          plan: "BETA",
+          startDate: new Date(),
+          endDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 days later
+        },
+      });
+    }else{
+      await prisma.trial.create({
+        data: {
+          userId: newUser.id,
+
+          startDate: new Date(),
+          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days later
+        },
+      });
     }
+
 
     // Update Clerk public metadata
     // Update the current session's claims so the user is not redirected to onboarding again

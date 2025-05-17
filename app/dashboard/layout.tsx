@@ -17,13 +17,26 @@ const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
   if (!userId) {
     redirect("/sign-in");
   }
-
-  const loggedInUser = await prisma.user.findFirst({
-    where: { clerkId: userId },
+  const user = await prisma.user.findUnique({
+    where: { clerkId: userId! },
+    include: {
+      trial: true,
+      Subscription: true, // include Stripe subscription
+    },
   });
 
-  if (!loggedInUser?.onboardingCompleted) {
+  if (!user?.onboardingCompleted) {
     redirect("/onboarding");
+  }
+
+
+  const now = new Date();
+
+  const isTrialValid = user?.trial?.endDate && now < user.trial.endDate;
+  const isSubscribed = user?.Subscription?.status === "active"; // or trialing if you're syncing from Stripe
+
+  if (!isTrialValid && !isSubscribed) {
+    redirect("/plans");
   }
 
   return (

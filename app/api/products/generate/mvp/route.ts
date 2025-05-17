@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import {
-  generateMvpPrompt_MarcAndTheoStyle,
-  generateMvpPrompt_MarcLouStyle,
-} from "@/lib/ai_helpers/generate-prompts";
+import { generateMvpPrompt_MarcAndTheoStyle } from "@/lib/ai_helpers/generate-prompts";
+import { generateWithChatGPT } from "@/lib/ai_helpers/chatgptMvpGenerator";
 // import { generateWithGemini } from "@/lib/ai_helpers/geminiMvpGenerator";
-import { generateMvpWithChatGPT } from "@/lib/ai_helpers/chatgptMvpGenerator";
 
 export async function POST(req: NextRequest) {
   try {
@@ -70,7 +67,12 @@ export async function POST(req: NextRequest) {
         : [],
     });
 
-    const geminiResponse = await generateMvpWithChatGPT(prompt);
+    const geminiResponse = await generateWithChatGPT({
+      prompt,
+      userId: user.id,
+      productId,
+      type: "mvp_generation",
+    });
 
     if (!geminiResponse || !Array.isArray(geminiResponse.features)) {
       return NextResponse.json(

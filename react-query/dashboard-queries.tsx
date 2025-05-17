@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 // endpoints
 const DASHBOARD_DATA_ENDPOINT = "/api/current-user";
@@ -22,20 +22,35 @@ export type DashboardData = {
   user: object;
 };
 
-export const fetchDashboardData = async (): Promise<{
-  data: DashboardData;
-}> => {
-  const res = await axios.get(DASHBOARD_DATA_ENDPOINT);
-  return res.data;
+type RedirectError = {
+  redirect: string;
+  status: string;
+  message?: string;
 };
 
-export function useDashboardData({ ...requestOptions }) {
+export const fetchDashboardData = async (): Promise<DashboardData> => {
+  try {
+    const res = await axios.get(DASHBOARD_DATA_ENDPOINT);
+    return res.data.data; // response: { success, data: { ... } }
+  } catch (error) {
+    const axiosError = error as AxiosError;
+
+    if (
+      axiosError.response?.status === 403 &&
+      (axiosError.response?.data as RedirectError)?.redirect
+    ) {
+      const redirectUrl = (axiosError.response?.data as RedirectError).redirect;
+      window.location.href = redirectUrl;
+    }
+
+    throw error; // Let react-query handle other errors
+  }
+};
+
+export function useDashboardData({ ...requestOptions } = {}) {
   return useQuery({
     queryKey: ["dashboardData"],
-    queryFn: () => fetchDashboardData(),
-    select: (data) => ({
-      ...data.data,
-    }),
+    queryFn: fetchDashboardData,
     ...requestOptions,
   });
 }

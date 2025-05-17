@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Loader2, Search } from "lucide-react";
@@ -29,7 +29,7 @@ export default function BuildLogForm({ projectId }: BuildLogFormProps) {
   const [dayIndex, setDayIndex] = useState(0);
   const [search, setSearch] = useState("");
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
-  const queryClient = useQueryClient();
+
 
   const { data: completedTasks = [], isLoading: tasksLoading } = useQuery<
     Task[]

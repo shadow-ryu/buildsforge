@@ -45,7 +45,7 @@ export async function generateWithGemini({
 
   console.log("Raw Gemini Output:\n", fullText);
 
-  let parsed: any;
+  let parsed;
 
   try {
     const cleaned = fullText

@@ -263,6 +263,19 @@ exports.Prisma.SettingsScalarFieldEnum = {
   twitter: 'twitter'
 };
 
+exports.Prisma.SubscriptionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  stripeCustomerId: 'stripeCustomerId',
+  stripeSubscriptionId: 'stripeSubscriptionId',
+  status: 'status',
+  planName: 'planName',
+  currentPeriodEnd: 'currentPeriodEnd',
+  trialEndsAt: 'trialEndsAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -315,7 +328,8 @@ exports.Prisma.ModelName = {
   DailyStreak: 'DailyStreak',
   AiLog: 'AiLog',
   TokenUsage: 'TokenUsage',
-  Settings: 'Settings'
+  Settings: 'Settings',
+  Subscription: 'Subscription'
 };
 
 /**

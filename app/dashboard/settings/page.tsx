@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -31,6 +31,7 @@ export default function SettingsPage() {
   const [dailyHours, setDailyHours] = useState(2);
   const [deadlineDays, setDeadlineDays] = useState(14);
   const [aiModel, setAiModel] = useState("gpt-4");
+  console.log(aiModel);
   // const [emailNudges, setEmailNudges] = useState(true); .
   const [isPublic, setIsPublic] = useState(false);
   const [slug, setSlug] = useState("");
