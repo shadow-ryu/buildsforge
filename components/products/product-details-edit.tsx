@@ -44,11 +44,7 @@ export function EditProductDetails({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-1 text-[#FBBF24] border-[#FBBF24] hover:bg-[#FBBF24]/10"
-        >
+        <Button variant="ghost" size="sm" className="">
           <Pencil size={16} /> Edit Details
         </Button>
       </DialogTrigger>

@@ -34,11 +34,6 @@ export type Trial = $Result.DefaultSelection<Prisma.$TrialPayload>
  */
 export type Product = $Result.DefaultSelection<Prisma.$ProductPayload>
 /**
- * Model Roadmap
- * 
- */
-export type Roadmap = $Result.DefaultSelection<Prisma.$RoadmapPayload>
-/**
  * Model Feature
  * 
  */
@@ -54,20 +49,30 @@ export type Task = $Result.DefaultSelection<Prisma.$TaskPayload>
  */
 export type DayTask = $Result.DefaultSelection<Prisma.$DayTaskPayload>
 /**
- * Model DailyLog
- * 
- */
-export type DailyLog = $Result.DefaultSelection<Prisma.$DailyLogPayload>
-/**
  * Model BuildLog
  * 
  */
 export type BuildLog = $Result.DefaultSelection<Prisma.$BuildLogPayload>
 /**
- * Model Streak
+ * Model DailyStreak
  * 
  */
-export type Streak = $Result.DefaultSelection<Prisma.$StreakPayload>
+export type DailyStreak = $Result.DefaultSelection<Prisma.$DailyStreakPayload>
+/**
+ * Model AiLog
+ * 
+ */
+export type AiLog = $Result.DefaultSelection<Prisma.$AiLogPayload>
+/**
+ * Model TokenUsage
+ * 
+ */
+export type TokenUsage = $Result.DefaultSelection<Prisma.$TokenUsagePayload>
+/**
+ * Model Settings
+ * 
+ */
+export type Settings = $Result.DefaultSelection<Prisma.$SettingsPayload>
 
 /**
  * Enums
@@ -83,11 +88,26 @@ export namespace $Enums {
 
 export type AccessTier = (typeof AccessTier)[keyof typeof AccessTier]
 
+
+export const TaskStatus: {
+  backlog: 'backlog',
+  in_progress: 'in_progress',
+  done: 'done',
+  skipped: 'skipped',
+  blocked: 'blocked'
+};
+
+export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus]
+
 }
 
 export type AccessTier = $Enums.AccessTier
 
 export const AccessTier: typeof $Enums.AccessTier
+
+export type TaskStatus = $Enums.TaskStatus
+
+export const TaskStatus: typeof $Enums.TaskStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -255,16 +275,6 @@ export class PrismaClient<
   get product(): Prisma.ProductDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.roadmap`: Exposes CRUD operations for the **Roadmap** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more Roadmaps
-    * const roadmaps = await prisma.roadmap.findMany()
-    * ```
-    */
-  get roadmap(): Prisma.RoadmapDelegate<ExtArgs, ClientOptions>;
-
-  /**
    * `prisma.feature`: Exposes CRUD operations for the **Feature** model.
     * Example usage:
     * ```ts
@@ -295,16 +305,6 @@ export class PrismaClient<
   get dayTask(): Prisma.DayTaskDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.dailyLog`: Exposes CRUD operations for the **DailyLog** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more DailyLogs
-    * const dailyLogs = await prisma.dailyLog.findMany()
-    * ```
-    */
-  get dailyLog(): Prisma.DailyLogDelegate<ExtArgs, ClientOptions>;
-
-  /**
    * `prisma.buildLog`: Exposes CRUD operations for the **BuildLog** model.
     * Example usage:
     * ```ts
@@ -315,14 +315,44 @@ export class PrismaClient<
   get buildLog(): Prisma.BuildLogDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.streak`: Exposes CRUD operations for the **Streak** model.
+   * `prisma.dailyStreak`: Exposes CRUD operations for the **DailyStreak** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more Streaks
-    * const streaks = await prisma.streak.findMany()
+    * // Fetch zero or more DailyStreaks
+    * const dailyStreaks = await prisma.dailyStreak.findMany()
     * ```
     */
-  get streak(): Prisma.StreakDelegate<ExtArgs, ClientOptions>;
+  get dailyStreak(): Prisma.DailyStreakDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.aiLog`: Exposes CRUD operations for the **AiLog** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AiLogs
+    * const aiLogs = await prisma.aiLog.findMany()
+    * ```
+    */
+  get aiLog(): Prisma.AiLogDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.tokenUsage`: Exposes CRUD operations for the **TokenUsage** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TokenUsages
+    * const tokenUsages = await prisma.tokenUsage.findMany()
+    * ```
+    */
+  get tokenUsage(): Prisma.TokenUsageDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.settings`: Exposes CRUD operations for the **Settings** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Settings
+    * const settings = await prisma.settings.findMany()
+    * ```
+    */
+  get settings(): Prisma.SettingsDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -767,13 +797,14 @@ export namespace Prisma {
     EarlyAccess: 'EarlyAccess',
     Trial: 'Trial',
     Product: 'Product',
-    Roadmap: 'Roadmap',
     Feature: 'Feature',
     Task: 'Task',
     DayTask: 'DayTask',
-    DailyLog: 'DailyLog',
     BuildLog: 'BuildLog',
-    Streak: 'Streak'
+    DailyStreak: 'DailyStreak',
+    AiLog: 'AiLog',
+    TokenUsage: 'TokenUsage',
+    Settings: 'Settings'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -792,7 +823,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "earlyAccess" | "trial" | "product" | "roadmap" | "feature" | "task" | "dayTask" | "dailyLog" | "buildLog" | "streak"
+      modelProps: "user" | "earlyAccess" | "trial" | "product" | "feature" | "task" | "dayTask" | "buildLog" | "dailyStreak" | "aiLog" | "tokenUsage" | "settings"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1092,80 +1123,6 @@ export namespace Prisma {
           }
         }
       }
-      Roadmap: {
-        payload: Prisma.$RoadmapPayload<ExtArgs>
-        fields: Prisma.RoadmapFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.RoadmapFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RoadmapPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.RoadmapFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RoadmapPayload>
-          }
-          findFirst: {
-            args: Prisma.RoadmapFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RoadmapPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.RoadmapFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RoadmapPayload>
-          }
-          findMany: {
-            args: Prisma.RoadmapFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RoadmapPayload>[]
-          }
-          create: {
-            args: Prisma.RoadmapCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RoadmapPayload>
-          }
-          createMany: {
-            args: Prisma.RoadmapCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.RoadmapCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RoadmapPayload>[]
-          }
-          delete: {
-            args: Prisma.RoadmapDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RoadmapPayload>
-          }
-          update: {
-            args: Prisma.RoadmapUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RoadmapPayload>
-          }
-          deleteMany: {
-            args: Prisma.RoadmapDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.RoadmapUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.RoadmapUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RoadmapPayload>[]
-          }
-          upsert: {
-            args: Prisma.RoadmapUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$RoadmapPayload>
-          }
-          aggregate: {
-            args: Prisma.RoadmapAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateRoadmap>
-          }
-          groupBy: {
-            args: Prisma.RoadmapGroupByArgs<ExtArgs>
-            result: $Utils.Optional<RoadmapGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.RoadmapCountArgs<ExtArgs>
-            result: $Utils.Optional<RoadmapCountAggregateOutputType> | number
-          }
-        }
-      }
       Feature: {
         payload: Prisma.$FeaturePayload<ExtArgs>
         fields: Prisma.FeatureFieldRefs
@@ -1388,80 +1345,6 @@ export namespace Prisma {
           }
         }
       }
-      DailyLog: {
-        payload: Prisma.$DailyLogPayload<ExtArgs>
-        fields: Prisma.DailyLogFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.DailyLogFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DailyLogPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.DailyLogFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DailyLogPayload>
-          }
-          findFirst: {
-            args: Prisma.DailyLogFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DailyLogPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.DailyLogFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DailyLogPayload>
-          }
-          findMany: {
-            args: Prisma.DailyLogFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DailyLogPayload>[]
-          }
-          create: {
-            args: Prisma.DailyLogCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DailyLogPayload>
-          }
-          createMany: {
-            args: Prisma.DailyLogCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.DailyLogCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DailyLogPayload>[]
-          }
-          delete: {
-            args: Prisma.DailyLogDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DailyLogPayload>
-          }
-          update: {
-            args: Prisma.DailyLogUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DailyLogPayload>
-          }
-          deleteMany: {
-            args: Prisma.DailyLogDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.DailyLogUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.DailyLogUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DailyLogPayload>[]
-          }
-          upsert: {
-            args: Prisma.DailyLogUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DailyLogPayload>
-          }
-          aggregate: {
-            args: Prisma.DailyLogAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateDailyLog>
-          }
-          groupBy: {
-            args: Prisma.DailyLogGroupByArgs<ExtArgs>
-            result: $Utils.Optional<DailyLogGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.DailyLogCountArgs<ExtArgs>
-            result: $Utils.Optional<DailyLogCountAggregateOutputType> | number
-          }
-        }
-      }
       BuildLog: {
         payload: Prisma.$BuildLogPayload<ExtArgs>
         fields: Prisma.BuildLogFieldRefs
@@ -1536,77 +1419,299 @@ export namespace Prisma {
           }
         }
       }
-      Streak: {
-        payload: Prisma.$StreakPayload<ExtArgs>
-        fields: Prisma.StreakFieldRefs
+      DailyStreak: {
+        payload: Prisma.$DailyStreakPayload<ExtArgs>
+        fields: Prisma.DailyStreakFieldRefs
         operations: {
           findUnique: {
-            args: Prisma.StreakFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StreakPayload> | null
+            args: Prisma.DailyStreakFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DailyStreakPayload> | null
           }
           findUniqueOrThrow: {
-            args: Prisma.StreakFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StreakPayload>
+            args: Prisma.DailyStreakFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DailyStreakPayload>
           }
           findFirst: {
-            args: Prisma.StreakFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StreakPayload> | null
+            args: Prisma.DailyStreakFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DailyStreakPayload> | null
           }
           findFirstOrThrow: {
-            args: Prisma.StreakFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StreakPayload>
+            args: Prisma.DailyStreakFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DailyStreakPayload>
           }
           findMany: {
-            args: Prisma.StreakFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StreakPayload>[]
+            args: Prisma.DailyStreakFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DailyStreakPayload>[]
           }
           create: {
-            args: Prisma.StreakCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StreakPayload>
+            args: Prisma.DailyStreakCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DailyStreakPayload>
           }
           createMany: {
-            args: Prisma.StreakCreateManyArgs<ExtArgs>
+            args: Prisma.DailyStreakCreateManyArgs<ExtArgs>
             result: BatchPayload
           }
           createManyAndReturn: {
-            args: Prisma.StreakCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StreakPayload>[]
+            args: Prisma.DailyStreakCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DailyStreakPayload>[]
           }
           delete: {
-            args: Prisma.StreakDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StreakPayload>
+            args: Prisma.DailyStreakDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DailyStreakPayload>
           }
           update: {
-            args: Prisma.StreakUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StreakPayload>
+            args: Prisma.DailyStreakUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DailyStreakPayload>
           }
           deleteMany: {
-            args: Prisma.StreakDeleteManyArgs<ExtArgs>
+            args: Prisma.DailyStreakDeleteManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateMany: {
-            args: Prisma.StreakUpdateManyArgs<ExtArgs>
+            args: Prisma.DailyStreakUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateManyAndReturn: {
-            args: Prisma.StreakUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StreakPayload>[]
+            args: Prisma.DailyStreakUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DailyStreakPayload>[]
           }
           upsert: {
-            args: Prisma.StreakUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StreakPayload>
+            args: Prisma.DailyStreakUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DailyStreakPayload>
           }
           aggregate: {
-            args: Prisma.StreakAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateStreak>
+            args: Prisma.DailyStreakAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDailyStreak>
           }
           groupBy: {
-            args: Prisma.StreakGroupByArgs<ExtArgs>
-            result: $Utils.Optional<StreakGroupByOutputType>[]
+            args: Prisma.DailyStreakGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DailyStreakGroupByOutputType>[]
           }
           count: {
-            args: Prisma.StreakCountArgs<ExtArgs>
-            result: $Utils.Optional<StreakCountAggregateOutputType> | number
+            args: Prisma.DailyStreakCountArgs<ExtArgs>
+            result: $Utils.Optional<DailyStreakCountAggregateOutputType> | number
+          }
+        }
+      }
+      AiLog: {
+        payload: Prisma.$AiLogPayload<ExtArgs>
+        fields: Prisma.AiLogFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AiLogFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AiLogPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AiLogFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AiLogPayload>
+          }
+          findFirst: {
+            args: Prisma.AiLogFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AiLogPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AiLogFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AiLogPayload>
+          }
+          findMany: {
+            args: Prisma.AiLogFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AiLogPayload>[]
+          }
+          create: {
+            args: Prisma.AiLogCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AiLogPayload>
+          }
+          createMany: {
+            args: Prisma.AiLogCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AiLogCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AiLogPayload>[]
+          }
+          delete: {
+            args: Prisma.AiLogDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AiLogPayload>
+          }
+          update: {
+            args: Prisma.AiLogUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AiLogPayload>
+          }
+          deleteMany: {
+            args: Prisma.AiLogDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AiLogUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AiLogUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AiLogPayload>[]
+          }
+          upsert: {
+            args: Prisma.AiLogUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AiLogPayload>
+          }
+          aggregate: {
+            args: Prisma.AiLogAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAiLog>
+          }
+          groupBy: {
+            args: Prisma.AiLogGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AiLogGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AiLogCountArgs<ExtArgs>
+            result: $Utils.Optional<AiLogCountAggregateOutputType> | number
+          }
+        }
+      }
+      TokenUsage: {
+        payload: Prisma.$TokenUsagePayload<ExtArgs>
+        fields: Prisma.TokenUsageFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TokenUsageFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenUsagePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TokenUsageFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenUsagePayload>
+          }
+          findFirst: {
+            args: Prisma.TokenUsageFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenUsagePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TokenUsageFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenUsagePayload>
+          }
+          findMany: {
+            args: Prisma.TokenUsageFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenUsagePayload>[]
+          }
+          create: {
+            args: Prisma.TokenUsageCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenUsagePayload>
+          }
+          createMany: {
+            args: Prisma.TokenUsageCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TokenUsageCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenUsagePayload>[]
+          }
+          delete: {
+            args: Prisma.TokenUsageDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenUsagePayload>
+          }
+          update: {
+            args: Prisma.TokenUsageUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenUsagePayload>
+          }
+          deleteMany: {
+            args: Prisma.TokenUsageDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TokenUsageUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TokenUsageUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenUsagePayload>[]
+          }
+          upsert: {
+            args: Prisma.TokenUsageUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenUsagePayload>
+          }
+          aggregate: {
+            args: Prisma.TokenUsageAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTokenUsage>
+          }
+          groupBy: {
+            args: Prisma.TokenUsageGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TokenUsageGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TokenUsageCountArgs<ExtArgs>
+            result: $Utils.Optional<TokenUsageCountAggregateOutputType> | number
+          }
+        }
+      }
+      Settings: {
+        payload: Prisma.$SettingsPayload<ExtArgs>
+        fields: Prisma.SettingsFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SettingsFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SettingsFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload>
+          }
+          findFirst: {
+            args: Prisma.SettingsFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SettingsFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload>
+          }
+          findMany: {
+            args: Prisma.SettingsFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload>[]
+          }
+          create: {
+            args: Prisma.SettingsCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload>
+          }
+          createMany: {
+            args: Prisma.SettingsCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SettingsCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload>[]
+          }
+          delete: {
+            args: Prisma.SettingsDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload>
+          }
+          update: {
+            args: Prisma.SettingsUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload>
+          }
+          deleteMany: {
+            args: Prisma.SettingsDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SettingsUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SettingsUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload>[]
+          }
+          upsert: {
+            args: Prisma.SettingsUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload>
+          }
+          aggregate: {
+            args: Prisma.SettingsAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSettings>
+          }
+          groupBy: {
+            args: Prisma.SettingsGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SettingsGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SettingsCountArgs<ExtArgs>
+            result: $Utils.Optional<SettingsCountAggregateOutputType> | number
           }
         }
       }
@@ -1698,13 +1803,14 @@ export namespace Prisma {
     earlyAccess?: EarlyAccessOmit
     trial?: TrialOmit
     product?: ProductOmit
-    roadmap?: RoadmapOmit
     feature?: FeatureOmit
     task?: TaskOmit
     dayTask?: DayTaskOmit
-    dailyLog?: DailyLogOmit
     buildLog?: BuildLogOmit
-    streak?: StreakOmit
+    dailyStreak?: DailyStreakOmit
+    aiLog?: AiLogOmit
+    tokenUsage?: TokenUsageOmit
+    settings?: SettingsOmit
   }
 
   /* Types for Logging */
@@ -1801,15 +1907,17 @@ export namespace Prisma {
   export type UserCountOutputType = {
     products: number
     buildLogs: number
-    dailyLogs: number
-    streaks: number
+    DailyStreak: number
+    aiLogs: number
+    tokenUsages: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     products?: boolean | UserCountOutputTypeCountProductsArgs
     buildLogs?: boolean | UserCountOutputTypeCountBuildLogsArgs
-    dailyLogs?: boolean | UserCountOutputTypeCountDailyLogsArgs
-    streaks?: boolean | UserCountOutputTypeCountStreaksArgs
+    DailyStreak?: boolean | UserCountOutputTypeCountDailyStreakArgs
+    aiLogs?: boolean | UserCountOutputTypeCountAiLogsArgs
+    tokenUsages?: boolean | UserCountOutputTypeCountTokenUsagesArgs
   }
 
   // Custom InputTypes
@@ -1840,15 +1948,22 @@ export namespace Prisma {
   /**
    * UserCountOutputType without action
    */
-  export type UserCountOutputTypeCountDailyLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: DailyLogWhereInput
+  export type UserCountOutputTypeCountDailyStreakArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DailyStreakWhereInput
   }
 
   /**
    * UserCountOutputType without action
    */
-  export type UserCountOutputTypeCountStreaksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: StreakWhereInput
+  export type UserCountOutputTypeCountAiLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AiLogWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountTokenUsagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TokenUsageWhereInput
   }
 
 
@@ -1859,17 +1974,15 @@ export namespace Prisma {
   export type ProductCountOutputType = {
     features: number
     buildLogs: number
-    dailyLogs: number
-    streaks: number
-    User: number
+    DailyStreak: number
+    aiLogs: number
   }
 
   export type ProductCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     features?: boolean | ProductCountOutputTypeCountFeaturesArgs
     buildLogs?: boolean | ProductCountOutputTypeCountBuildLogsArgs
-    dailyLogs?: boolean | ProductCountOutputTypeCountDailyLogsArgs
-    streaks?: boolean | ProductCountOutputTypeCountStreaksArgs
-    User?: boolean | ProductCountOutputTypeCountUserArgs
+    DailyStreak?: boolean | ProductCountOutputTypeCountDailyStreakArgs
+    aiLogs?: boolean | ProductCountOutputTypeCountAiLogsArgs
   }
 
   // Custom InputTypes
@@ -1900,22 +2013,15 @@ export namespace Prisma {
   /**
    * ProductCountOutputType without action
    */
-  export type ProductCountOutputTypeCountDailyLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: DailyLogWhereInput
+  export type ProductCountOutputTypeCountDailyStreakArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DailyStreakWhereInput
   }
 
   /**
    * ProductCountOutputType without action
    */
-  export type ProductCountOutputTypeCountStreaksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: StreakWhereInput
-  }
-
-  /**
-   * ProductCountOutputType without action
-   */
-  export type ProductCountOutputTypeCountUserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: UserWhereInput
+  export type ProductCountOutputTypeCountAiLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AiLogWhereInput
   }
 
 
@@ -1951,6 +2057,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type BuildLogCountOutputType
+   */
+
+  export type BuildLogCountOutputType = {
+    DayTask: number
+  }
+
+  export type BuildLogCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    DayTask?: boolean | BuildLogCountOutputTypeCountDayTaskArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * BuildLogCountOutputType without action
+   */
+  export type BuildLogCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuildLogCountOutputType
+     */
+    select?: BuildLogCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * BuildLogCountOutputType without action
+   */
+  export type BuildLogCountOutputTypeCountDayTaskArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DayTaskWhereInput
+  }
+
+
+  /**
    * Models
    */
 
@@ -1980,10 +2117,10 @@ export namespace Prisma {
     email: string | null
     name: string | null
     username: string | null
+    onboardingCompleted: boolean | null
     discovery: string | null
     role: string | null
     bestStreakOverall: number | null
-    activeProjectId: string | null
     createdAt: Date | null
   }
 
@@ -1993,10 +2130,10 @@ export namespace Prisma {
     email: string | null
     name: string | null
     username: string | null
+    onboardingCompleted: boolean | null
     discovery: string | null
     role: string | null
     bestStreakOverall: number | null
-    activeProjectId: string | null
     createdAt: Date | null
   }
 
@@ -2006,10 +2143,10 @@ export namespace Prisma {
     email: number
     name: number
     username: number
+    onboardingCompleted: number
     discovery: number
     role: number
     bestStreakOverall: number
-    activeProjectId: number
     createdAt: number
     _all: number
   }
@@ -2029,10 +2166,10 @@ export namespace Prisma {
     email?: true
     name?: true
     username?: true
+    onboardingCompleted?: true
     discovery?: true
     role?: true
     bestStreakOverall?: true
-    activeProjectId?: true
     createdAt?: true
   }
 
@@ -2042,10 +2179,10 @@ export namespace Prisma {
     email?: true
     name?: true
     username?: true
+    onboardingCompleted?: true
     discovery?: true
     role?: true
     bestStreakOverall?: true
-    activeProjectId?: true
     createdAt?: true
   }
 
@@ -2055,10 +2192,10 @@ export namespace Prisma {
     email?: true
     name?: true
     username?: true
+    onboardingCompleted?: true
     discovery?: true
     role?: true
     bestStreakOverall?: true
-    activeProjectId?: true
     createdAt?: true
     _all?: true
   }
@@ -2155,10 +2292,10 @@ export namespace Prisma {
     email: string
     name: string
     username: string | null
+    onboardingCompleted: boolean
     discovery: string | null
     role: string | null
     bestStreakOverall: number
-    activeProjectId: string | null
     createdAt: Date
     _count: UserCountAggregateOutputType | null
     _avg: UserAvgAggregateOutputType | null
@@ -2187,17 +2324,18 @@ export namespace Prisma {
     email?: boolean
     name?: boolean
     username?: boolean
+    onboardingCompleted?: boolean
     discovery?: boolean
     role?: boolean
     bestStreakOverall?: boolean
-    activeProjectId?: boolean
     createdAt?: boolean
-    activeProject?: boolean | User$activeProjectArgs<ExtArgs>
     products?: boolean | User$productsArgs<ExtArgs>
     buildLogs?: boolean | User$buildLogsArgs<ExtArgs>
-    dailyLogs?: boolean | User$dailyLogsArgs<ExtArgs>
     trial?: boolean | User$trialArgs<ExtArgs>
-    streaks?: boolean | User$streaksArgs<ExtArgs>
+    DailyStreak?: boolean | User$DailyStreakArgs<ExtArgs>
+    aiLogs?: boolean | User$aiLogsArgs<ExtArgs>
+    tokenUsages?: boolean | User$tokenUsagesArgs<ExtArgs>
+    settings?: boolean | User$settingsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -2207,12 +2345,11 @@ export namespace Prisma {
     email?: boolean
     name?: boolean
     username?: boolean
+    onboardingCompleted?: boolean
     discovery?: boolean
     role?: boolean
     bestStreakOverall?: boolean
-    activeProjectId?: boolean
     createdAt?: boolean
-    activeProject?: boolean | User$activeProjectArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2221,12 +2358,11 @@ export namespace Prisma {
     email?: boolean
     name?: boolean
     username?: boolean
+    onboardingCompleted?: boolean
     discovery?: boolean
     role?: boolean
     bestStreakOverall?: boolean
-    activeProjectId?: boolean
     createdAt?: boolean
-    activeProject?: boolean | User$activeProjectArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -2235,39 +2371,37 @@ export namespace Prisma {
     email?: boolean
     name?: boolean
     username?: boolean
+    onboardingCompleted?: boolean
     discovery?: boolean
     role?: boolean
     bestStreakOverall?: boolean
-    activeProjectId?: boolean
     createdAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clerkId" | "email" | "name" | "username" | "discovery" | "role" | "bestStreakOverall" | "activeProjectId" | "createdAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clerkId" | "email" | "name" | "username" | "onboardingCompleted" | "discovery" | "role" | "bestStreakOverall" | "createdAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    activeProject?: boolean | User$activeProjectArgs<ExtArgs>
     products?: boolean | User$productsArgs<ExtArgs>
     buildLogs?: boolean | User$buildLogsArgs<ExtArgs>
-    dailyLogs?: boolean | User$dailyLogsArgs<ExtArgs>
     trial?: boolean | User$trialArgs<ExtArgs>
-    streaks?: boolean | User$streaksArgs<ExtArgs>
+    DailyStreak?: boolean | User$DailyStreakArgs<ExtArgs>
+    aiLogs?: boolean | User$aiLogsArgs<ExtArgs>
+    tokenUsages?: boolean | User$tokenUsagesArgs<ExtArgs>
+    settings?: boolean | User$settingsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    activeProject?: boolean | User$activeProjectArgs<ExtArgs>
-  }
-  export type UserIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    activeProject?: boolean | User$activeProjectArgs<ExtArgs>
-  }
+  export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type UserIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
     objects: {
-      activeProject: Prisma.$ProductPayload<ExtArgs> | null
       products: Prisma.$ProductPayload<ExtArgs>[]
       buildLogs: Prisma.$BuildLogPayload<ExtArgs>[]
-      dailyLogs: Prisma.$DailyLogPayload<ExtArgs>[]
       trial: Prisma.$TrialPayload<ExtArgs> | null
-      streaks: Prisma.$StreakPayload<ExtArgs>[]
+      DailyStreak: Prisma.$DailyStreakPayload<ExtArgs>[]
+      aiLogs: Prisma.$AiLogPayload<ExtArgs>[]
+      tokenUsages: Prisma.$TokenUsagePayload<ExtArgs>[]
+      settings: Prisma.$SettingsPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2275,10 +2409,10 @@ export namespace Prisma {
       email: string
       name: string
       username: string | null
+      onboardingCompleted: boolean
       discovery: string | null
       role: string | null
       bestStreakOverall: number
-      activeProjectId: string | null
       createdAt: Date
     }, ExtArgs["result"]["user"]>
     composites: {}
@@ -2674,12 +2808,13 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    activeProject<T extends User$activeProjectArgs<ExtArgs> = {}>(args?: Subset<T, User$activeProjectArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     products<T extends User$productsArgs<ExtArgs> = {}>(args?: Subset<T, User$productsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     buildLogs<T extends User$buildLogsArgs<ExtArgs> = {}>(args?: Subset<T, User$buildLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BuildLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    dailyLogs<T extends User$dailyLogsArgs<ExtArgs> = {}>(args?: Subset<T, User$dailyLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DailyLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     trial<T extends User$trialArgs<ExtArgs> = {}>(args?: Subset<T, User$trialArgs<ExtArgs>>): Prisma__TrialClient<$Result.GetResult<Prisma.$TrialPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    streaks<T extends User$streaksArgs<ExtArgs> = {}>(args?: Subset<T, User$streaksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StreakPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    DailyStreak<T extends User$DailyStreakArgs<ExtArgs> = {}>(args?: Subset<T, User$DailyStreakArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DailyStreakPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    aiLogs<T extends User$aiLogsArgs<ExtArgs> = {}>(args?: Subset<T, User$aiLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AiLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    tokenUsages<T extends User$tokenUsagesArgs<ExtArgs> = {}>(args?: Subset<T, User$tokenUsagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenUsagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    settings<T extends User$settingsArgs<ExtArgs> = {}>(args?: Subset<T, User$settingsArgs<ExtArgs>>): Prisma__SettingsClient<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2714,10 +2849,10 @@ export namespace Prisma {
     readonly email: FieldRef<"User", 'String'>
     readonly name: FieldRef<"User", 'String'>
     readonly username: FieldRef<"User", 'String'>
+    readonly onboardingCompleted: FieldRef<"User", 'Boolean'>
     readonly discovery: FieldRef<"User", 'String'>
     readonly role: FieldRef<"User", 'String'>
     readonly bestStreakOverall: FieldRef<"User", 'Int'>
-    readonly activeProjectId: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
   }
     
@@ -2968,10 +3103,6 @@ export namespace Prisma {
      */
     data: UserCreateManyInput | UserCreateManyInput[]
     skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -3042,10 +3173,6 @@ export namespace Prisma {
      * Limit how many Users to update.
      */
     limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -3115,25 +3242,6 @@ export namespace Prisma {
   }
 
   /**
-   * User.activeProject
-   */
-  export type User$activeProjectArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Product
-     */
-    select?: ProductSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Product
-     */
-    omit?: ProductOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ProductInclude<ExtArgs> | null
-    where?: ProductWhereInput
-  }
-
-  /**
    * User.products
    */
   export type User$productsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3182,30 +3290,6 @@ export namespace Prisma {
   }
 
   /**
-   * User.dailyLogs
-   */
-  export type User$dailyLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DailyLog
-     */
-    select?: DailyLogSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DailyLog
-     */
-    omit?: DailyLogOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: DailyLogInclude<ExtArgs> | null
-    where?: DailyLogWhereInput
-    orderBy?: DailyLogOrderByWithRelationInput | DailyLogOrderByWithRelationInput[]
-    cursor?: DailyLogWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: DailyLogScalarFieldEnum | DailyLogScalarFieldEnum[]
-  }
-
-  /**
    * User.trial
    */
   export type User$trialArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3225,27 +3309,94 @@ export namespace Prisma {
   }
 
   /**
-   * User.streaks
+   * User.DailyStreak
    */
-  export type User$streaksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type User$DailyStreakArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Streak
+     * Select specific fields to fetch from the DailyStreak
      */
-    select?: StreakSelect<ExtArgs> | null
+    select?: DailyStreakSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Streak
+     * Omit specific fields from the DailyStreak
      */
-    omit?: StreakOmit<ExtArgs> | null
+    omit?: DailyStreakOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StreakInclude<ExtArgs> | null
-    where?: StreakWhereInput
-    orderBy?: StreakOrderByWithRelationInput | StreakOrderByWithRelationInput[]
-    cursor?: StreakWhereUniqueInput
+    include?: DailyStreakInclude<ExtArgs> | null
+    where?: DailyStreakWhereInput
+    orderBy?: DailyStreakOrderByWithRelationInput | DailyStreakOrderByWithRelationInput[]
+    cursor?: DailyStreakWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: StreakScalarFieldEnum | StreakScalarFieldEnum[]
+    distinct?: DailyStreakScalarFieldEnum | DailyStreakScalarFieldEnum[]
+  }
+
+  /**
+   * User.aiLogs
+   */
+  export type User$aiLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AiLog
+     */
+    select?: AiLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AiLog
+     */
+    omit?: AiLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AiLogInclude<ExtArgs> | null
+    where?: AiLogWhereInput
+    orderBy?: AiLogOrderByWithRelationInput | AiLogOrderByWithRelationInput[]
+    cursor?: AiLogWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AiLogScalarFieldEnum | AiLogScalarFieldEnum[]
+  }
+
+  /**
+   * User.tokenUsages
+   */
+  export type User$tokenUsagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenUsage
+     */
+    select?: TokenUsageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TokenUsage
+     */
+    omit?: TokenUsageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TokenUsageInclude<ExtArgs> | null
+    where?: TokenUsageWhereInput
+    orderBy?: TokenUsageOrderByWithRelationInput | TokenUsageOrderByWithRelationInput[]
+    cursor?: TokenUsageWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TokenUsageScalarFieldEnum | TokenUsageScalarFieldEnum[]
+  }
+
+  /**
+   * User.settings
+   */
+  export type User$settingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Settings
+     */
+    select?: SettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Settings
+     */
+    omit?: SettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettingsInclude<ExtArgs> | null
+    where?: SettingsWhereInput
   }
 
   /**
@@ -5385,27 +5536,39 @@ export namespace Prisma {
   }
 
   export type ProductAvgAggregateOutputType = {
+    currentStreak: number | null
+    AllTimeBestStreak: number | null
     dailyCommitmentHrs: number | null
   }
 
   export type ProductSumAggregateOutputType = {
+    currentStreak: number | null
+    AllTimeBestStreak: number | null
     dailyCommitmentHrs: number | null
   }
 
   export type ProductMinAggregateOutputType = {
     id: string | null
     name: string | null
+    slug: string | null
     description: string | null
     problemStatement: string | null
     targetAudience: string | null
     userGoals: string | null
     uniqueValueProp: string | null
+    isMvpGenerated: boolean | null
+    isRoadmapGenerated: boolean | null
+    currentStreak: number | null
+    AllTimeBestStreak: number | null
+    active: boolean | null
     techStack: string | null
     inspirationApps: string | null
     initialFeatures: string | null
+    startDate: Date | null
     deadline: Date | null
     dailyCommitmentHrs: number | null
     userId: string | null
+    mvpSummary: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -5413,17 +5576,25 @@ export namespace Prisma {
   export type ProductMaxAggregateOutputType = {
     id: string | null
     name: string | null
+    slug: string | null
     description: string | null
     problemStatement: string | null
     targetAudience: string | null
     userGoals: string | null
     uniqueValueProp: string | null
+    isMvpGenerated: boolean | null
+    isRoadmapGenerated: boolean | null
+    currentStreak: number | null
+    AllTimeBestStreak: number | null
+    active: boolean | null
     techStack: string | null
     inspirationApps: string | null
     initialFeatures: string | null
+    startDate: Date | null
     deadline: Date | null
     dailyCommitmentHrs: number | null
     userId: string | null
+    mvpSummary: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -5431,17 +5602,25 @@ export namespace Prisma {
   export type ProductCountAggregateOutputType = {
     id: number
     name: number
+    slug: number
     description: number
     problemStatement: number
     targetAudience: number
     userGoals: number
     uniqueValueProp: number
+    isMvpGenerated: number
+    isRoadmapGenerated: number
+    currentStreak: number
+    AllTimeBestStreak: number
+    active: number
     techStack: number
     inspirationApps: number
     initialFeatures: number
+    startDate: number
     deadline: number
     dailyCommitmentHrs: number
     userId: number
+    mvpSummary: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -5449,27 +5628,39 @@ export namespace Prisma {
 
 
   export type ProductAvgAggregateInputType = {
+    currentStreak?: true
+    AllTimeBestStreak?: true
     dailyCommitmentHrs?: true
   }
 
   export type ProductSumAggregateInputType = {
+    currentStreak?: true
+    AllTimeBestStreak?: true
     dailyCommitmentHrs?: true
   }
 
   export type ProductMinAggregateInputType = {
     id?: true
     name?: true
+    slug?: true
     description?: true
     problemStatement?: true
     targetAudience?: true
     userGoals?: true
     uniqueValueProp?: true
+    isMvpGenerated?: true
+    isRoadmapGenerated?: true
+    currentStreak?: true
+    AllTimeBestStreak?: true
+    active?: true
     techStack?: true
     inspirationApps?: true
     initialFeatures?: true
+    startDate?: true
     deadline?: true
     dailyCommitmentHrs?: true
     userId?: true
+    mvpSummary?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -5477,17 +5668,25 @@ export namespace Prisma {
   export type ProductMaxAggregateInputType = {
     id?: true
     name?: true
+    slug?: true
     description?: true
     problemStatement?: true
     targetAudience?: true
     userGoals?: true
     uniqueValueProp?: true
+    isMvpGenerated?: true
+    isRoadmapGenerated?: true
+    currentStreak?: true
+    AllTimeBestStreak?: true
+    active?: true
     techStack?: true
     inspirationApps?: true
     initialFeatures?: true
+    startDate?: true
     deadline?: true
     dailyCommitmentHrs?: true
     userId?: true
+    mvpSummary?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -5495,17 +5694,25 @@ export namespace Prisma {
   export type ProductCountAggregateInputType = {
     id?: true
     name?: true
+    slug?: true
     description?: true
     problemStatement?: true
     targetAudience?: true
     userGoals?: true
     uniqueValueProp?: true
+    isMvpGenerated?: true
+    isRoadmapGenerated?: true
+    currentStreak?: true
+    AllTimeBestStreak?: true
+    active?: true
     techStack?: true
     inspirationApps?: true
     initialFeatures?: true
+    startDate?: true
     deadline?: true
     dailyCommitmentHrs?: true
     userId?: true
+    mvpSummary?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -5600,17 +5807,25 @@ export namespace Prisma {
   export type ProductGroupByOutputType = {
     id: string
     name: string
-    description: string
+    slug: string
+    description: string | null
     problemStatement: string
     targetAudience: string
     userGoals: string
     uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
+    isMvpGenerated: boolean
+    isRoadmapGenerated: boolean
+    currentStreak: number
+    AllTimeBestStreak: number
+    active: boolean
+    techStack: string | null
+    inspirationApps: string | null
+    initialFeatures: string | null
+    startDate: Date
     deadline: Date
     dailyCommitmentHrs: number
     userId: string
+    mvpSummary: string | null
     createdAt: Date
     updatedAt: Date
     _count: ProductCountAggregateOutputType | null
@@ -5637,43 +5852,57 @@ export namespace Prisma {
   export type ProductSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
+    slug?: boolean
     description?: boolean
     problemStatement?: boolean
     targetAudience?: boolean
     userGoals?: boolean
     uniqueValueProp?: boolean
+    isMvpGenerated?: boolean
+    isRoadmapGenerated?: boolean
+    currentStreak?: boolean
+    AllTimeBestStreak?: boolean
+    active?: boolean
     techStack?: boolean
     inspirationApps?: boolean
     initialFeatures?: boolean
+    startDate?: boolean
     deadline?: boolean
     dailyCommitmentHrs?: boolean
     userId?: boolean
+    mvpSummary?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
-    roadmap?: boolean | Product$roadmapArgs<ExtArgs>
     features?: boolean | Product$featuresArgs<ExtArgs>
     buildLogs?: boolean | Product$buildLogsArgs<ExtArgs>
-    dailyLogs?: boolean | Product$dailyLogsArgs<ExtArgs>
-    streaks?: boolean | Product$streaksArgs<ExtArgs>
-    User?: boolean | Product$UserArgs<ExtArgs>
+    DailyStreak?: boolean | Product$DailyStreakArgs<ExtArgs>
+    aiLogs?: boolean | Product$aiLogsArgs<ExtArgs>
     _count?: boolean | ProductCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["product"]>
 
   export type ProductSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
+    slug?: boolean
     description?: boolean
     problemStatement?: boolean
     targetAudience?: boolean
     userGoals?: boolean
     uniqueValueProp?: boolean
+    isMvpGenerated?: boolean
+    isRoadmapGenerated?: boolean
+    currentStreak?: boolean
+    AllTimeBestStreak?: boolean
+    active?: boolean
     techStack?: boolean
     inspirationApps?: boolean
     initialFeatures?: boolean
+    startDate?: boolean
     deadline?: boolean
     dailyCommitmentHrs?: boolean
     userId?: boolean
+    mvpSummary?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -5682,17 +5911,25 @@ export namespace Prisma {
   export type ProductSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
+    slug?: boolean
     description?: boolean
     problemStatement?: boolean
     targetAudience?: boolean
     userGoals?: boolean
     uniqueValueProp?: boolean
+    isMvpGenerated?: boolean
+    isRoadmapGenerated?: boolean
+    currentStreak?: boolean
+    AllTimeBestStreak?: boolean
+    active?: boolean
     techStack?: boolean
     inspirationApps?: boolean
     initialFeatures?: boolean
+    startDate?: boolean
     deadline?: boolean
     dailyCommitmentHrs?: boolean
     userId?: boolean
+    mvpSummary?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -5701,30 +5938,36 @@ export namespace Prisma {
   export type ProductSelectScalar = {
     id?: boolean
     name?: boolean
+    slug?: boolean
     description?: boolean
     problemStatement?: boolean
     targetAudience?: boolean
     userGoals?: boolean
     uniqueValueProp?: boolean
+    isMvpGenerated?: boolean
+    isRoadmapGenerated?: boolean
+    currentStreak?: boolean
+    AllTimeBestStreak?: boolean
+    active?: boolean
     techStack?: boolean
     inspirationApps?: boolean
     initialFeatures?: boolean
+    startDate?: boolean
     deadline?: boolean
     dailyCommitmentHrs?: boolean
     userId?: boolean
+    mvpSummary?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "problemStatement" | "targetAudience" | "userGoals" | "uniqueValueProp" | "techStack" | "inspirationApps" | "initialFeatures" | "deadline" | "dailyCommitmentHrs" | "userId" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "slug" | "description" | "problemStatement" | "targetAudience" | "userGoals" | "uniqueValueProp" | "isMvpGenerated" | "isRoadmapGenerated" | "currentStreak" | "AllTimeBestStreak" | "active" | "techStack" | "inspirationApps" | "initialFeatures" | "startDate" | "deadline" | "dailyCommitmentHrs" | "userId" | "mvpSummary" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
   export type ProductInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
-    roadmap?: boolean | Product$roadmapArgs<ExtArgs>
     features?: boolean | Product$featuresArgs<ExtArgs>
     buildLogs?: boolean | Product$buildLogsArgs<ExtArgs>
-    dailyLogs?: boolean | Product$dailyLogsArgs<ExtArgs>
-    streaks?: boolean | Product$streaksArgs<ExtArgs>
-    User?: boolean | Product$UserArgs<ExtArgs>
+    DailyStreak?: boolean | Product$DailyStreakArgs<ExtArgs>
+    aiLogs?: boolean | Product$aiLogsArgs<ExtArgs>
     _count?: boolean | ProductCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ProductIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5738,27 +5981,33 @@ export namespace Prisma {
     name: "Product"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
-      roadmap: Prisma.$RoadmapPayload<ExtArgs> | null
       features: Prisma.$FeaturePayload<ExtArgs>[]
       buildLogs: Prisma.$BuildLogPayload<ExtArgs>[]
-      dailyLogs: Prisma.$DailyLogPayload<ExtArgs>[]
-      streaks: Prisma.$StreakPayload<ExtArgs>[]
-      User: Prisma.$UserPayload<ExtArgs>[]
+      DailyStreak: Prisma.$DailyStreakPayload<ExtArgs>[]
+      aiLogs: Prisma.$AiLogPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       name: string
-      description: string
+      slug: string
+      description: string | null
       problemStatement: string
       targetAudience: string
       userGoals: string
       uniqueValueProp: string
-      techStack: string
-      inspirationApps: string
-      initialFeatures: string
+      isMvpGenerated: boolean
+      isRoadmapGenerated: boolean
+      currentStreak: number
+      AllTimeBestStreak: number
+      active: boolean
+      techStack: string | null
+      inspirationApps: string | null
+      initialFeatures: string | null
+      startDate: Date
       deadline: Date
       dailyCommitmentHrs: number
       userId: string
+      mvpSummary: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["product"]>
@@ -6156,12 +6405,10 @@ export namespace Prisma {
   export interface Prisma__ProductClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    roadmap<T extends Product$roadmapArgs<ExtArgs> = {}>(args?: Subset<T, Product$roadmapArgs<ExtArgs>>): Prisma__RoadmapClient<$Result.GetResult<Prisma.$RoadmapPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     features<T extends Product$featuresArgs<ExtArgs> = {}>(args?: Subset<T, Product$featuresArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeaturePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     buildLogs<T extends Product$buildLogsArgs<ExtArgs> = {}>(args?: Subset<T, Product$buildLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BuildLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    dailyLogs<T extends Product$dailyLogsArgs<ExtArgs> = {}>(args?: Subset<T, Product$dailyLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DailyLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    streaks<T extends Product$streaksArgs<ExtArgs> = {}>(args?: Subset<T, Product$streaksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StreakPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    User<T extends Product$UserArgs<ExtArgs> = {}>(args?: Subset<T, Product$UserArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    DailyStreak<T extends Product$DailyStreakArgs<ExtArgs> = {}>(args?: Subset<T, Product$DailyStreakArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DailyStreakPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    aiLogs<T extends Product$aiLogsArgs<ExtArgs> = {}>(args?: Subset<T, Product$aiLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AiLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6193,17 +6440,25 @@ export namespace Prisma {
   interface ProductFieldRefs {
     readonly id: FieldRef<"Product", 'String'>
     readonly name: FieldRef<"Product", 'String'>
+    readonly slug: FieldRef<"Product", 'String'>
     readonly description: FieldRef<"Product", 'String'>
     readonly problemStatement: FieldRef<"Product", 'String'>
     readonly targetAudience: FieldRef<"Product", 'String'>
     readonly userGoals: FieldRef<"Product", 'String'>
     readonly uniqueValueProp: FieldRef<"Product", 'String'>
+    readonly isMvpGenerated: FieldRef<"Product", 'Boolean'>
+    readonly isRoadmapGenerated: FieldRef<"Product", 'Boolean'>
+    readonly currentStreak: FieldRef<"Product", 'Int'>
+    readonly AllTimeBestStreak: FieldRef<"Product", 'Int'>
+    readonly active: FieldRef<"Product", 'Boolean'>
     readonly techStack: FieldRef<"Product", 'String'>
     readonly inspirationApps: FieldRef<"Product", 'String'>
     readonly initialFeatures: FieldRef<"Product", 'String'>
+    readonly startDate: FieldRef<"Product", 'DateTime'>
     readonly deadline: FieldRef<"Product", 'DateTime'>
     readonly dailyCommitmentHrs: FieldRef<"Product", 'Float'>
     readonly userId: FieldRef<"Product", 'String'>
+    readonly mvpSummary: FieldRef<"Product", 'String'>
     readonly createdAt: FieldRef<"Product", 'DateTime'>
     readonly updatedAt: FieldRef<"Product", 'DateTime'>
   }
@@ -6602,25 +6857,6 @@ export namespace Prisma {
   }
 
   /**
-   * Product.roadmap
-   */
-  export type Product$roadmapArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Roadmap
-     */
-    select?: RoadmapSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Roadmap
-     */
-    omit?: RoadmapOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: RoadmapInclude<ExtArgs> | null
-    where?: RoadmapWhereInput
-  }
-
-  /**
    * Product.features
    */
   export type Product$featuresArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6669,75 +6905,51 @@ export namespace Prisma {
   }
 
   /**
-   * Product.dailyLogs
+   * Product.DailyStreak
    */
-  export type Product$dailyLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Product$DailyStreakArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the DailyLog
+     * Select specific fields to fetch from the DailyStreak
      */
-    select?: DailyLogSelect<ExtArgs> | null
+    select?: DailyStreakSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the DailyLog
+     * Omit specific fields from the DailyStreak
      */
-    omit?: DailyLogOmit<ExtArgs> | null
+    omit?: DailyStreakOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: DailyLogInclude<ExtArgs> | null
-    where?: DailyLogWhereInput
-    orderBy?: DailyLogOrderByWithRelationInput | DailyLogOrderByWithRelationInput[]
-    cursor?: DailyLogWhereUniqueInput
+    include?: DailyStreakInclude<ExtArgs> | null
+    where?: DailyStreakWhereInput
+    orderBy?: DailyStreakOrderByWithRelationInput | DailyStreakOrderByWithRelationInput[]
+    cursor?: DailyStreakWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: DailyLogScalarFieldEnum | DailyLogScalarFieldEnum[]
+    distinct?: DailyStreakScalarFieldEnum | DailyStreakScalarFieldEnum[]
   }
 
   /**
-   * Product.streaks
+   * Product.aiLogs
    */
-  export type Product$streaksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Product$aiLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Streak
+     * Select specific fields to fetch from the AiLog
      */
-    select?: StreakSelect<ExtArgs> | null
+    select?: AiLogSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Streak
+     * Omit specific fields from the AiLog
      */
-    omit?: StreakOmit<ExtArgs> | null
+    omit?: AiLogOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StreakInclude<ExtArgs> | null
-    where?: StreakWhereInput
-    orderBy?: StreakOrderByWithRelationInput | StreakOrderByWithRelationInput[]
-    cursor?: StreakWhereUniqueInput
+    include?: AiLogInclude<ExtArgs> | null
+    where?: AiLogWhereInput
+    orderBy?: AiLogOrderByWithRelationInput | AiLogOrderByWithRelationInput[]
+    cursor?: AiLogWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: StreakScalarFieldEnum | StreakScalarFieldEnum[]
-  }
-
-  /**
-   * Product.User
-   */
-  export type Product$UserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the User
-     */
-    select?: UserSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the User
-     */
-    omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    where?: UserWhereInput
-    orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
-    cursor?: UserWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
+    distinct?: AiLogScalarFieldEnum | AiLogScalarFieldEnum[]
   }
 
   /**
@@ -6756,1051 +6968,6 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: ProductInclude<ExtArgs> | null
-  }
-
-
-  /**
-   * Model Roadmap
-   */
-
-  export type AggregateRoadmap = {
-    _count: RoadmapCountAggregateOutputType | null
-    _min: RoadmapMinAggregateOutputType | null
-    _max: RoadmapMaxAggregateOutputType | null
-  }
-
-  export type RoadmapMinAggregateOutputType = {
-    id: string | null
-    mvpSummary: string | null
-    productId: string | null
-    createdAt: Date | null
-  }
-
-  export type RoadmapMaxAggregateOutputType = {
-    id: string | null
-    mvpSummary: string | null
-    productId: string | null
-    createdAt: Date | null
-  }
-
-  export type RoadmapCountAggregateOutputType = {
-    id: number
-    mvpSummary: number
-    productId: number
-    createdAt: number
-    _all: number
-  }
-
-
-  export type RoadmapMinAggregateInputType = {
-    id?: true
-    mvpSummary?: true
-    productId?: true
-    createdAt?: true
-  }
-
-  export type RoadmapMaxAggregateInputType = {
-    id?: true
-    mvpSummary?: true
-    productId?: true
-    createdAt?: true
-  }
-
-  export type RoadmapCountAggregateInputType = {
-    id?: true
-    mvpSummary?: true
-    productId?: true
-    createdAt?: true
-    _all?: true
-  }
-
-  export type RoadmapAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which Roadmap to aggregate.
-     */
-    where?: RoadmapWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Roadmaps to fetch.
-     */
-    orderBy?: RoadmapOrderByWithRelationInput | RoadmapOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: RoadmapWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Roadmaps from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Roadmaps.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned Roadmaps
-    **/
-    _count?: true | RoadmapCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: RoadmapMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: RoadmapMaxAggregateInputType
-  }
-
-  export type GetRoadmapAggregateType<T extends RoadmapAggregateArgs> = {
-        [P in keyof T & keyof AggregateRoadmap]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateRoadmap[P]>
-      : GetScalarType<T[P], AggregateRoadmap[P]>
-  }
-
-
-
-
-  export type RoadmapGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: RoadmapWhereInput
-    orderBy?: RoadmapOrderByWithAggregationInput | RoadmapOrderByWithAggregationInput[]
-    by: RoadmapScalarFieldEnum[] | RoadmapScalarFieldEnum
-    having?: RoadmapScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: RoadmapCountAggregateInputType | true
-    _min?: RoadmapMinAggregateInputType
-    _max?: RoadmapMaxAggregateInputType
-  }
-
-  export type RoadmapGroupByOutputType = {
-    id: string
-    mvpSummary: string
-    productId: string
-    createdAt: Date
-    _count: RoadmapCountAggregateOutputType | null
-    _min: RoadmapMinAggregateOutputType | null
-    _max: RoadmapMaxAggregateOutputType | null
-  }
-
-  type GetRoadmapGroupByPayload<T extends RoadmapGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<RoadmapGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof RoadmapGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], RoadmapGroupByOutputType[P]>
-            : GetScalarType<T[P], RoadmapGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type RoadmapSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    mvpSummary?: boolean
-    productId?: boolean
-    createdAt?: boolean
-    product?: boolean | ProductDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["roadmap"]>
-
-  export type RoadmapSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    mvpSummary?: boolean
-    productId?: boolean
-    createdAt?: boolean
-    product?: boolean | ProductDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["roadmap"]>
-
-  export type RoadmapSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    mvpSummary?: boolean
-    productId?: boolean
-    createdAt?: boolean
-    product?: boolean | ProductDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["roadmap"]>
-
-  export type RoadmapSelectScalar = {
-    id?: boolean
-    mvpSummary?: boolean
-    productId?: boolean
-    createdAt?: boolean
-  }
-
-  export type RoadmapOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "mvpSummary" | "productId" | "createdAt", ExtArgs["result"]["roadmap"]>
-  export type RoadmapInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    product?: boolean | ProductDefaultArgs<ExtArgs>
-  }
-  export type RoadmapIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    product?: boolean | ProductDefaultArgs<ExtArgs>
-  }
-  export type RoadmapIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    product?: boolean | ProductDefaultArgs<ExtArgs>
-  }
-
-  export type $RoadmapPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "Roadmap"
-    objects: {
-      product: Prisma.$ProductPayload<ExtArgs>
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      mvpSummary: string
-      productId: string
-      createdAt: Date
-    }, ExtArgs["result"]["roadmap"]>
-    composites: {}
-  }
-
-  type RoadmapGetPayload<S extends boolean | null | undefined | RoadmapDefaultArgs> = $Result.GetResult<Prisma.$RoadmapPayload, S>
-
-  type RoadmapCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<RoadmapFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: RoadmapCountAggregateInputType | true
-    }
-
-  export interface RoadmapDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Roadmap'], meta: { name: 'Roadmap' } }
-    /**
-     * Find zero or one Roadmap that matches the filter.
-     * @param {RoadmapFindUniqueArgs} args - Arguments to find a Roadmap
-     * @example
-     * // Get one Roadmap
-     * const roadmap = await prisma.roadmap.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends RoadmapFindUniqueArgs>(args: SelectSubset<T, RoadmapFindUniqueArgs<ExtArgs>>): Prisma__RoadmapClient<$Result.GetResult<Prisma.$RoadmapPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one Roadmap that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {RoadmapFindUniqueOrThrowArgs} args - Arguments to find a Roadmap
-     * @example
-     * // Get one Roadmap
-     * const roadmap = await prisma.roadmap.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends RoadmapFindUniqueOrThrowArgs>(args: SelectSubset<T, RoadmapFindUniqueOrThrowArgs<ExtArgs>>): Prisma__RoadmapClient<$Result.GetResult<Prisma.$RoadmapPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first Roadmap that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {RoadmapFindFirstArgs} args - Arguments to find a Roadmap
-     * @example
-     * // Get one Roadmap
-     * const roadmap = await prisma.roadmap.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends RoadmapFindFirstArgs>(args?: SelectSubset<T, RoadmapFindFirstArgs<ExtArgs>>): Prisma__RoadmapClient<$Result.GetResult<Prisma.$RoadmapPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first Roadmap that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {RoadmapFindFirstOrThrowArgs} args - Arguments to find a Roadmap
-     * @example
-     * // Get one Roadmap
-     * const roadmap = await prisma.roadmap.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends RoadmapFindFirstOrThrowArgs>(args?: SelectSubset<T, RoadmapFindFirstOrThrowArgs<ExtArgs>>): Prisma__RoadmapClient<$Result.GetResult<Prisma.$RoadmapPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more Roadmaps that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {RoadmapFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all Roadmaps
-     * const roadmaps = await prisma.roadmap.findMany()
-     * 
-     * // Get first 10 Roadmaps
-     * const roadmaps = await prisma.roadmap.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const roadmapWithIdOnly = await prisma.roadmap.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends RoadmapFindManyArgs>(args?: SelectSubset<T, RoadmapFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoadmapPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a Roadmap.
-     * @param {RoadmapCreateArgs} args - Arguments to create a Roadmap.
-     * @example
-     * // Create one Roadmap
-     * const Roadmap = await prisma.roadmap.create({
-     *   data: {
-     *     // ... data to create a Roadmap
-     *   }
-     * })
-     * 
-     */
-    create<T extends RoadmapCreateArgs>(args: SelectSubset<T, RoadmapCreateArgs<ExtArgs>>): Prisma__RoadmapClient<$Result.GetResult<Prisma.$RoadmapPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many Roadmaps.
-     * @param {RoadmapCreateManyArgs} args - Arguments to create many Roadmaps.
-     * @example
-     * // Create many Roadmaps
-     * const roadmap = await prisma.roadmap.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends RoadmapCreateManyArgs>(args?: SelectSubset<T, RoadmapCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many Roadmaps and returns the data saved in the database.
-     * @param {RoadmapCreateManyAndReturnArgs} args - Arguments to create many Roadmaps.
-     * @example
-     * // Create many Roadmaps
-     * const roadmap = await prisma.roadmap.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many Roadmaps and only return the `id`
-     * const roadmapWithIdOnly = await prisma.roadmap.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends RoadmapCreateManyAndReturnArgs>(args?: SelectSubset<T, RoadmapCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoadmapPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a Roadmap.
-     * @param {RoadmapDeleteArgs} args - Arguments to delete one Roadmap.
-     * @example
-     * // Delete one Roadmap
-     * const Roadmap = await prisma.roadmap.delete({
-     *   where: {
-     *     // ... filter to delete one Roadmap
-     *   }
-     * })
-     * 
-     */
-    delete<T extends RoadmapDeleteArgs>(args: SelectSubset<T, RoadmapDeleteArgs<ExtArgs>>): Prisma__RoadmapClient<$Result.GetResult<Prisma.$RoadmapPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one Roadmap.
-     * @param {RoadmapUpdateArgs} args - Arguments to update one Roadmap.
-     * @example
-     * // Update one Roadmap
-     * const roadmap = await prisma.roadmap.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends RoadmapUpdateArgs>(args: SelectSubset<T, RoadmapUpdateArgs<ExtArgs>>): Prisma__RoadmapClient<$Result.GetResult<Prisma.$RoadmapPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more Roadmaps.
-     * @param {RoadmapDeleteManyArgs} args - Arguments to filter Roadmaps to delete.
-     * @example
-     * // Delete a few Roadmaps
-     * const { count } = await prisma.roadmap.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends RoadmapDeleteManyArgs>(args?: SelectSubset<T, RoadmapDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Roadmaps.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {RoadmapUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many Roadmaps
-     * const roadmap = await prisma.roadmap.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends RoadmapUpdateManyArgs>(args: SelectSubset<T, RoadmapUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Roadmaps and returns the data updated in the database.
-     * @param {RoadmapUpdateManyAndReturnArgs} args - Arguments to update many Roadmaps.
-     * @example
-     * // Update many Roadmaps
-     * const roadmap = await prisma.roadmap.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more Roadmaps and only return the `id`
-     * const roadmapWithIdOnly = await prisma.roadmap.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends RoadmapUpdateManyAndReturnArgs>(args: SelectSubset<T, RoadmapUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoadmapPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one Roadmap.
-     * @param {RoadmapUpsertArgs} args - Arguments to update or create a Roadmap.
-     * @example
-     * // Update or create a Roadmap
-     * const roadmap = await prisma.roadmap.upsert({
-     *   create: {
-     *     // ... data to create a Roadmap
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the Roadmap we want to update
-     *   }
-     * })
-     */
-    upsert<T extends RoadmapUpsertArgs>(args: SelectSubset<T, RoadmapUpsertArgs<ExtArgs>>): Prisma__RoadmapClient<$Result.GetResult<Prisma.$RoadmapPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of Roadmaps.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {RoadmapCountArgs} args - Arguments to filter Roadmaps to count.
-     * @example
-     * // Count the number of Roadmaps
-     * const count = await prisma.roadmap.count({
-     *   where: {
-     *     // ... the filter for the Roadmaps we want to count
-     *   }
-     * })
-    **/
-    count<T extends RoadmapCountArgs>(
-      args?: Subset<T, RoadmapCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], RoadmapCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a Roadmap.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {RoadmapAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends RoadmapAggregateArgs>(args: Subset<T, RoadmapAggregateArgs>): Prisma.PrismaPromise<GetRoadmapAggregateType<T>>
-
-    /**
-     * Group by Roadmap.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {RoadmapGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends RoadmapGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: RoadmapGroupByArgs['orderBy'] }
-        : { orderBy?: RoadmapGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, RoadmapGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRoadmapGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the Roadmap model
-   */
-  readonly fields: RoadmapFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for Roadmap.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__RoadmapClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    product<T extends ProductDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProductDefaultArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the Roadmap model
-   */
-  interface RoadmapFieldRefs {
-    readonly id: FieldRef<"Roadmap", 'String'>
-    readonly mvpSummary: FieldRef<"Roadmap", 'String'>
-    readonly productId: FieldRef<"Roadmap", 'String'>
-    readonly createdAt: FieldRef<"Roadmap", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * Roadmap findUnique
-   */
-  export type RoadmapFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Roadmap
-     */
-    select?: RoadmapSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Roadmap
-     */
-    omit?: RoadmapOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: RoadmapInclude<ExtArgs> | null
-    /**
-     * Filter, which Roadmap to fetch.
-     */
-    where: RoadmapWhereUniqueInput
-  }
-
-  /**
-   * Roadmap findUniqueOrThrow
-   */
-  export type RoadmapFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Roadmap
-     */
-    select?: RoadmapSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Roadmap
-     */
-    omit?: RoadmapOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: RoadmapInclude<ExtArgs> | null
-    /**
-     * Filter, which Roadmap to fetch.
-     */
-    where: RoadmapWhereUniqueInput
-  }
-
-  /**
-   * Roadmap findFirst
-   */
-  export type RoadmapFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Roadmap
-     */
-    select?: RoadmapSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Roadmap
-     */
-    omit?: RoadmapOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: RoadmapInclude<ExtArgs> | null
-    /**
-     * Filter, which Roadmap to fetch.
-     */
-    where?: RoadmapWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Roadmaps to fetch.
-     */
-    orderBy?: RoadmapOrderByWithRelationInput | RoadmapOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for Roadmaps.
-     */
-    cursor?: RoadmapWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Roadmaps from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Roadmaps.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of Roadmaps.
-     */
-    distinct?: RoadmapScalarFieldEnum | RoadmapScalarFieldEnum[]
-  }
-
-  /**
-   * Roadmap findFirstOrThrow
-   */
-  export type RoadmapFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Roadmap
-     */
-    select?: RoadmapSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Roadmap
-     */
-    omit?: RoadmapOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: RoadmapInclude<ExtArgs> | null
-    /**
-     * Filter, which Roadmap to fetch.
-     */
-    where?: RoadmapWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Roadmaps to fetch.
-     */
-    orderBy?: RoadmapOrderByWithRelationInput | RoadmapOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for Roadmaps.
-     */
-    cursor?: RoadmapWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Roadmaps from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Roadmaps.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of Roadmaps.
-     */
-    distinct?: RoadmapScalarFieldEnum | RoadmapScalarFieldEnum[]
-  }
-
-  /**
-   * Roadmap findMany
-   */
-  export type RoadmapFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Roadmap
-     */
-    select?: RoadmapSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Roadmap
-     */
-    omit?: RoadmapOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: RoadmapInclude<ExtArgs> | null
-    /**
-     * Filter, which Roadmaps to fetch.
-     */
-    where?: RoadmapWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Roadmaps to fetch.
-     */
-    orderBy?: RoadmapOrderByWithRelationInput | RoadmapOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing Roadmaps.
-     */
-    cursor?: RoadmapWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Roadmaps from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Roadmaps.
-     */
-    skip?: number
-    distinct?: RoadmapScalarFieldEnum | RoadmapScalarFieldEnum[]
-  }
-
-  /**
-   * Roadmap create
-   */
-  export type RoadmapCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Roadmap
-     */
-    select?: RoadmapSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Roadmap
-     */
-    omit?: RoadmapOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: RoadmapInclude<ExtArgs> | null
-    /**
-     * The data needed to create a Roadmap.
-     */
-    data: XOR<RoadmapCreateInput, RoadmapUncheckedCreateInput>
-  }
-
-  /**
-   * Roadmap createMany
-   */
-  export type RoadmapCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many Roadmaps.
-     */
-    data: RoadmapCreateManyInput | RoadmapCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * Roadmap createManyAndReturn
-   */
-  export type RoadmapCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Roadmap
-     */
-    select?: RoadmapSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the Roadmap
-     */
-    omit?: RoadmapOmit<ExtArgs> | null
-    /**
-     * The data used to create many Roadmaps.
-     */
-    data: RoadmapCreateManyInput | RoadmapCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: RoadmapIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * Roadmap update
-   */
-  export type RoadmapUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Roadmap
-     */
-    select?: RoadmapSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Roadmap
-     */
-    omit?: RoadmapOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: RoadmapInclude<ExtArgs> | null
-    /**
-     * The data needed to update a Roadmap.
-     */
-    data: XOR<RoadmapUpdateInput, RoadmapUncheckedUpdateInput>
-    /**
-     * Choose, which Roadmap to update.
-     */
-    where: RoadmapWhereUniqueInput
-  }
-
-  /**
-   * Roadmap updateMany
-   */
-  export type RoadmapUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update Roadmaps.
-     */
-    data: XOR<RoadmapUpdateManyMutationInput, RoadmapUncheckedUpdateManyInput>
-    /**
-     * Filter which Roadmaps to update
-     */
-    where?: RoadmapWhereInput
-    /**
-     * Limit how many Roadmaps to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * Roadmap updateManyAndReturn
-   */
-  export type RoadmapUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Roadmap
-     */
-    select?: RoadmapSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the Roadmap
-     */
-    omit?: RoadmapOmit<ExtArgs> | null
-    /**
-     * The data used to update Roadmaps.
-     */
-    data: XOR<RoadmapUpdateManyMutationInput, RoadmapUncheckedUpdateManyInput>
-    /**
-     * Filter which Roadmaps to update
-     */
-    where?: RoadmapWhereInput
-    /**
-     * Limit how many Roadmaps to update.
-     */
-    limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: RoadmapIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * Roadmap upsert
-   */
-  export type RoadmapUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Roadmap
-     */
-    select?: RoadmapSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Roadmap
-     */
-    omit?: RoadmapOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: RoadmapInclude<ExtArgs> | null
-    /**
-     * The filter to search for the Roadmap to update in case it exists.
-     */
-    where: RoadmapWhereUniqueInput
-    /**
-     * In case the Roadmap found by the `where` argument doesn't exist, create a new Roadmap with this data.
-     */
-    create: XOR<RoadmapCreateInput, RoadmapUncheckedCreateInput>
-    /**
-     * In case the Roadmap was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<RoadmapUpdateInput, RoadmapUncheckedUpdateInput>
-  }
-
-  /**
-   * Roadmap delete
-   */
-  export type RoadmapDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Roadmap
-     */
-    select?: RoadmapSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Roadmap
-     */
-    omit?: RoadmapOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: RoadmapInclude<ExtArgs> | null
-    /**
-     * Filter which Roadmap to delete.
-     */
-    where: RoadmapWhereUniqueInput
-  }
-
-  /**
-   * Roadmap deleteMany
-   */
-  export type RoadmapDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which Roadmaps to delete
-     */
-    where?: RoadmapWhereInput
-    /**
-     * Limit how many Roadmaps to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * Roadmap without action
-   */
-  export type RoadmapDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Roadmap
-     */
-    select?: RoadmapSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Roadmap
-     */
-    omit?: RoadmapOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: RoadmapInclude<ExtArgs> | null
   }
 
 
@@ -8939,16 +8106,20 @@ export namespace Prisma {
   }
 
   export type TaskAvgAggregateOutputType = {
+    estimatedHours: number | null
     dayNumber: number | null
   }
 
   export type TaskSumAggregateOutputType = {
+    estimatedHours: number | null
     dayNumber: number | null
   }
 
   export type TaskMinAggregateOutputType = {
     id: string | null
     title: string | null
+    estimatedHours: number | null
+    status: $Enums.TaskStatus | null
     dayNumber: number | null
     completed: boolean | null
     featureId: string | null
@@ -8957,6 +8128,8 @@ export namespace Prisma {
   export type TaskMaxAggregateOutputType = {
     id: string | null
     title: string | null
+    estimatedHours: number | null
+    status: $Enums.TaskStatus | null
     dayNumber: number | null
     completed: boolean | null
     featureId: string | null
@@ -8965,6 +8138,8 @@ export namespace Prisma {
   export type TaskCountAggregateOutputType = {
     id: number
     title: number
+    estimatedHours: number
+    status: number
     dayNumber: number
     completed: number
     featureId: number
@@ -8973,16 +8148,20 @@ export namespace Prisma {
 
 
   export type TaskAvgAggregateInputType = {
+    estimatedHours?: true
     dayNumber?: true
   }
 
   export type TaskSumAggregateInputType = {
+    estimatedHours?: true
     dayNumber?: true
   }
 
   export type TaskMinAggregateInputType = {
     id?: true
     title?: true
+    estimatedHours?: true
+    status?: true
     dayNumber?: true
     completed?: true
     featureId?: true
@@ -8991,6 +8170,8 @@ export namespace Prisma {
   export type TaskMaxAggregateInputType = {
     id?: true
     title?: true
+    estimatedHours?: true
+    status?: true
     dayNumber?: true
     completed?: true
     featureId?: true
@@ -8999,6 +8180,8 @@ export namespace Prisma {
   export type TaskCountAggregateInputType = {
     id?: true
     title?: true
+    estimatedHours?: true
+    status?: true
     dayNumber?: true
     completed?: true
     featureId?: true
@@ -9094,6 +8277,8 @@ export namespace Prisma {
   export type TaskGroupByOutputType = {
     id: string
     title: string
+    estimatedHours: number | null
+    status: $Enums.TaskStatus
     dayNumber: number | null
     completed: boolean
     featureId: string
@@ -9121,6 +8306,8 @@ export namespace Prisma {
   export type TaskSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     title?: boolean
+    estimatedHours?: boolean
+    status?: boolean
     dayNumber?: boolean
     completed?: boolean
     featureId?: boolean
@@ -9131,6 +8318,8 @@ export namespace Prisma {
   export type TaskSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     title?: boolean
+    estimatedHours?: boolean
+    status?: boolean
     dayNumber?: boolean
     completed?: boolean
     featureId?: boolean
@@ -9140,6 +8329,8 @@ export namespace Prisma {
   export type TaskSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     title?: boolean
+    estimatedHours?: boolean
+    status?: boolean
     dayNumber?: boolean
     completed?: boolean
     featureId?: boolean
@@ -9149,12 +8340,14 @@ export namespace Prisma {
   export type TaskSelectScalar = {
     id?: boolean
     title?: boolean
+    estimatedHours?: boolean
+    status?: boolean
     dayNumber?: boolean
     completed?: boolean
     featureId?: boolean
   }
 
-  export type TaskOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "dayNumber" | "completed" | "featureId", ExtArgs["result"]["task"]>
+  export type TaskOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "estimatedHours" | "status" | "dayNumber" | "completed" | "featureId", ExtArgs["result"]["task"]>
   export type TaskInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     feature?: boolean | FeatureDefaultArgs<ExtArgs>
     dayTask?: boolean | Task$dayTaskArgs<ExtArgs>
@@ -9175,6 +8368,8 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       title: string
+      estimatedHours: number | null
+      status: $Enums.TaskStatus
       dayNumber: number | null
       completed: boolean
       featureId: string
@@ -9605,6 +8800,8 @@ export namespace Prisma {
   interface TaskFieldRefs {
     readonly id: FieldRef<"Task", 'String'>
     readonly title: FieldRef<"Task", 'String'>
+    readonly estimatedHours: FieldRef<"Task", 'Float'>
+    readonly status: FieldRef<"Task", 'TaskStatus'>
     readonly dayNumber: FieldRef<"Task", 'Int'>
     readonly completed: FieldRef<"Task", 'Boolean'>
     readonly featureId: FieldRef<"Task", 'String'>
@@ -10066,9 +9263,13 @@ export namespace Prisma {
     taskId: string | null
     dayIndex: number | null
     dueDate: Date | null
+    completedAt: Date | null
     category: string | null
     description: string | null
     status: string | null
+    milestoneGoal: string | null
+    shipCheck: string | null
+    buildLogId: string | null
   }
 
   export type DayTaskMaxAggregateOutputType = {
@@ -10076,9 +9277,13 @@ export namespace Prisma {
     taskId: string | null
     dayIndex: number | null
     dueDate: Date | null
+    completedAt: Date | null
     category: string | null
     description: string | null
     status: string | null
+    milestoneGoal: string | null
+    shipCheck: string | null
+    buildLogId: string | null
   }
 
   export type DayTaskCountAggregateOutputType = {
@@ -10086,9 +9291,13 @@ export namespace Prisma {
     taskId: number
     dayIndex: number
     dueDate: number
+    completedAt: number
     category: number
     description: number
     status: number
+    milestoneGoal: number
+    shipCheck: number
+    buildLogId: number
     _all: number
   }
 
@@ -10106,9 +9315,13 @@ export namespace Prisma {
     taskId?: true
     dayIndex?: true
     dueDate?: true
+    completedAt?: true
     category?: true
     description?: true
     status?: true
+    milestoneGoal?: true
+    shipCheck?: true
+    buildLogId?: true
   }
 
   export type DayTaskMaxAggregateInputType = {
@@ -10116,9 +9329,13 @@ export namespace Prisma {
     taskId?: true
     dayIndex?: true
     dueDate?: true
+    completedAt?: true
     category?: true
     description?: true
     status?: true
+    milestoneGoal?: true
+    shipCheck?: true
+    buildLogId?: true
   }
 
   export type DayTaskCountAggregateInputType = {
@@ -10126,9 +9343,13 @@ export namespace Prisma {
     taskId?: true
     dayIndex?: true
     dueDate?: true
+    completedAt?: true
     category?: true
     description?: true
     status?: true
+    milestoneGoal?: true
+    shipCheck?: true
+    buildLogId?: true
     _all?: true
   }
 
@@ -10223,9 +9444,13 @@ export namespace Prisma {
     taskId: string
     dayIndex: number
     dueDate: Date
+    completedAt: Date | null
     category: string
     description: string
     status: string
+    milestoneGoal: string | null
+    shipCheck: string | null
+    buildLogId: string | null
     _count: DayTaskCountAggregateOutputType | null
     _avg: DayTaskAvgAggregateOutputType | null
     _sum: DayTaskSumAggregateOutputType | null
@@ -10252,10 +9477,15 @@ export namespace Prisma {
     taskId?: boolean
     dayIndex?: boolean
     dueDate?: boolean
+    completedAt?: boolean
     category?: boolean
     description?: boolean
     status?: boolean
+    milestoneGoal?: boolean
+    shipCheck?: boolean
+    buildLogId?: boolean
     task?: boolean | TaskDefaultArgs<ExtArgs>
+    buildLog?: boolean | DayTask$buildLogArgs<ExtArgs>
   }, ExtArgs["result"]["dayTask"]>
 
   export type DayTaskSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -10263,10 +9493,15 @@ export namespace Prisma {
     taskId?: boolean
     dayIndex?: boolean
     dueDate?: boolean
+    completedAt?: boolean
     category?: boolean
     description?: boolean
     status?: boolean
+    milestoneGoal?: boolean
+    shipCheck?: boolean
+    buildLogId?: boolean
     task?: boolean | TaskDefaultArgs<ExtArgs>
+    buildLog?: boolean | DayTask$buildLogArgs<ExtArgs>
   }, ExtArgs["result"]["dayTask"]>
 
   export type DayTaskSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -10274,10 +9509,15 @@ export namespace Prisma {
     taskId?: boolean
     dayIndex?: boolean
     dueDate?: boolean
+    completedAt?: boolean
     category?: boolean
     description?: boolean
     status?: boolean
+    milestoneGoal?: boolean
+    shipCheck?: boolean
+    buildLogId?: boolean
     task?: boolean | TaskDefaultArgs<ExtArgs>
+    buildLog?: boolean | DayTask$buildLogArgs<ExtArgs>
   }, ExtArgs["result"]["dayTask"]>
 
   export type DayTaskSelectScalar = {
@@ -10285,35 +9525,47 @@ export namespace Prisma {
     taskId?: boolean
     dayIndex?: boolean
     dueDate?: boolean
+    completedAt?: boolean
     category?: boolean
     description?: boolean
     status?: boolean
+    milestoneGoal?: boolean
+    shipCheck?: boolean
+    buildLogId?: boolean
   }
 
-  export type DayTaskOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "taskId" | "dayIndex" | "dueDate" | "category" | "description" | "status", ExtArgs["result"]["dayTask"]>
+  export type DayTaskOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "taskId" | "dayIndex" | "dueDate" | "completedAt" | "category" | "description" | "status" | "milestoneGoal" | "shipCheck" | "buildLogId", ExtArgs["result"]["dayTask"]>
   export type DayTaskInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     task?: boolean | TaskDefaultArgs<ExtArgs>
+    buildLog?: boolean | DayTask$buildLogArgs<ExtArgs>
   }
   export type DayTaskIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     task?: boolean | TaskDefaultArgs<ExtArgs>
+    buildLog?: boolean | DayTask$buildLogArgs<ExtArgs>
   }
   export type DayTaskIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     task?: boolean | TaskDefaultArgs<ExtArgs>
+    buildLog?: boolean | DayTask$buildLogArgs<ExtArgs>
   }
 
   export type $DayTaskPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "DayTask"
     objects: {
       task: Prisma.$TaskPayload<ExtArgs>
+      buildLog: Prisma.$BuildLogPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       taskId: string
       dayIndex: number
       dueDate: Date
+      completedAt: Date | null
       category: string
       description: string
       status: string
+      milestoneGoal: string | null
+      shipCheck: string | null
+      buildLogId: string | null
     }, ExtArgs["result"]["dayTask"]>
     composites: {}
   }
@@ -10709,6 +9961,7 @@ export namespace Prisma {
   export interface Prisma__DayTaskClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     task<T extends TaskDefaultArgs<ExtArgs> = {}>(args?: Subset<T, TaskDefaultArgs<ExtArgs>>): Prisma__TaskClient<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    buildLog<T extends DayTask$buildLogArgs<ExtArgs> = {}>(args?: Subset<T, DayTask$buildLogArgs<ExtArgs>>): Prisma__BuildLogClient<$Result.GetResult<Prisma.$BuildLogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10742,9 +9995,13 @@ export namespace Prisma {
     readonly taskId: FieldRef<"DayTask", 'String'>
     readonly dayIndex: FieldRef<"DayTask", 'Int'>
     readonly dueDate: FieldRef<"DayTask", 'DateTime'>
+    readonly completedAt: FieldRef<"DayTask", 'DateTime'>
     readonly category: FieldRef<"DayTask", 'String'>
     readonly description: FieldRef<"DayTask", 'String'>
     readonly status: FieldRef<"DayTask", 'String'>
+    readonly milestoneGoal: FieldRef<"DayTask", 'String'>
+    readonly shipCheck: FieldRef<"DayTask", 'String'>
+    readonly buildLogId: FieldRef<"DayTask", 'String'>
   }
     
 
@@ -11141,6 +10398,25 @@ export namespace Prisma {
   }
 
   /**
+   * DayTask.buildLog
+   */
+  export type DayTask$buildLogArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuildLog
+     */
+    select?: BuildLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuildLog
+     */
+    omit?: BuildLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuildLogInclude<ExtArgs> | null
+    where?: BuildLogWhereInput
+  }
+
+  /**
    * DayTask without action
    */
   export type DayTaskDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -11156,1094 +10432,6 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: DayTaskInclude<ExtArgs> | null
-  }
-
-
-  /**
-   * Model DailyLog
-   */
-
-  export type AggregateDailyLog = {
-    _count: DailyLogCountAggregateOutputType | null
-    _min: DailyLogMinAggregateOutputType | null
-    _max: DailyLogMaxAggregateOutputType | null
-  }
-
-  export type DailyLogMinAggregateOutputType = {
-    id: string | null
-    userId: string | null
-    projectId: string | null
-    date: Date | null
-    notes: string | null
-    createdAt: Date | null
-  }
-
-  export type DailyLogMaxAggregateOutputType = {
-    id: string | null
-    userId: string | null
-    projectId: string | null
-    date: Date | null
-    notes: string | null
-    createdAt: Date | null
-  }
-
-  export type DailyLogCountAggregateOutputType = {
-    id: number
-    userId: number
-    projectId: number
-    date: number
-    completedTasks: number
-    notes: number
-    createdAt: number
-    _all: number
-  }
-
-
-  export type DailyLogMinAggregateInputType = {
-    id?: true
-    userId?: true
-    projectId?: true
-    date?: true
-    notes?: true
-    createdAt?: true
-  }
-
-  export type DailyLogMaxAggregateInputType = {
-    id?: true
-    userId?: true
-    projectId?: true
-    date?: true
-    notes?: true
-    createdAt?: true
-  }
-
-  export type DailyLogCountAggregateInputType = {
-    id?: true
-    userId?: true
-    projectId?: true
-    date?: true
-    completedTasks?: true
-    notes?: true
-    createdAt?: true
-    _all?: true
-  }
-
-  export type DailyLogAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which DailyLog to aggregate.
-     */
-    where?: DailyLogWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of DailyLogs to fetch.
-     */
-    orderBy?: DailyLogOrderByWithRelationInput | DailyLogOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: DailyLogWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` DailyLogs from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` DailyLogs.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned DailyLogs
-    **/
-    _count?: true | DailyLogCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: DailyLogMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: DailyLogMaxAggregateInputType
-  }
-
-  export type GetDailyLogAggregateType<T extends DailyLogAggregateArgs> = {
-        [P in keyof T & keyof AggregateDailyLog]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateDailyLog[P]>
-      : GetScalarType<T[P], AggregateDailyLog[P]>
-  }
-
-
-
-
-  export type DailyLogGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: DailyLogWhereInput
-    orderBy?: DailyLogOrderByWithAggregationInput | DailyLogOrderByWithAggregationInput[]
-    by: DailyLogScalarFieldEnum[] | DailyLogScalarFieldEnum
-    having?: DailyLogScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: DailyLogCountAggregateInputType | true
-    _min?: DailyLogMinAggregateInputType
-    _max?: DailyLogMaxAggregateInputType
-  }
-
-  export type DailyLogGroupByOutputType = {
-    id: string
-    userId: string
-    projectId: string
-    date: Date
-    completedTasks: JsonValue
-    notes: string | null
-    createdAt: Date
-    _count: DailyLogCountAggregateOutputType | null
-    _min: DailyLogMinAggregateOutputType | null
-    _max: DailyLogMaxAggregateOutputType | null
-  }
-
-  type GetDailyLogGroupByPayload<T extends DailyLogGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<DailyLogGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof DailyLogGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], DailyLogGroupByOutputType[P]>
-            : GetScalarType<T[P], DailyLogGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type DailyLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    userId?: boolean
-    projectId?: boolean
-    date?: boolean
-    completedTasks?: boolean
-    notes?: boolean
-    createdAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
-    project?: boolean | ProductDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["dailyLog"]>
-
-  export type DailyLogSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    userId?: boolean
-    projectId?: boolean
-    date?: boolean
-    completedTasks?: boolean
-    notes?: boolean
-    createdAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
-    project?: boolean | ProductDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["dailyLog"]>
-
-  export type DailyLogSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    userId?: boolean
-    projectId?: boolean
-    date?: boolean
-    completedTasks?: boolean
-    notes?: boolean
-    createdAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
-    project?: boolean | ProductDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["dailyLog"]>
-
-  export type DailyLogSelectScalar = {
-    id?: boolean
-    userId?: boolean
-    projectId?: boolean
-    date?: boolean
-    completedTasks?: boolean
-    notes?: boolean
-    createdAt?: boolean
-  }
-
-  export type DailyLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "projectId" | "date" | "completedTasks" | "notes" | "createdAt", ExtArgs["result"]["dailyLog"]>
-  export type DailyLogInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
-    project?: boolean | ProductDefaultArgs<ExtArgs>
-  }
-  export type DailyLogIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
-    project?: boolean | ProductDefaultArgs<ExtArgs>
-  }
-  export type DailyLogIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
-    project?: boolean | ProductDefaultArgs<ExtArgs>
-  }
-
-  export type $DailyLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "DailyLog"
-    objects: {
-      user: Prisma.$UserPayload<ExtArgs>
-      project: Prisma.$ProductPayload<ExtArgs>
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      userId: string
-      projectId: string
-      date: Date
-      completedTasks: Prisma.JsonValue
-      notes: string | null
-      createdAt: Date
-    }, ExtArgs["result"]["dailyLog"]>
-    composites: {}
-  }
-
-  type DailyLogGetPayload<S extends boolean | null | undefined | DailyLogDefaultArgs> = $Result.GetResult<Prisma.$DailyLogPayload, S>
-
-  type DailyLogCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<DailyLogFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: DailyLogCountAggregateInputType | true
-    }
-
-  export interface DailyLogDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DailyLog'], meta: { name: 'DailyLog' } }
-    /**
-     * Find zero or one DailyLog that matches the filter.
-     * @param {DailyLogFindUniqueArgs} args - Arguments to find a DailyLog
-     * @example
-     * // Get one DailyLog
-     * const dailyLog = await prisma.dailyLog.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends DailyLogFindUniqueArgs>(args: SelectSubset<T, DailyLogFindUniqueArgs<ExtArgs>>): Prisma__DailyLogClient<$Result.GetResult<Prisma.$DailyLogPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one DailyLog that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {DailyLogFindUniqueOrThrowArgs} args - Arguments to find a DailyLog
-     * @example
-     * // Get one DailyLog
-     * const dailyLog = await prisma.dailyLog.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends DailyLogFindUniqueOrThrowArgs>(args: SelectSubset<T, DailyLogFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DailyLogClient<$Result.GetResult<Prisma.$DailyLogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first DailyLog that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DailyLogFindFirstArgs} args - Arguments to find a DailyLog
-     * @example
-     * // Get one DailyLog
-     * const dailyLog = await prisma.dailyLog.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends DailyLogFindFirstArgs>(args?: SelectSubset<T, DailyLogFindFirstArgs<ExtArgs>>): Prisma__DailyLogClient<$Result.GetResult<Prisma.$DailyLogPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first DailyLog that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DailyLogFindFirstOrThrowArgs} args - Arguments to find a DailyLog
-     * @example
-     * // Get one DailyLog
-     * const dailyLog = await prisma.dailyLog.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends DailyLogFindFirstOrThrowArgs>(args?: SelectSubset<T, DailyLogFindFirstOrThrowArgs<ExtArgs>>): Prisma__DailyLogClient<$Result.GetResult<Prisma.$DailyLogPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more DailyLogs that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DailyLogFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all DailyLogs
-     * const dailyLogs = await prisma.dailyLog.findMany()
-     * 
-     * // Get first 10 DailyLogs
-     * const dailyLogs = await prisma.dailyLog.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const dailyLogWithIdOnly = await prisma.dailyLog.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends DailyLogFindManyArgs>(args?: SelectSubset<T, DailyLogFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DailyLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a DailyLog.
-     * @param {DailyLogCreateArgs} args - Arguments to create a DailyLog.
-     * @example
-     * // Create one DailyLog
-     * const DailyLog = await prisma.dailyLog.create({
-     *   data: {
-     *     // ... data to create a DailyLog
-     *   }
-     * })
-     * 
-     */
-    create<T extends DailyLogCreateArgs>(args: SelectSubset<T, DailyLogCreateArgs<ExtArgs>>): Prisma__DailyLogClient<$Result.GetResult<Prisma.$DailyLogPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many DailyLogs.
-     * @param {DailyLogCreateManyArgs} args - Arguments to create many DailyLogs.
-     * @example
-     * // Create many DailyLogs
-     * const dailyLog = await prisma.dailyLog.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends DailyLogCreateManyArgs>(args?: SelectSubset<T, DailyLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many DailyLogs and returns the data saved in the database.
-     * @param {DailyLogCreateManyAndReturnArgs} args - Arguments to create many DailyLogs.
-     * @example
-     * // Create many DailyLogs
-     * const dailyLog = await prisma.dailyLog.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many DailyLogs and only return the `id`
-     * const dailyLogWithIdOnly = await prisma.dailyLog.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends DailyLogCreateManyAndReturnArgs>(args?: SelectSubset<T, DailyLogCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DailyLogPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a DailyLog.
-     * @param {DailyLogDeleteArgs} args - Arguments to delete one DailyLog.
-     * @example
-     * // Delete one DailyLog
-     * const DailyLog = await prisma.dailyLog.delete({
-     *   where: {
-     *     // ... filter to delete one DailyLog
-     *   }
-     * })
-     * 
-     */
-    delete<T extends DailyLogDeleteArgs>(args: SelectSubset<T, DailyLogDeleteArgs<ExtArgs>>): Prisma__DailyLogClient<$Result.GetResult<Prisma.$DailyLogPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one DailyLog.
-     * @param {DailyLogUpdateArgs} args - Arguments to update one DailyLog.
-     * @example
-     * // Update one DailyLog
-     * const dailyLog = await prisma.dailyLog.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends DailyLogUpdateArgs>(args: SelectSubset<T, DailyLogUpdateArgs<ExtArgs>>): Prisma__DailyLogClient<$Result.GetResult<Prisma.$DailyLogPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more DailyLogs.
-     * @param {DailyLogDeleteManyArgs} args - Arguments to filter DailyLogs to delete.
-     * @example
-     * // Delete a few DailyLogs
-     * const { count } = await prisma.dailyLog.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends DailyLogDeleteManyArgs>(args?: SelectSubset<T, DailyLogDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more DailyLogs.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DailyLogUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many DailyLogs
-     * const dailyLog = await prisma.dailyLog.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends DailyLogUpdateManyArgs>(args: SelectSubset<T, DailyLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more DailyLogs and returns the data updated in the database.
-     * @param {DailyLogUpdateManyAndReturnArgs} args - Arguments to update many DailyLogs.
-     * @example
-     * // Update many DailyLogs
-     * const dailyLog = await prisma.dailyLog.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more DailyLogs and only return the `id`
-     * const dailyLogWithIdOnly = await prisma.dailyLog.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends DailyLogUpdateManyAndReturnArgs>(args: SelectSubset<T, DailyLogUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DailyLogPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one DailyLog.
-     * @param {DailyLogUpsertArgs} args - Arguments to update or create a DailyLog.
-     * @example
-     * // Update or create a DailyLog
-     * const dailyLog = await prisma.dailyLog.upsert({
-     *   create: {
-     *     // ... data to create a DailyLog
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the DailyLog we want to update
-     *   }
-     * })
-     */
-    upsert<T extends DailyLogUpsertArgs>(args: SelectSubset<T, DailyLogUpsertArgs<ExtArgs>>): Prisma__DailyLogClient<$Result.GetResult<Prisma.$DailyLogPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of DailyLogs.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DailyLogCountArgs} args - Arguments to filter DailyLogs to count.
-     * @example
-     * // Count the number of DailyLogs
-     * const count = await prisma.dailyLog.count({
-     *   where: {
-     *     // ... the filter for the DailyLogs we want to count
-     *   }
-     * })
-    **/
-    count<T extends DailyLogCountArgs>(
-      args?: Subset<T, DailyLogCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], DailyLogCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a DailyLog.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DailyLogAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends DailyLogAggregateArgs>(args: Subset<T, DailyLogAggregateArgs>): Prisma.PrismaPromise<GetDailyLogAggregateType<T>>
-
-    /**
-     * Group by DailyLog.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DailyLogGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends DailyLogGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: DailyLogGroupByArgs['orderBy'] }
-        : { orderBy?: DailyLogGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, DailyLogGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDailyLogGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the DailyLog model
-   */
-  readonly fields: DailyLogFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for DailyLog.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__DailyLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    project<T extends ProductDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProductDefaultArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the DailyLog model
-   */
-  interface DailyLogFieldRefs {
-    readonly id: FieldRef<"DailyLog", 'String'>
-    readonly userId: FieldRef<"DailyLog", 'String'>
-    readonly projectId: FieldRef<"DailyLog", 'String'>
-    readonly date: FieldRef<"DailyLog", 'DateTime'>
-    readonly completedTasks: FieldRef<"DailyLog", 'Json'>
-    readonly notes: FieldRef<"DailyLog", 'String'>
-    readonly createdAt: FieldRef<"DailyLog", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * DailyLog findUnique
-   */
-  export type DailyLogFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DailyLog
-     */
-    select?: DailyLogSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DailyLog
-     */
-    omit?: DailyLogOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: DailyLogInclude<ExtArgs> | null
-    /**
-     * Filter, which DailyLog to fetch.
-     */
-    where: DailyLogWhereUniqueInput
-  }
-
-  /**
-   * DailyLog findUniqueOrThrow
-   */
-  export type DailyLogFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DailyLog
-     */
-    select?: DailyLogSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DailyLog
-     */
-    omit?: DailyLogOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: DailyLogInclude<ExtArgs> | null
-    /**
-     * Filter, which DailyLog to fetch.
-     */
-    where: DailyLogWhereUniqueInput
-  }
-
-  /**
-   * DailyLog findFirst
-   */
-  export type DailyLogFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DailyLog
-     */
-    select?: DailyLogSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DailyLog
-     */
-    omit?: DailyLogOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: DailyLogInclude<ExtArgs> | null
-    /**
-     * Filter, which DailyLog to fetch.
-     */
-    where?: DailyLogWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of DailyLogs to fetch.
-     */
-    orderBy?: DailyLogOrderByWithRelationInput | DailyLogOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for DailyLogs.
-     */
-    cursor?: DailyLogWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` DailyLogs from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` DailyLogs.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of DailyLogs.
-     */
-    distinct?: DailyLogScalarFieldEnum | DailyLogScalarFieldEnum[]
-  }
-
-  /**
-   * DailyLog findFirstOrThrow
-   */
-  export type DailyLogFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DailyLog
-     */
-    select?: DailyLogSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DailyLog
-     */
-    omit?: DailyLogOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: DailyLogInclude<ExtArgs> | null
-    /**
-     * Filter, which DailyLog to fetch.
-     */
-    where?: DailyLogWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of DailyLogs to fetch.
-     */
-    orderBy?: DailyLogOrderByWithRelationInput | DailyLogOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for DailyLogs.
-     */
-    cursor?: DailyLogWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` DailyLogs from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` DailyLogs.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of DailyLogs.
-     */
-    distinct?: DailyLogScalarFieldEnum | DailyLogScalarFieldEnum[]
-  }
-
-  /**
-   * DailyLog findMany
-   */
-  export type DailyLogFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DailyLog
-     */
-    select?: DailyLogSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DailyLog
-     */
-    omit?: DailyLogOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: DailyLogInclude<ExtArgs> | null
-    /**
-     * Filter, which DailyLogs to fetch.
-     */
-    where?: DailyLogWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of DailyLogs to fetch.
-     */
-    orderBy?: DailyLogOrderByWithRelationInput | DailyLogOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing DailyLogs.
-     */
-    cursor?: DailyLogWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` DailyLogs from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` DailyLogs.
-     */
-    skip?: number
-    distinct?: DailyLogScalarFieldEnum | DailyLogScalarFieldEnum[]
-  }
-
-  /**
-   * DailyLog create
-   */
-  export type DailyLogCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DailyLog
-     */
-    select?: DailyLogSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DailyLog
-     */
-    omit?: DailyLogOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: DailyLogInclude<ExtArgs> | null
-    /**
-     * The data needed to create a DailyLog.
-     */
-    data: XOR<DailyLogCreateInput, DailyLogUncheckedCreateInput>
-  }
-
-  /**
-   * DailyLog createMany
-   */
-  export type DailyLogCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many DailyLogs.
-     */
-    data: DailyLogCreateManyInput | DailyLogCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * DailyLog createManyAndReturn
-   */
-  export type DailyLogCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DailyLog
-     */
-    select?: DailyLogSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the DailyLog
-     */
-    omit?: DailyLogOmit<ExtArgs> | null
-    /**
-     * The data used to create many DailyLogs.
-     */
-    data: DailyLogCreateManyInput | DailyLogCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: DailyLogIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * DailyLog update
-   */
-  export type DailyLogUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DailyLog
-     */
-    select?: DailyLogSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DailyLog
-     */
-    omit?: DailyLogOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: DailyLogInclude<ExtArgs> | null
-    /**
-     * The data needed to update a DailyLog.
-     */
-    data: XOR<DailyLogUpdateInput, DailyLogUncheckedUpdateInput>
-    /**
-     * Choose, which DailyLog to update.
-     */
-    where: DailyLogWhereUniqueInput
-  }
-
-  /**
-   * DailyLog updateMany
-   */
-  export type DailyLogUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update DailyLogs.
-     */
-    data: XOR<DailyLogUpdateManyMutationInput, DailyLogUncheckedUpdateManyInput>
-    /**
-     * Filter which DailyLogs to update
-     */
-    where?: DailyLogWhereInput
-    /**
-     * Limit how many DailyLogs to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * DailyLog updateManyAndReturn
-   */
-  export type DailyLogUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DailyLog
-     */
-    select?: DailyLogSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the DailyLog
-     */
-    omit?: DailyLogOmit<ExtArgs> | null
-    /**
-     * The data used to update DailyLogs.
-     */
-    data: XOR<DailyLogUpdateManyMutationInput, DailyLogUncheckedUpdateManyInput>
-    /**
-     * Filter which DailyLogs to update
-     */
-    where?: DailyLogWhereInput
-    /**
-     * Limit how many DailyLogs to update.
-     */
-    limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: DailyLogIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * DailyLog upsert
-   */
-  export type DailyLogUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DailyLog
-     */
-    select?: DailyLogSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DailyLog
-     */
-    omit?: DailyLogOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: DailyLogInclude<ExtArgs> | null
-    /**
-     * The filter to search for the DailyLog to update in case it exists.
-     */
-    where: DailyLogWhereUniqueInput
-    /**
-     * In case the DailyLog found by the `where` argument doesn't exist, create a new DailyLog with this data.
-     */
-    create: XOR<DailyLogCreateInput, DailyLogUncheckedCreateInput>
-    /**
-     * In case the DailyLog was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<DailyLogUpdateInput, DailyLogUncheckedUpdateInput>
-  }
-
-  /**
-   * DailyLog delete
-   */
-  export type DailyLogDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DailyLog
-     */
-    select?: DailyLogSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DailyLog
-     */
-    omit?: DailyLogOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: DailyLogInclude<ExtArgs> | null
-    /**
-     * Filter which DailyLog to delete.
-     */
-    where: DailyLogWhereUniqueInput
-  }
-
-  /**
-   * DailyLog deleteMany
-   */
-  export type DailyLogDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which DailyLogs to delete
-     */
-    where?: DailyLogWhereInput
-    /**
-     * Limit how many DailyLogs to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * DailyLog without action
-   */
-  export type DailyLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DailyLog
-     */
-    select?: DailyLogSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DailyLog
-     */
-    omit?: DailyLogOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: DailyLogInclude<ExtArgs> | null
   }
 
 
@@ -12270,7 +10458,7 @@ export namespace Prisma {
   export type BuildLogMinAggregateOutputType = {
     id: string | null
     userId: string | null
-    projectId: string | null
+    productId: string | null
     logDate: Date | null
     tweet: string | null
     dayIndex: number | null
@@ -12281,7 +10469,7 @@ export namespace Prisma {
   export type BuildLogMaxAggregateOutputType = {
     id: string | null
     userId: string | null
-    projectId: string | null
+    productId: string | null
     logDate: Date | null
     tweet: string | null
     dayIndex: number | null
@@ -12292,12 +10480,11 @@ export namespace Prisma {
   export type BuildLogCountAggregateOutputType = {
     id: number
     userId: number
-    projectId: number
+    productId: number
     logDate: number
     tweet: number
     dayIndex: number
     summary: number
-    sourceTasks: number
     generatedAt: number
     _all: number
   }
@@ -12314,7 +10501,7 @@ export namespace Prisma {
   export type BuildLogMinAggregateInputType = {
     id?: true
     userId?: true
-    projectId?: true
+    productId?: true
     logDate?: true
     tweet?: true
     dayIndex?: true
@@ -12325,7 +10512,7 @@ export namespace Prisma {
   export type BuildLogMaxAggregateInputType = {
     id?: true
     userId?: true
-    projectId?: true
+    productId?: true
     logDate?: true
     tweet?: true
     dayIndex?: true
@@ -12336,12 +10523,11 @@ export namespace Prisma {
   export type BuildLogCountAggregateInputType = {
     id?: true
     userId?: true
-    projectId?: true
+    productId?: true
     logDate?: true
     tweet?: true
     dayIndex?: true
     summary?: true
-    sourceTasks?: true
     generatedAt?: true
     _all?: true
   }
@@ -12435,12 +10621,11 @@ export namespace Prisma {
   export type BuildLogGroupByOutputType = {
     id: string
     userId: string
-    projectId: string
+    productId: string
     logDate: Date
     tweet: string | null
     dayIndex: number
     summary: string
-    sourceTasks: JsonValue
     generatedAt: Date
     _count: BuildLogCountAggregateOutputType | null
     _avg: BuildLogAvgAggregateOutputType | null
@@ -12466,86 +10651,86 @@ export namespace Prisma {
   export type BuildLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
-    projectId?: boolean
+    productId?: boolean
     logDate?: boolean
     tweet?: boolean
     dayIndex?: boolean
     summary?: boolean
-    sourceTasks?: boolean
     generatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
-    project?: boolean | ProductDefaultArgs<ExtArgs>
+    product?: boolean | ProductDefaultArgs<ExtArgs>
+    DayTask?: boolean | BuildLog$DayTaskArgs<ExtArgs>
+    _count?: boolean | BuildLogCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["buildLog"]>
 
   export type BuildLogSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
-    projectId?: boolean
+    productId?: boolean
     logDate?: boolean
     tweet?: boolean
     dayIndex?: boolean
     summary?: boolean
-    sourceTasks?: boolean
     generatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
-    project?: boolean | ProductDefaultArgs<ExtArgs>
+    product?: boolean | ProductDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["buildLog"]>
 
   export type BuildLogSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
-    projectId?: boolean
+    productId?: boolean
     logDate?: boolean
     tweet?: boolean
     dayIndex?: boolean
     summary?: boolean
-    sourceTasks?: boolean
     generatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
-    project?: boolean | ProductDefaultArgs<ExtArgs>
+    product?: boolean | ProductDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["buildLog"]>
 
   export type BuildLogSelectScalar = {
     id?: boolean
     userId?: boolean
-    projectId?: boolean
+    productId?: boolean
     logDate?: boolean
     tweet?: boolean
     dayIndex?: boolean
     summary?: boolean
-    sourceTasks?: boolean
     generatedAt?: boolean
   }
 
-  export type BuildLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "projectId" | "logDate" | "tweet" | "dayIndex" | "summary" | "sourceTasks" | "generatedAt", ExtArgs["result"]["buildLog"]>
+  export type BuildLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "productId" | "logDate" | "tweet" | "dayIndex" | "summary" | "generatedAt", ExtArgs["result"]["buildLog"]>
   export type BuildLogInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
-    project?: boolean | ProductDefaultArgs<ExtArgs>
+    product?: boolean | ProductDefaultArgs<ExtArgs>
+    DayTask?: boolean | BuildLog$DayTaskArgs<ExtArgs>
+    _count?: boolean | BuildLogCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type BuildLogIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
-    project?: boolean | ProductDefaultArgs<ExtArgs>
+    product?: boolean | ProductDefaultArgs<ExtArgs>
   }
   export type BuildLogIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
-    project?: boolean | ProductDefaultArgs<ExtArgs>
+    product?: boolean | ProductDefaultArgs<ExtArgs>
   }
 
   export type $BuildLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "BuildLog"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
-      project: Prisma.$ProductPayload<ExtArgs>
+      product: Prisma.$ProductPayload<ExtArgs>
+      DayTask: Prisma.$DayTaskPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       userId: string
-      projectId: string
+      productId: string
       logDate: Date
       tweet: string | null
       dayIndex: number
       summary: string
-      sourceTasks: Prisma.JsonValue
       generatedAt: Date
     }, ExtArgs["result"]["buildLog"]>
     composites: {}
@@ -12942,7 +11127,8 @@ export namespace Prisma {
   export interface Prisma__BuildLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    project<T extends ProductDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProductDefaultArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    product<T extends ProductDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProductDefaultArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    DayTask<T extends BuildLog$DayTaskArgs<ExtArgs> = {}>(args?: Subset<T, BuildLog$DayTaskArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DayTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -12974,12 +11160,11 @@ export namespace Prisma {
   interface BuildLogFieldRefs {
     readonly id: FieldRef<"BuildLog", 'String'>
     readonly userId: FieldRef<"BuildLog", 'String'>
-    readonly projectId: FieldRef<"BuildLog", 'String'>
+    readonly productId: FieldRef<"BuildLog", 'String'>
     readonly logDate: FieldRef<"BuildLog", 'DateTime'>
     readonly tweet: FieldRef<"BuildLog", 'String'>
     readonly dayIndex: FieldRef<"BuildLog", 'Int'>
     readonly summary: FieldRef<"BuildLog", 'String'>
-    readonly sourceTasks: FieldRef<"BuildLog", 'Json'>
     readonly generatedAt: FieldRef<"BuildLog", 'DateTime'>
   }
     
@@ -13377,6 +11562,30 @@ export namespace Prisma {
   }
 
   /**
+   * BuildLog.DayTask
+   */
+  export type BuildLog$DayTaskArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DayTask
+     */
+    select?: DayTaskSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DayTask
+     */
+    omit?: DayTaskOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DayTaskInclude<ExtArgs> | null
+    where?: DayTaskWhereInput
+    orderBy?: DayTaskOrderByWithRelationInput | DayTaskOrderByWithRelationInput[]
+    cursor?: DayTaskWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DayTaskScalarFieldEnum | DayTaskScalarFieldEnum[]
+  }
+
+  /**
    * BuildLog without action
    */
   export type BuildLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -13396,288 +11605,228 @@ export namespace Prisma {
 
 
   /**
-   * Model Streak
+   * Model DailyStreak
    */
 
-  export type AggregateStreak = {
-    _count: StreakCountAggregateOutputType | null
-    _avg: StreakAvgAggregateOutputType | null
-    _sum: StreakSumAggregateOutputType | null
-    _min: StreakMinAggregateOutputType | null
-    _max: StreakMaxAggregateOutputType | null
+  export type AggregateDailyStreak = {
+    _count: DailyStreakCountAggregateOutputType | null
+    _min: DailyStreakMinAggregateOutputType | null
+    _max: DailyStreakMaxAggregateOutputType | null
   }
 
-  export type StreakAvgAggregateOutputType = {
-    currentStreak: number | null
-    bestStreak: number | null
-  }
-
-  export type StreakSumAggregateOutputType = {
-    currentStreak: number | null
-    bestStreak: number | null
-  }
-
-  export type StreakMinAggregateOutputType = {
+  export type DailyStreakMinAggregateOutputType = {
     id: string | null
     userId: string | null
     productId: string | null
-    currentStreak: number | null
-    bestStreak: number | null
-    lastActiveDate: Date | null
-    streakStart: Date | null
-    updatedAt: Date | null
+    date: Date | null
+    hasBuildLog: boolean | null
+    createdAt: Date | null
   }
 
-  export type StreakMaxAggregateOutputType = {
+  export type DailyStreakMaxAggregateOutputType = {
     id: string | null
     userId: string | null
     productId: string | null
-    currentStreak: number | null
-    bestStreak: number | null
-    lastActiveDate: Date | null
-    streakStart: Date | null
-    updatedAt: Date | null
+    date: Date | null
+    hasBuildLog: boolean | null
+    createdAt: Date | null
   }
 
-  export type StreakCountAggregateOutputType = {
+  export type DailyStreakCountAggregateOutputType = {
     id: number
     userId: number
     productId: number
-    currentStreak: number
-    bestStreak: number
-    lastActiveDate: number
-    streakStart: number
-    updatedAt: number
+    date: number
+    hasBuildLog: number
+    createdAt: number
     _all: number
   }
 
 
-  export type StreakAvgAggregateInputType = {
-    currentStreak?: true
-    bestStreak?: true
-  }
-
-  export type StreakSumAggregateInputType = {
-    currentStreak?: true
-    bestStreak?: true
-  }
-
-  export type StreakMinAggregateInputType = {
+  export type DailyStreakMinAggregateInputType = {
     id?: true
     userId?: true
     productId?: true
-    currentStreak?: true
-    bestStreak?: true
-    lastActiveDate?: true
-    streakStart?: true
-    updatedAt?: true
+    date?: true
+    hasBuildLog?: true
+    createdAt?: true
   }
 
-  export type StreakMaxAggregateInputType = {
+  export type DailyStreakMaxAggregateInputType = {
     id?: true
     userId?: true
     productId?: true
-    currentStreak?: true
-    bestStreak?: true
-    lastActiveDate?: true
-    streakStart?: true
-    updatedAt?: true
+    date?: true
+    hasBuildLog?: true
+    createdAt?: true
   }
 
-  export type StreakCountAggregateInputType = {
+  export type DailyStreakCountAggregateInputType = {
     id?: true
     userId?: true
     productId?: true
-    currentStreak?: true
-    bestStreak?: true
-    lastActiveDate?: true
-    streakStart?: true
-    updatedAt?: true
+    date?: true
+    hasBuildLog?: true
+    createdAt?: true
     _all?: true
   }
 
-  export type StreakAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which Streak to aggregate.
+     * Filter which DailyStreak to aggregate.
      */
-    where?: StreakWhereInput
+    where?: DailyStreakWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Streaks to fetch.
+     * Determine the order of DailyStreaks to fetch.
      */
-    orderBy?: StreakOrderByWithRelationInput | StreakOrderByWithRelationInput[]
+    orderBy?: DailyStreakOrderByWithRelationInput | DailyStreakOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
      * Sets the start position
      */
-    cursor?: StreakWhereUniqueInput
+    cursor?: DailyStreakWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Streaks from the position of the cursor.
+     * Take `±n` DailyStreaks from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Streaks.
+     * Skip the first `n` DailyStreaks.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned Streaks
+     * Count returned DailyStreaks
     **/
-    _count?: true | StreakCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to average
-    **/
-    _avg?: StreakAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: StreakSumAggregateInputType
+    _count?: true | DailyStreakCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the minimum value
     **/
-    _min?: StreakMinAggregateInputType
+    _min?: DailyStreakMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the maximum value
     **/
-    _max?: StreakMaxAggregateInputType
+    _max?: DailyStreakMaxAggregateInputType
   }
 
-  export type GetStreakAggregateType<T extends StreakAggregateArgs> = {
-        [P in keyof T & keyof AggregateStreak]: P extends '_count' | 'count'
+  export type GetDailyStreakAggregateType<T extends DailyStreakAggregateArgs> = {
+        [P in keyof T & keyof AggregateDailyStreak]: P extends '_count' | 'count'
       ? T[P] extends true
         ? number
-        : GetScalarType<T[P], AggregateStreak[P]>
-      : GetScalarType<T[P], AggregateStreak[P]>
+        : GetScalarType<T[P], AggregateDailyStreak[P]>
+      : GetScalarType<T[P], AggregateDailyStreak[P]>
   }
 
 
 
 
-  export type StreakGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: StreakWhereInput
-    orderBy?: StreakOrderByWithAggregationInput | StreakOrderByWithAggregationInput[]
-    by: StreakScalarFieldEnum[] | StreakScalarFieldEnum
-    having?: StreakScalarWhereWithAggregatesInput
+  export type DailyStreakGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DailyStreakWhereInput
+    orderBy?: DailyStreakOrderByWithAggregationInput | DailyStreakOrderByWithAggregationInput[]
+    by: DailyStreakScalarFieldEnum[] | DailyStreakScalarFieldEnum
+    having?: DailyStreakScalarWhereWithAggregatesInput
     take?: number
     skip?: number
-    _count?: StreakCountAggregateInputType | true
-    _avg?: StreakAvgAggregateInputType
-    _sum?: StreakSumAggregateInputType
-    _min?: StreakMinAggregateInputType
-    _max?: StreakMaxAggregateInputType
+    _count?: DailyStreakCountAggregateInputType | true
+    _min?: DailyStreakMinAggregateInputType
+    _max?: DailyStreakMaxAggregateInputType
   }
 
-  export type StreakGroupByOutputType = {
+  export type DailyStreakGroupByOutputType = {
     id: string
     userId: string
     productId: string
-    currentStreak: number
-    bestStreak: number
-    lastActiveDate: Date
-    streakStart: Date
-    updatedAt: Date
-    _count: StreakCountAggregateOutputType | null
-    _avg: StreakAvgAggregateOutputType | null
-    _sum: StreakSumAggregateOutputType | null
-    _min: StreakMinAggregateOutputType | null
-    _max: StreakMaxAggregateOutputType | null
+    date: Date
+    hasBuildLog: boolean
+    createdAt: Date
+    _count: DailyStreakCountAggregateOutputType | null
+    _min: DailyStreakMinAggregateOutputType | null
+    _max: DailyStreakMaxAggregateOutputType | null
   }
 
-  type GetStreakGroupByPayload<T extends StreakGroupByArgs> = Prisma.PrismaPromise<
+  type GetDailyStreakGroupByPayload<T extends DailyStreakGroupByArgs> = Prisma.PrismaPromise<
     Array<
-      PickEnumerable<StreakGroupByOutputType, T['by']> &
+      PickEnumerable<DailyStreakGroupByOutputType, T['by']> &
         {
-          [P in ((keyof T) & (keyof StreakGroupByOutputType))]: P extends '_count'
+          [P in ((keyof T) & (keyof DailyStreakGroupByOutputType))]: P extends '_count'
             ? T[P] extends boolean
               ? number
-              : GetScalarType<T[P], StreakGroupByOutputType[P]>
-            : GetScalarType<T[P], StreakGroupByOutputType[P]>
+              : GetScalarType<T[P], DailyStreakGroupByOutputType[P]>
+            : GetScalarType<T[P], DailyStreakGroupByOutputType[P]>
         }
       >
     >
 
 
-  export type StreakSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type DailyStreakSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
     productId?: boolean
-    currentStreak?: boolean
-    bestStreak?: boolean
-    lastActiveDate?: boolean
-    streakStart?: boolean
-    updatedAt?: boolean
+    date?: boolean
+    hasBuildLog?: boolean
+    createdAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     product?: boolean | ProductDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["streak"]>
+  }, ExtArgs["result"]["dailyStreak"]>
 
-  export type StreakSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type DailyStreakSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
     productId?: boolean
-    currentStreak?: boolean
-    bestStreak?: boolean
-    lastActiveDate?: boolean
-    streakStart?: boolean
-    updatedAt?: boolean
+    date?: boolean
+    hasBuildLog?: boolean
+    createdAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     product?: boolean | ProductDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["streak"]>
+  }, ExtArgs["result"]["dailyStreak"]>
 
-  export type StreakSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type DailyStreakSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
     productId?: boolean
-    currentStreak?: boolean
-    bestStreak?: boolean
-    lastActiveDate?: boolean
-    streakStart?: boolean
-    updatedAt?: boolean
+    date?: boolean
+    hasBuildLog?: boolean
+    createdAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     product?: boolean | ProductDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["streak"]>
+  }, ExtArgs["result"]["dailyStreak"]>
 
-  export type StreakSelectScalar = {
+  export type DailyStreakSelectScalar = {
     id?: boolean
     userId?: boolean
     productId?: boolean
-    currentStreak?: boolean
-    bestStreak?: boolean
-    lastActiveDate?: boolean
-    streakStart?: boolean
-    updatedAt?: boolean
+    date?: boolean
+    hasBuildLog?: boolean
+    createdAt?: boolean
   }
 
-  export type StreakOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "productId" | "currentStreak" | "bestStreak" | "lastActiveDate" | "streakStart" | "updatedAt", ExtArgs["result"]["streak"]>
-  export type StreakInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "productId" | "date" | "hasBuildLog" | "createdAt", ExtArgs["result"]["dailyStreak"]>
+  export type DailyStreakInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     product?: boolean | ProductDefaultArgs<ExtArgs>
   }
-  export type StreakIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     product?: boolean | ProductDefaultArgs<ExtArgs>
   }
-  export type StreakIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     product?: boolean | ProductDefaultArgs<ExtArgs>
   }
 
-  export type $StreakPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "Streak"
+  export type $DailyStreakPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DailyStreak"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
       product: Prisma.$ProductPayload<ExtArgs>
@@ -13686,141 +11835,139 @@ export namespace Prisma {
       id: string
       userId: string
       productId: string
-      currentStreak: number
-      bestStreak: number
-      lastActiveDate: Date
-      streakStart: Date
-      updatedAt: Date
-    }, ExtArgs["result"]["streak"]>
+      date: Date
+      hasBuildLog: boolean
+      createdAt: Date
+    }, ExtArgs["result"]["dailyStreak"]>
     composites: {}
   }
 
-  type StreakGetPayload<S extends boolean | null | undefined | StreakDefaultArgs> = $Result.GetResult<Prisma.$StreakPayload, S>
+  type DailyStreakGetPayload<S extends boolean | null | undefined | DailyStreakDefaultArgs> = $Result.GetResult<Prisma.$DailyStreakPayload, S>
 
-  type StreakCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<StreakFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: StreakCountAggregateInputType | true
+  type DailyStreakCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DailyStreakFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DailyStreakCountAggregateInputType | true
     }
 
-  export interface StreakDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Streak'], meta: { name: 'Streak' } }
+  export interface DailyStreakDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DailyStreak'], meta: { name: 'DailyStreak' } }
     /**
-     * Find zero or one Streak that matches the filter.
-     * @param {StreakFindUniqueArgs} args - Arguments to find a Streak
+     * Find zero or one DailyStreak that matches the filter.
+     * @param {DailyStreakFindUniqueArgs} args - Arguments to find a DailyStreak
      * @example
-     * // Get one Streak
-     * const streak = await prisma.streak.findUnique({
+     * // Get one DailyStreak
+     * const dailyStreak = await prisma.dailyStreak.findUnique({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUnique<T extends StreakFindUniqueArgs>(args: SelectSubset<T, StreakFindUniqueArgs<ExtArgs>>): Prisma__StreakClient<$Result.GetResult<Prisma.$StreakPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    findUnique<T extends DailyStreakFindUniqueArgs>(args: SelectSubset<T, DailyStreakFindUniqueArgs<ExtArgs>>): Prisma__DailyStreakClient<$Result.GetResult<Prisma.$DailyStreakPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one Streak that matches the filter or throw an error with `error.code='P2025'`
+     * Find one DailyStreak that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
-     * @param {StreakFindUniqueOrThrowArgs} args - Arguments to find a Streak
+     * @param {DailyStreakFindUniqueOrThrowArgs} args - Arguments to find a DailyStreak
      * @example
-     * // Get one Streak
-     * const streak = await prisma.streak.findUniqueOrThrow({
+     * // Get one DailyStreak
+     * const dailyStreak = await prisma.dailyStreak.findUniqueOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUniqueOrThrow<T extends StreakFindUniqueOrThrowArgs>(args: SelectSubset<T, StreakFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StreakClient<$Result.GetResult<Prisma.$StreakPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    findUniqueOrThrow<T extends DailyStreakFindUniqueOrThrowArgs>(args: SelectSubset<T, DailyStreakFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DailyStreakClient<$Result.GetResult<Prisma.$DailyStreakPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find the first Streak that matches the filter.
+     * Find the first DailyStreak that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StreakFindFirstArgs} args - Arguments to find a Streak
+     * @param {DailyStreakFindFirstArgs} args - Arguments to find a DailyStreak
      * @example
-     * // Get one Streak
-     * const streak = await prisma.streak.findFirst({
+     * // Get one DailyStreak
+     * const dailyStreak = await prisma.dailyStreak.findFirst({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirst<T extends StreakFindFirstArgs>(args?: SelectSubset<T, StreakFindFirstArgs<ExtArgs>>): Prisma__StreakClient<$Result.GetResult<Prisma.$StreakPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    findFirst<T extends DailyStreakFindFirstArgs>(args?: SelectSubset<T, DailyStreakFindFirstArgs<ExtArgs>>): Prisma__DailyStreakClient<$Result.GetResult<Prisma.$DailyStreakPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find the first Streak that matches the filter or
+     * Find the first DailyStreak that matches the filter or
      * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StreakFindFirstOrThrowArgs} args - Arguments to find a Streak
+     * @param {DailyStreakFindFirstOrThrowArgs} args - Arguments to find a DailyStreak
      * @example
-     * // Get one Streak
-     * const streak = await prisma.streak.findFirstOrThrow({
+     * // Get one DailyStreak
+     * const dailyStreak = await prisma.dailyStreak.findFirstOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirstOrThrow<T extends StreakFindFirstOrThrowArgs>(args?: SelectSubset<T, StreakFindFirstOrThrowArgs<ExtArgs>>): Prisma__StreakClient<$Result.GetResult<Prisma.$StreakPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    findFirstOrThrow<T extends DailyStreakFindFirstOrThrowArgs>(args?: SelectSubset<T, DailyStreakFindFirstOrThrowArgs<ExtArgs>>): Prisma__DailyStreakClient<$Result.GetResult<Prisma.$DailyStreakPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find zero or more Streaks that matches the filter.
+     * Find zero or more DailyStreaks that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StreakFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @param {DailyStreakFindManyArgs} args - Arguments to filter and select certain fields only.
      * @example
-     * // Get all Streaks
-     * const streaks = await prisma.streak.findMany()
+     * // Get all DailyStreaks
+     * const dailyStreaks = await prisma.dailyStreak.findMany()
      * 
-     * // Get first 10 Streaks
-     * const streaks = await prisma.streak.findMany({ take: 10 })
+     * // Get first 10 DailyStreaks
+     * const dailyStreaks = await prisma.dailyStreak.findMany({ take: 10 })
      * 
      * // Only select the `id`
-     * const streakWithIdOnly = await prisma.streak.findMany({ select: { id: true } })
+     * const dailyStreakWithIdOnly = await prisma.dailyStreak.findMany({ select: { id: true } })
      * 
      */
-    findMany<T extends StreakFindManyArgs>(args?: SelectSubset<T, StreakFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StreakPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+    findMany<T extends DailyStreakFindManyArgs>(args?: SelectSubset<T, DailyStreakFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DailyStreakPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
-     * Create a Streak.
-     * @param {StreakCreateArgs} args - Arguments to create a Streak.
+     * Create a DailyStreak.
+     * @param {DailyStreakCreateArgs} args - Arguments to create a DailyStreak.
      * @example
-     * // Create one Streak
-     * const Streak = await prisma.streak.create({
+     * // Create one DailyStreak
+     * const DailyStreak = await prisma.dailyStreak.create({
      *   data: {
-     *     // ... data to create a Streak
+     *     // ... data to create a DailyStreak
      *   }
      * })
      * 
      */
-    create<T extends StreakCreateArgs>(args: SelectSubset<T, StreakCreateArgs<ExtArgs>>): Prisma__StreakClient<$Result.GetResult<Prisma.$StreakPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    create<T extends DailyStreakCreateArgs>(args: SelectSubset<T, DailyStreakCreateArgs<ExtArgs>>): Prisma__DailyStreakClient<$Result.GetResult<Prisma.$DailyStreakPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Create many Streaks.
-     * @param {StreakCreateManyArgs} args - Arguments to create many Streaks.
+     * Create many DailyStreaks.
+     * @param {DailyStreakCreateManyArgs} args - Arguments to create many DailyStreaks.
      * @example
-     * // Create many Streaks
-     * const streak = await prisma.streak.createMany({
+     * // Create many DailyStreaks
+     * const dailyStreak = await prisma.dailyStreak.createMany({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      *     
      */
-    createMany<T extends StreakCreateManyArgs>(args?: SelectSubset<T, StreakCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    createMany<T extends DailyStreakCreateManyArgs>(args?: SelectSubset<T, DailyStreakCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create many Streaks and returns the data saved in the database.
-     * @param {StreakCreateManyAndReturnArgs} args - Arguments to create many Streaks.
+     * Create many DailyStreaks and returns the data saved in the database.
+     * @param {DailyStreakCreateManyAndReturnArgs} args - Arguments to create many DailyStreaks.
      * @example
-     * // Create many Streaks
-     * const streak = await prisma.streak.createManyAndReturn({
+     * // Create many DailyStreaks
+     * const dailyStreak = await prisma.dailyStreak.createManyAndReturn({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      * 
-     * // Create many Streaks and only return the `id`
-     * const streakWithIdOnly = await prisma.streak.createManyAndReturn({
+     * // Create many DailyStreaks and only return the `id`
+     * const dailyStreakWithIdOnly = await prisma.dailyStreak.createManyAndReturn({
      *   select: { id: true },
      *   data: [
      *     // ... provide data here
@@ -13830,28 +11977,28 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends StreakCreateManyAndReturnArgs>(args?: SelectSubset<T, StreakCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StreakPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+    createManyAndReturn<T extends DailyStreakCreateManyAndReturnArgs>(args?: SelectSubset<T, DailyStreakCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DailyStreakPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
-     * Delete a Streak.
-     * @param {StreakDeleteArgs} args - Arguments to delete one Streak.
+     * Delete a DailyStreak.
+     * @param {DailyStreakDeleteArgs} args - Arguments to delete one DailyStreak.
      * @example
-     * // Delete one Streak
-     * const Streak = await prisma.streak.delete({
+     * // Delete one DailyStreak
+     * const DailyStreak = await prisma.dailyStreak.delete({
      *   where: {
-     *     // ... filter to delete one Streak
+     *     // ... filter to delete one DailyStreak
      *   }
      * })
      * 
      */
-    delete<T extends StreakDeleteArgs>(args: SelectSubset<T, StreakDeleteArgs<ExtArgs>>): Prisma__StreakClient<$Result.GetResult<Prisma.$StreakPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    delete<T extends DailyStreakDeleteArgs>(args: SelectSubset<T, DailyStreakDeleteArgs<ExtArgs>>): Prisma__DailyStreakClient<$Result.GetResult<Prisma.$DailyStreakPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Update one Streak.
-     * @param {StreakUpdateArgs} args - Arguments to update one Streak.
+     * Update one DailyStreak.
+     * @param {DailyStreakUpdateArgs} args - Arguments to update one DailyStreak.
      * @example
-     * // Update one Streak
-     * const streak = await prisma.streak.update({
+     * // Update one DailyStreak
+     * const dailyStreak = await prisma.dailyStreak.update({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -13861,30 +12008,30 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends StreakUpdateArgs>(args: SelectSubset<T, StreakUpdateArgs<ExtArgs>>): Prisma__StreakClient<$Result.GetResult<Prisma.$StreakPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    update<T extends DailyStreakUpdateArgs>(args: SelectSubset<T, DailyStreakUpdateArgs<ExtArgs>>): Prisma__DailyStreakClient<$Result.GetResult<Prisma.$DailyStreakPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Delete zero or more Streaks.
-     * @param {StreakDeleteManyArgs} args - Arguments to filter Streaks to delete.
+     * Delete zero or more DailyStreaks.
+     * @param {DailyStreakDeleteManyArgs} args - Arguments to filter DailyStreaks to delete.
      * @example
-     * // Delete a few Streaks
-     * const { count } = await prisma.streak.deleteMany({
+     * // Delete a few DailyStreaks
+     * const { count } = await prisma.dailyStreak.deleteMany({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      * 
      */
-    deleteMany<T extends StreakDeleteManyArgs>(args?: SelectSubset<T, StreakDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    deleteMany<T extends DailyStreakDeleteManyArgs>(args?: SelectSubset<T, DailyStreakDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more Streaks.
+     * Update zero or more DailyStreaks.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StreakUpdateManyArgs} args - Arguments to update one or more rows.
+     * @param {DailyStreakUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
-     * // Update many Streaks
-     * const streak = await prisma.streak.updateMany({
+     * // Update many DailyStreaks
+     * const dailyStreak = await prisma.dailyStreak.updateMany({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -13894,14 +12041,14 @@ export namespace Prisma {
      * })
      * 
      */
-    updateMany<T extends StreakUpdateManyArgs>(args: SelectSubset<T, StreakUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    updateMany<T extends DailyStreakUpdateManyArgs>(args: SelectSubset<T, DailyStreakUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more Streaks and returns the data updated in the database.
-     * @param {StreakUpdateManyAndReturnArgs} args - Arguments to update many Streaks.
+     * Update zero or more DailyStreaks and returns the data updated in the database.
+     * @param {DailyStreakUpdateManyAndReturnArgs} args - Arguments to update many DailyStreaks.
      * @example
-     * // Update many Streaks
-     * const streak = await prisma.streak.updateManyAndReturn({
+     * // Update many DailyStreaks
+     * const dailyStreak = await prisma.dailyStreak.updateManyAndReturn({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -13910,8 +12057,8 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Update zero or more Streaks and only return the `id`
-     * const streakWithIdOnly = await prisma.streak.updateManyAndReturn({
+     * // Update zero or more DailyStreaks and only return the `id`
+     * const dailyStreakWithIdOnly = await prisma.dailyStreak.updateManyAndReturn({
      *   select: { id: true },
      *   where: {
      *     // ... provide filter here
@@ -13924,56 +12071,56 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    updateManyAndReturn<T extends StreakUpdateManyAndReturnArgs>(args: SelectSubset<T, StreakUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StreakPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+    updateManyAndReturn<T extends DailyStreakUpdateManyAndReturnArgs>(args: SelectSubset<T, DailyStreakUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DailyStreakPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
     /**
-     * Create or update one Streak.
-     * @param {StreakUpsertArgs} args - Arguments to update or create a Streak.
+     * Create or update one DailyStreak.
+     * @param {DailyStreakUpsertArgs} args - Arguments to update or create a DailyStreak.
      * @example
-     * // Update or create a Streak
-     * const streak = await prisma.streak.upsert({
+     * // Update or create a DailyStreak
+     * const dailyStreak = await prisma.dailyStreak.upsert({
      *   create: {
-     *     // ... data to create a Streak
+     *     // ... data to create a DailyStreak
      *   },
      *   update: {
      *     // ... in case it already exists, update
      *   },
      *   where: {
-     *     // ... the filter for the Streak we want to update
+     *     // ... the filter for the DailyStreak we want to update
      *   }
      * })
      */
-    upsert<T extends StreakUpsertArgs>(args: SelectSubset<T, StreakUpsertArgs<ExtArgs>>): Prisma__StreakClient<$Result.GetResult<Prisma.$StreakPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    upsert<T extends DailyStreakUpsertArgs>(args: SelectSubset<T, DailyStreakUpsertArgs<ExtArgs>>): Prisma__DailyStreakClient<$Result.GetResult<Prisma.$DailyStreakPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
-     * Count the number of Streaks.
+     * Count the number of DailyStreaks.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StreakCountArgs} args - Arguments to filter Streaks to count.
+     * @param {DailyStreakCountArgs} args - Arguments to filter DailyStreaks to count.
      * @example
-     * // Count the number of Streaks
-     * const count = await prisma.streak.count({
+     * // Count the number of DailyStreaks
+     * const count = await prisma.dailyStreak.count({
      *   where: {
-     *     // ... the filter for the Streaks we want to count
+     *     // ... the filter for the DailyStreaks we want to count
      *   }
      * })
     **/
-    count<T extends StreakCountArgs>(
-      args?: Subset<T, StreakCountArgs>,
+    count<T extends DailyStreakCountArgs>(
+      args?: Subset<T, DailyStreakCountArgs>,
     ): Prisma.PrismaPromise<
       T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
-          : GetScalarType<T['select'], StreakCountAggregateOutputType>
+          : GetScalarType<T['select'], DailyStreakCountAggregateOutputType>
         : number
     >
 
     /**
-     * Allows you to perform aggregations operations on a Streak.
+     * Allows you to perform aggregations operations on a DailyStreak.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StreakAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @param {DailyStreakAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
@@ -13993,13 +12140,13 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends StreakAggregateArgs>(args: Subset<T, StreakAggregateArgs>): Prisma.PrismaPromise<GetStreakAggregateType<T>>
+    aggregate<T extends DailyStreakAggregateArgs>(args: Subset<T, DailyStreakAggregateArgs>): Prisma.PrismaPromise<GetDailyStreakAggregateType<T>>
 
     /**
-     * Group by Streak.
+     * Group by DailyStreak.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StreakGroupByArgs} args - Group by arguments.
+     * @param {DailyStreakGroupByArgs} args - Group by arguments.
      * @example
      * // Group by city, order by createdAt, get count
      * const result = await prisma.user.groupBy({
@@ -14014,14 +12161,14 @@ export namespace Prisma {
      * 
     **/
     groupBy<
-      T extends StreakGroupByArgs,
+      T extends DailyStreakGroupByArgs,
       HasSelectOrTake extends Or<
         Extends<'skip', Keys<T>>,
         Extends<'take', Keys<T>>
       >,
       OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: StreakGroupByArgs['orderBy'] }
-        : { orderBy?: StreakGroupByArgs['orderBy'] },
+        ? { orderBy: DailyStreakGroupByArgs['orderBy'] }
+        : { orderBy?: DailyStreakGroupByArgs['orderBy'] },
       OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
       ByFields extends MaybeTupleToUnion<T['by']>,
       ByValid extends Has<ByFields, OrderFields>,
@@ -14070,20 +12217,20 @@ export namespace Prisma {
             ? never
             : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
         }[OrderFields]
-    >(args: SubsetIntersection<T, StreakGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStreakGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+    >(args: SubsetIntersection<T, DailyStreakGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDailyStreakGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
   /**
-   * Fields of the Streak model
+   * Fields of the DailyStreak model
    */
-  readonly fields: StreakFieldRefs;
+  readonly fields: DailyStreakFieldRefs;
   }
 
   /**
-   * The delegate class that acts as a "Promise-like" for Streak.
+   * The delegate class that acts as a "Promise-like" for DailyStreak.
    * Why is this prefixed with `Prisma__`?
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__StreakClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__DailyStreakClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     product<T extends ProductDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProductDefaultArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
@@ -14113,428 +12260,3776 @@ export namespace Prisma {
 
 
   /**
-   * Fields of the Streak model
+   * Fields of the DailyStreak model
    */
-  interface StreakFieldRefs {
-    readonly id: FieldRef<"Streak", 'String'>
-    readonly userId: FieldRef<"Streak", 'String'>
-    readonly productId: FieldRef<"Streak", 'String'>
-    readonly currentStreak: FieldRef<"Streak", 'Int'>
-    readonly bestStreak: FieldRef<"Streak", 'Int'>
-    readonly lastActiveDate: FieldRef<"Streak", 'DateTime'>
-    readonly streakStart: FieldRef<"Streak", 'DateTime'>
-    readonly updatedAt: FieldRef<"Streak", 'DateTime'>
+  interface DailyStreakFieldRefs {
+    readonly id: FieldRef<"DailyStreak", 'String'>
+    readonly userId: FieldRef<"DailyStreak", 'String'>
+    readonly productId: FieldRef<"DailyStreak", 'String'>
+    readonly date: FieldRef<"DailyStreak", 'DateTime'>
+    readonly hasBuildLog: FieldRef<"DailyStreak", 'Boolean'>
+    readonly createdAt: FieldRef<"DailyStreak", 'DateTime'>
   }
     
 
   // Custom InputTypes
   /**
-   * Streak findUnique
+   * DailyStreak findUnique
    */
-  export type StreakFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Streak
+     * Select specific fields to fetch from the DailyStreak
      */
-    select?: StreakSelect<ExtArgs> | null
+    select?: DailyStreakSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Streak
+     * Omit specific fields from the DailyStreak
      */
-    omit?: StreakOmit<ExtArgs> | null
+    omit?: DailyStreakOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StreakInclude<ExtArgs> | null
+    include?: DailyStreakInclude<ExtArgs> | null
     /**
-     * Filter, which Streak to fetch.
+     * Filter, which DailyStreak to fetch.
      */
-    where: StreakWhereUniqueInput
+    where: DailyStreakWhereUniqueInput
   }
 
   /**
-   * Streak findUniqueOrThrow
+   * DailyStreak findUniqueOrThrow
    */
-  export type StreakFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Streak
+     * Select specific fields to fetch from the DailyStreak
      */
-    select?: StreakSelect<ExtArgs> | null
+    select?: DailyStreakSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Streak
+     * Omit specific fields from the DailyStreak
      */
-    omit?: StreakOmit<ExtArgs> | null
+    omit?: DailyStreakOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StreakInclude<ExtArgs> | null
+    include?: DailyStreakInclude<ExtArgs> | null
     /**
-     * Filter, which Streak to fetch.
+     * Filter, which DailyStreak to fetch.
      */
-    where: StreakWhereUniqueInput
+    where: DailyStreakWhereUniqueInput
   }
 
   /**
-   * Streak findFirst
+   * DailyStreak findFirst
    */
-  export type StreakFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Streak
+     * Select specific fields to fetch from the DailyStreak
      */
-    select?: StreakSelect<ExtArgs> | null
+    select?: DailyStreakSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Streak
+     * Omit specific fields from the DailyStreak
      */
-    omit?: StreakOmit<ExtArgs> | null
+    omit?: DailyStreakOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StreakInclude<ExtArgs> | null
+    include?: DailyStreakInclude<ExtArgs> | null
     /**
-     * Filter, which Streak to fetch.
+     * Filter, which DailyStreak to fetch.
      */
-    where?: StreakWhereInput
+    where?: DailyStreakWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Streaks to fetch.
+     * Determine the order of DailyStreaks to fetch.
      */
-    orderBy?: StreakOrderByWithRelationInput | StreakOrderByWithRelationInput[]
+    orderBy?: DailyStreakOrderByWithRelationInput | DailyStreakOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for Streaks.
+     * Sets the position for searching for DailyStreaks.
      */
-    cursor?: StreakWhereUniqueInput
+    cursor?: DailyStreakWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Streaks from the position of the cursor.
+     * Take `±n` DailyStreaks from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Streaks.
+     * Skip the first `n` DailyStreaks.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of Streaks.
+     * Filter by unique combinations of DailyStreaks.
      */
-    distinct?: StreakScalarFieldEnum | StreakScalarFieldEnum[]
+    distinct?: DailyStreakScalarFieldEnum | DailyStreakScalarFieldEnum[]
   }
 
   /**
-   * Streak findFirstOrThrow
+   * DailyStreak findFirstOrThrow
    */
-  export type StreakFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Streak
+     * Select specific fields to fetch from the DailyStreak
      */
-    select?: StreakSelect<ExtArgs> | null
+    select?: DailyStreakSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Streak
+     * Omit specific fields from the DailyStreak
      */
-    omit?: StreakOmit<ExtArgs> | null
+    omit?: DailyStreakOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StreakInclude<ExtArgs> | null
+    include?: DailyStreakInclude<ExtArgs> | null
     /**
-     * Filter, which Streak to fetch.
+     * Filter, which DailyStreak to fetch.
      */
-    where?: StreakWhereInput
+    where?: DailyStreakWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Streaks to fetch.
+     * Determine the order of DailyStreaks to fetch.
      */
-    orderBy?: StreakOrderByWithRelationInput | StreakOrderByWithRelationInput[]
+    orderBy?: DailyStreakOrderByWithRelationInput | DailyStreakOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for Streaks.
+     * Sets the position for searching for DailyStreaks.
      */
-    cursor?: StreakWhereUniqueInput
+    cursor?: DailyStreakWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Streaks from the position of the cursor.
+     * Take `±n` DailyStreaks from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Streaks.
+     * Skip the first `n` DailyStreaks.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of Streaks.
+     * Filter by unique combinations of DailyStreaks.
      */
-    distinct?: StreakScalarFieldEnum | StreakScalarFieldEnum[]
+    distinct?: DailyStreakScalarFieldEnum | DailyStreakScalarFieldEnum[]
   }
 
   /**
-   * Streak findMany
+   * DailyStreak findMany
    */
-  export type StreakFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Streak
+     * Select specific fields to fetch from the DailyStreak
      */
-    select?: StreakSelect<ExtArgs> | null
+    select?: DailyStreakSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Streak
+     * Omit specific fields from the DailyStreak
      */
-    omit?: StreakOmit<ExtArgs> | null
+    omit?: DailyStreakOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StreakInclude<ExtArgs> | null
+    include?: DailyStreakInclude<ExtArgs> | null
     /**
-     * Filter, which Streaks to fetch.
+     * Filter, which DailyStreaks to fetch.
      */
-    where?: StreakWhereInput
+    where?: DailyStreakWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Streaks to fetch.
+     * Determine the order of DailyStreaks to fetch.
      */
-    orderBy?: StreakOrderByWithRelationInput | StreakOrderByWithRelationInput[]
+    orderBy?: DailyStreakOrderByWithRelationInput | DailyStreakOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing Streaks.
+     * Sets the position for listing DailyStreaks.
      */
-    cursor?: StreakWhereUniqueInput
+    cursor?: DailyStreakWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Streaks from the position of the cursor.
+     * Take `±n` DailyStreaks from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Streaks.
+     * Skip the first `n` DailyStreaks.
      */
     skip?: number
-    distinct?: StreakScalarFieldEnum | StreakScalarFieldEnum[]
+    distinct?: DailyStreakScalarFieldEnum | DailyStreakScalarFieldEnum[]
   }
 
   /**
-   * Streak create
+   * DailyStreak create
    */
-  export type StreakCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Streak
+     * Select specific fields to fetch from the DailyStreak
      */
-    select?: StreakSelect<ExtArgs> | null
+    select?: DailyStreakSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Streak
+     * Omit specific fields from the DailyStreak
      */
-    omit?: StreakOmit<ExtArgs> | null
+    omit?: DailyStreakOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StreakInclude<ExtArgs> | null
+    include?: DailyStreakInclude<ExtArgs> | null
     /**
-     * The data needed to create a Streak.
+     * The data needed to create a DailyStreak.
      */
-    data: XOR<StreakCreateInput, StreakUncheckedCreateInput>
+    data: XOR<DailyStreakCreateInput, DailyStreakUncheckedCreateInput>
   }
 
   /**
-   * Streak createMany
+   * DailyStreak createMany
    */
-  export type StreakCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to create many Streaks.
+     * The data used to create many DailyStreaks.
      */
-    data: StreakCreateManyInput | StreakCreateManyInput[]
+    data: DailyStreakCreateManyInput | DailyStreakCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * Streak createManyAndReturn
+   * DailyStreak createManyAndReturn
    */
-  export type StreakCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Streak
+     * Select specific fields to fetch from the DailyStreak
      */
-    select?: StreakSelectCreateManyAndReturn<ExtArgs> | null
+    select?: DailyStreakSelectCreateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the Streak
+     * Omit specific fields from the DailyStreak
      */
-    omit?: StreakOmit<ExtArgs> | null
+    omit?: DailyStreakOmit<ExtArgs> | null
     /**
-     * The data used to create many Streaks.
+     * The data used to create many DailyStreaks.
      */
-    data: StreakCreateManyInput | StreakCreateManyInput[]
+    data: DailyStreakCreateManyInput | DailyStreakCreateManyInput[]
     skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StreakIncludeCreateManyAndReturn<ExtArgs> | null
+    include?: DailyStreakIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * Streak update
+   * DailyStreak update
    */
-  export type StreakUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Streak
+     * Select specific fields to fetch from the DailyStreak
      */
-    select?: StreakSelect<ExtArgs> | null
+    select?: DailyStreakSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Streak
+     * Omit specific fields from the DailyStreak
      */
-    omit?: StreakOmit<ExtArgs> | null
+    omit?: DailyStreakOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StreakInclude<ExtArgs> | null
+    include?: DailyStreakInclude<ExtArgs> | null
     /**
-     * The data needed to update a Streak.
+     * The data needed to update a DailyStreak.
      */
-    data: XOR<StreakUpdateInput, StreakUncheckedUpdateInput>
+    data: XOR<DailyStreakUpdateInput, DailyStreakUncheckedUpdateInput>
     /**
-     * Choose, which Streak to update.
+     * Choose, which DailyStreak to update.
      */
-    where: StreakWhereUniqueInput
+    where: DailyStreakWhereUniqueInput
   }
 
   /**
-   * Streak updateMany
+   * DailyStreak updateMany
    */
-  export type StreakUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to update Streaks.
+     * The data used to update DailyStreaks.
      */
-    data: XOR<StreakUpdateManyMutationInput, StreakUncheckedUpdateManyInput>
+    data: XOR<DailyStreakUpdateManyMutationInput, DailyStreakUncheckedUpdateManyInput>
     /**
-     * Filter which Streaks to update
+     * Filter which DailyStreaks to update
      */
-    where?: StreakWhereInput
+    where?: DailyStreakWhereInput
     /**
-     * Limit how many Streaks to update.
+     * Limit how many DailyStreaks to update.
      */
     limit?: number
   }
 
   /**
-   * Streak updateManyAndReturn
+   * DailyStreak updateManyAndReturn
    */
-  export type StreakUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Streak
+     * Select specific fields to fetch from the DailyStreak
      */
-    select?: StreakSelectUpdateManyAndReturn<ExtArgs> | null
+    select?: DailyStreakSelectUpdateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the Streak
+     * Omit specific fields from the DailyStreak
      */
-    omit?: StreakOmit<ExtArgs> | null
+    omit?: DailyStreakOmit<ExtArgs> | null
     /**
-     * The data used to update Streaks.
+     * The data used to update DailyStreaks.
      */
-    data: XOR<StreakUpdateManyMutationInput, StreakUncheckedUpdateManyInput>
+    data: XOR<DailyStreakUpdateManyMutationInput, DailyStreakUncheckedUpdateManyInput>
     /**
-     * Filter which Streaks to update
+     * Filter which DailyStreaks to update
      */
-    where?: StreakWhereInput
+    where?: DailyStreakWhereInput
     /**
-     * Limit how many Streaks to update.
+     * Limit how many DailyStreaks to update.
      */
     limit?: number
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StreakIncludeUpdateManyAndReturn<ExtArgs> | null
+    include?: DailyStreakIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * Streak upsert
+   * DailyStreak upsert
    */
-  export type StreakUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Streak
+     * Select specific fields to fetch from the DailyStreak
      */
-    select?: StreakSelect<ExtArgs> | null
+    select?: DailyStreakSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Streak
+     * Omit specific fields from the DailyStreak
      */
-    omit?: StreakOmit<ExtArgs> | null
+    omit?: DailyStreakOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StreakInclude<ExtArgs> | null
+    include?: DailyStreakInclude<ExtArgs> | null
     /**
-     * The filter to search for the Streak to update in case it exists.
+     * The filter to search for the DailyStreak to update in case it exists.
      */
-    where: StreakWhereUniqueInput
+    where: DailyStreakWhereUniqueInput
     /**
-     * In case the Streak found by the `where` argument doesn't exist, create a new Streak with this data.
+     * In case the DailyStreak found by the `where` argument doesn't exist, create a new DailyStreak with this data.
      */
-    create: XOR<StreakCreateInput, StreakUncheckedCreateInput>
+    create: XOR<DailyStreakCreateInput, DailyStreakUncheckedCreateInput>
     /**
-     * In case the Streak was found with the provided `where` argument, update it with this data.
+     * In case the DailyStreak was found with the provided `where` argument, update it with this data.
      */
-    update: XOR<StreakUpdateInput, StreakUncheckedUpdateInput>
+    update: XOR<DailyStreakUpdateInput, DailyStreakUncheckedUpdateInput>
   }
 
   /**
-   * Streak delete
+   * DailyStreak delete
    */
-  export type StreakDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Streak
+     * Select specific fields to fetch from the DailyStreak
      */
-    select?: StreakSelect<ExtArgs> | null
+    select?: DailyStreakSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Streak
+     * Omit specific fields from the DailyStreak
      */
-    omit?: StreakOmit<ExtArgs> | null
+    omit?: DailyStreakOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StreakInclude<ExtArgs> | null
+    include?: DailyStreakInclude<ExtArgs> | null
     /**
-     * Filter which Streak to delete.
+     * Filter which DailyStreak to delete.
      */
-    where: StreakWhereUniqueInput
+    where: DailyStreakWhereUniqueInput
   }
 
   /**
-   * Streak deleteMany
+   * DailyStreak deleteMany
    */
-  export type StreakDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which Streaks to delete
+     * Filter which DailyStreaks to delete
      */
-    where?: StreakWhereInput
+    where?: DailyStreakWhereInput
     /**
-     * Limit how many Streaks to delete.
+     * Limit how many DailyStreaks to delete.
      */
     limit?: number
   }
 
   /**
-   * Streak without action
+   * DailyStreak without action
    */
-  export type StreakDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DailyStreakDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Streak
+     * Select specific fields to fetch from the DailyStreak
      */
-    select?: StreakSelect<ExtArgs> | null
+    select?: DailyStreakSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Streak
+     * Omit specific fields from the DailyStreak
      */
-    omit?: StreakOmit<ExtArgs> | null
+    omit?: DailyStreakOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StreakInclude<ExtArgs> | null
+    include?: DailyStreakInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model AiLog
+   */
+
+  export type AggregateAiLog = {
+    _count: AiLogCountAggregateOutputType | null
+    _min: AiLogMinAggregateOutputType | null
+    _max: AiLogMaxAggregateOutputType | null
+  }
+
+  export type AiLogMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    productId: string | null
+    ai_model: string | null
+    type: string | null
+    createdAt: Date | null
+  }
+
+  export type AiLogMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    productId: string | null
+    ai_model: string | null
+    type: string | null
+    createdAt: Date | null
+  }
+
+  export type AiLogCountAggregateOutputType = {
+    id: number
+    userId: number
+    productId: number
+    ai_model: number
+    type: number
+    input: number
+    output: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type AiLogMinAggregateInputType = {
+    id?: true
+    userId?: true
+    productId?: true
+    ai_model?: true
+    type?: true
+    createdAt?: true
+  }
+
+  export type AiLogMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    productId?: true
+    ai_model?: true
+    type?: true
+    createdAt?: true
+  }
+
+  export type AiLogCountAggregateInputType = {
+    id?: true
+    userId?: true
+    productId?: true
+    ai_model?: true
+    type?: true
+    input?: true
+    output?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type AiLogAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AiLog to aggregate.
+     */
+    where?: AiLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AiLogs to fetch.
+     */
+    orderBy?: AiLogOrderByWithRelationInput | AiLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AiLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AiLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AiLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AiLogs
+    **/
+    _count?: true | AiLogCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AiLogMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AiLogMaxAggregateInputType
+  }
+
+  export type GetAiLogAggregateType<T extends AiLogAggregateArgs> = {
+        [P in keyof T & keyof AggregateAiLog]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAiLog[P]>
+      : GetScalarType<T[P], AggregateAiLog[P]>
+  }
+
+
+
+
+  export type AiLogGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AiLogWhereInput
+    orderBy?: AiLogOrderByWithAggregationInput | AiLogOrderByWithAggregationInput[]
+    by: AiLogScalarFieldEnum[] | AiLogScalarFieldEnum
+    having?: AiLogScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AiLogCountAggregateInputType | true
+    _min?: AiLogMinAggregateInputType
+    _max?: AiLogMaxAggregateInputType
+  }
+
+  export type AiLogGroupByOutputType = {
+    id: string
+    userId: string
+    productId: string
+    ai_model: string
+    type: string
+    input: JsonValue
+    output: JsonValue
+    createdAt: Date
+    _count: AiLogCountAggregateOutputType | null
+    _min: AiLogMinAggregateOutputType | null
+    _max: AiLogMaxAggregateOutputType | null
+  }
+
+  type GetAiLogGroupByPayload<T extends AiLogGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AiLogGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AiLogGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AiLogGroupByOutputType[P]>
+            : GetScalarType<T[P], AiLogGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AiLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    productId?: boolean
+    ai_model?: boolean
+    type?: boolean
+    input?: boolean
+    output?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    product?: boolean | ProductDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["aiLog"]>
+
+  export type AiLogSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    productId?: boolean
+    ai_model?: boolean
+    type?: boolean
+    input?: boolean
+    output?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    product?: boolean | ProductDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["aiLog"]>
+
+  export type AiLogSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    productId?: boolean
+    ai_model?: boolean
+    type?: boolean
+    input?: boolean
+    output?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    product?: boolean | ProductDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["aiLog"]>
+
+  export type AiLogSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    productId?: boolean
+    ai_model?: boolean
+    type?: boolean
+    input?: boolean
+    output?: boolean
+    createdAt?: boolean
+  }
+
+  export type AiLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "productId" | "ai_model" | "type" | "input" | "output" | "createdAt", ExtArgs["result"]["aiLog"]>
+  export type AiLogInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    product?: boolean | ProductDefaultArgs<ExtArgs>
+  }
+  export type AiLogIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    product?: boolean | ProductDefaultArgs<ExtArgs>
+  }
+  export type AiLogIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    product?: boolean | ProductDefaultArgs<ExtArgs>
+  }
+
+  export type $AiLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AiLog"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      product: Prisma.$ProductPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      productId: string
+      ai_model: string
+      type: string
+      input: Prisma.JsonValue
+      output: Prisma.JsonValue
+      createdAt: Date
+    }, ExtArgs["result"]["aiLog"]>
+    composites: {}
+  }
+
+  type AiLogGetPayload<S extends boolean | null | undefined | AiLogDefaultArgs> = $Result.GetResult<Prisma.$AiLogPayload, S>
+
+  type AiLogCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AiLogFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AiLogCountAggregateInputType | true
+    }
+
+  export interface AiLogDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AiLog'], meta: { name: 'AiLog' } }
+    /**
+     * Find zero or one AiLog that matches the filter.
+     * @param {AiLogFindUniqueArgs} args - Arguments to find a AiLog
+     * @example
+     * // Get one AiLog
+     * const aiLog = await prisma.aiLog.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AiLogFindUniqueArgs>(args: SelectSubset<T, AiLogFindUniqueArgs<ExtArgs>>): Prisma__AiLogClient<$Result.GetResult<Prisma.$AiLogPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AiLog that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AiLogFindUniqueOrThrowArgs} args - Arguments to find a AiLog
+     * @example
+     * // Get one AiLog
+     * const aiLog = await prisma.aiLog.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AiLogFindUniqueOrThrowArgs>(args: SelectSubset<T, AiLogFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AiLogClient<$Result.GetResult<Prisma.$AiLogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AiLog that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AiLogFindFirstArgs} args - Arguments to find a AiLog
+     * @example
+     * // Get one AiLog
+     * const aiLog = await prisma.aiLog.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AiLogFindFirstArgs>(args?: SelectSubset<T, AiLogFindFirstArgs<ExtArgs>>): Prisma__AiLogClient<$Result.GetResult<Prisma.$AiLogPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AiLog that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AiLogFindFirstOrThrowArgs} args - Arguments to find a AiLog
+     * @example
+     * // Get one AiLog
+     * const aiLog = await prisma.aiLog.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AiLogFindFirstOrThrowArgs>(args?: SelectSubset<T, AiLogFindFirstOrThrowArgs<ExtArgs>>): Prisma__AiLogClient<$Result.GetResult<Prisma.$AiLogPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AiLogs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AiLogFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AiLogs
+     * const aiLogs = await prisma.aiLog.findMany()
+     * 
+     * // Get first 10 AiLogs
+     * const aiLogs = await prisma.aiLog.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const aiLogWithIdOnly = await prisma.aiLog.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AiLogFindManyArgs>(args?: SelectSubset<T, AiLogFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AiLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AiLog.
+     * @param {AiLogCreateArgs} args - Arguments to create a AiLog.
+     * @example
+     * // Create one AiLog
+     * const AiLog = await prisma.aiLog.create({
+     *   data: {
+     *     // ... data to create a AiLog
+     *   }
+     * })
+     * 
+     */
+    create<T extends AiLogCreateArgs>(args: SelectSubset<T, AiLogCreateArgs<ExtArgs>>): Prisma__AiLogClient<$Result.GetResult<Prisma.$AiLogPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AiLogs.
+     * @param {AiLogCreateManyArgs} args - Arguments to create many AiLogs.
+     * @example
+     * // Create many AiLogs
+     * const aiLog = await prisma.aiLog.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AiLogCreateManyArgs>(args?: SelectSubset<T, AiLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AiLogs and returns the data saved in the database.
+     * @param {AiLogCreateManyAndReturnArgs} args - Arguments to create many AiLogs.
+     * @example
+     * // Create many AiLogs
+     * const aiLog = await prisma.aiLog.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AiLogs and only return the `id`
+     * const aiLogWithIdOnly = await prisma.aiLog.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AiLogCreateManyAndReturnArgs>(args?: SelectSubset<T, AiLogCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AiLogPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a AiLog.
+     * @param {AiLogDeleteArgs} args - Arguments to delete one AiLog.
+     * @example
+     * // Delete one AiLog
+     * const AiLog = await prisma.aiLog.delete({
+     *   where: {
+     *     // ... filter to delete one AiLog
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AiLogDeleteArgs>(args: SelectSubset<T, AiLogDeleteArgs<ExtArgs>>): Prisma__AiLogClient<$Result.GetResult<Prisma.$AiLogPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AiLog.
+     * @param {AiLogUpdateArgs} args - Arguments to update one AiLog.
+     * @example
+     * // Update one AiLog
+     * const aiLog = await prisma.aiLog.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AiLogUpdateArgs>(args: SelectSubset<T, AiLogUpdateArgs<ExtArgs>>): Prisma__AiLogClient<$Result.GetResult<Prisma.$AiLogPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AiLogs.
+     * @param {AiLogDeleteManyArgs} args - Arguments to filter AiLogs to delete.
+     * @example
+     * // Delete a few AiLogs
+     * const { count } = await prisma.aiLog.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AiLogDeleteManyArgs>(args?: SelectSubset<T, AiLogDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AiLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AiLogUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AiLogs
+     * const aiLog = await prisma.aiLog.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AiLogUpdateManyArgs>(args: SelectSubset<T, AiLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AiLogs and returns the data updated in the database.
+     * @param {AiLogUpdateManyAndReturnArgs} args - Arguments to update many AiLogs.
+     * @example
+     * // Update many AiLogs
+     * const aiLog = await prisma.aiLog.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AiLogs and only return the `id`
+     * const aiLogWithIdOnly = await prisma.aiLog.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AiLogUpdateManyAndReturnArgs>(args: SelectSubset<T, AiLogUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AiLogPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one AiLog.
+     * @param {AiLogUpsertArgs} args - Arguments to update or create a AiLog.
+     * @example
+     * // Update or create a AiLog
+     * const aiLog = await prisma.aiLog.upsert({
+     *   create: {
+     *     // ... data to create a AiLog
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AiLog we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AiLogUpsertArgs>(args: SelectSubset<T, AiLogUpsertArgs<ExtArgs>>): Prisma__AiLogClient<$Result.GetResult<Prisma.$AiLogPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AiLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AiLogCountArgs} args - Arguments to filter AiLogs to count.
+     * @example
+     * // Count the number of AiLogs
+     * const count = await prisma.aiLog.count({
+     *   where: {
+     *     // ... the filter for the AiLogs we want to count
+     *   }
+     * })
+    **/
+    count<T extends AiLogCountArgs>(
+      args?: Subset<T, AiLogCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AiLogCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AiLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AiLogAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AiLogAggregateArgs>(args: Subset<T, AiLogAggregateArgs>): Prisma.PrismaPromise<GetAiLogAggregateType<T>>
+
+    /**
+     * Group by AiLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AiLogGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AiLogGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AiLogGroupByArgs['orderBy'] }
+        : { orderBy?: AiLogGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AiLogGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAiLogGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AiLog model
+   */
+  readonly fields: AiLogFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AiLog.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AiLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    product<T extends ProductDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProductDefaultArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AiLog model
+   */
+  interface AiLogFieldRefs {
+    readonly id: FieldRef<"AiLog", 'String'>
+    readonly userId: FieldRef<"AiLog", 'String'>
+    readonly productId: FieldRef<"AiLog", 'String'>
+    readonly ai_model: FieldRef<"AiLog", 'String'>
+    readonly type: FieldRef<"AiLog", 'String'>
+    readonly input: FieldRef<"AiLog", 'Json'>
+    readonly output: FieldRef<"AiLog", 'Json'>
+    readonly createdAt: FieldRef<"AiLog", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AiLog findUnique
+   */
+  export type AiLogFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AiLog
+     */
+    select?: AiLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AiLog
+     */
+    omit?: AiLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AiLogInclude<ExtArgs> | null
+    /**
+     * Filter, which AiLog to fetch.
+     */
+    where: AiLogWhereUniqueInput
+  }
+
+  /**
+   * AiLog findUniqueOrThrow
+   */
+  export type AiLogFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AiLog
+     */
+    select?: AiLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AiLog
+     */
+    omit?: AiLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AiLogInclude<ExtArgs> | null
+    /**
+     * Filter, which AiLog to fetch.
+     */
+    where: AiLogWhereUniqueInput
+  }
+
+  /**
+   * AiLog findFirst
+   */
+  export type AiLogFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AiLog
+     */
+    select?: AiLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AiLog
+     */
+    omit?: AiLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AiLogInclude<ExtArgs> | null
+    /**
+     * Filter, which AiLog to fetch.
+     */
+    where?: AiLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AiLogs to fetch.
+     */
+    orderBy?: AiLogOrderByWithRelationInput | AiLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AiLogs.
+     */
+    cursor?: AiLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AiLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AiLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AiLogs.
+     */
+    distinct?: AiLogScalarFieldEnum | AiLogScalarFieldEnum[]
+  }
+
+  /**
+   * AiLog findFirstOrThrow
+   */
+  export type AiLogFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AiLog
+     */
+    select?: AiLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AiLog
+     */
+    omit?: AiLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AiLogInclude<ExtArgs> | null
+    /**
+     * Filter, which AiLog to fetch.
+     */
+    where?: AiLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AiLogs to fetch.
+     */
+    orderBy?: AiLogOrderByWithRelationInput | AiLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AiLogs.
+     */
+    cursor?: AiLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AiLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AiLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AiLogs.
+     */
+    distinct?: AiLogScalarFieldEnum | AiLogScalarFieldEnum[]
+  }
+
+  /**
+   * AiLog findMany
+   */
+  export type AiLogFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AiLog
+     */
+    select?: AiLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AiLog
+     */
+    omit?: AiLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AiLogInclude<ExtArgs> | null
+    /**
+     * Filter, which AiLogs to fetch.
+     */
+    where?: AiLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AiLogs to fetch.
+     */
+    orderBy?: AiLogOrderByWithRelationInput | AiLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AiLogs.
+     */
+    cursor?: AiLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AiLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AiLogs.
+     */
+    skip?: number
+    distinct?: AiLogScalarFieldEnum | AiLogScalarFieldEnum[]
+  }
+
+  /**
+   * AiLog create
+   */
+  export type AiLogCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AiLog
+     */
+    select?: AiLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AiLog
+     */
+    omit?: AiLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AiLogInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AiLog.
+     */
+    data: XOR<AiLogCreateInput, AiLogUncheckedCreateInput>
+  }
+
+  /**
+   * AiLog createMany
+   */
+  export type AiLogCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AiLogs.
+     */
+    data: AiLogCreateManyInput | AiLogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AiLog createManyAndReturn
+   */
+  export type AiLogCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AiLog
+     */
+    select?: AiLogSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AiLog
+     */
+    omit?: AiLogOmit<ExtArgs> | null
+    /**
+     * The data used to create many AiLogs.
+     */
+    data: AiLogCreateManyInput | AiLogCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AiLogIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AiLog update
+   */
+  export type AiLogUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AiLog
+     */
+    select?: AiLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AiLog
+     */
+    omit?: AiLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AiLogInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AiLog.
+     */
+    data: XOR<AiLogUpdateInput, AiLogUncheckedUpdateInput>
+    /**
+     * Choose, which AiLog to update.
+     */
+    where: AiLogWhereUniqueInput
+  }
+
+  /**
+   * AiLog updateMany
+   */
+  export type AiLogUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AiLogs.
+     */
+    data: XOR<AiLogUpdateManyMutationInput, AiLogUncheckedUpdateManyInput>
+    /**
+     * Filter which AiLogs to update
+     */
+    where?: AiLogWhereInput
+    /**
+     * Limit how many AiLogs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AiLog updateManyAndReturn
+   */
+  export type AiLogUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AiLog
+     */
+    select?: AiLogSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AiLog
+     */
+    omit?: AiLogOmit<ExtArgs> | null
+    /**
+     * The data used to update AiLogs.
+     */
+    data: XOR<AiLogUpdateManyMutationInput, AiLogUncheckedUpdateManyInput>
+    /**
+     * Filter which AiLogs to update
+     */
+    where?: AiLogWhereInput
+    /**
+     * Limit how many AiLogs to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AiLogIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AiLog upsert
+   */
+  export type AiLogUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AiLog
+     */
+    select?: AiLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AiLog
+     */
+    omit?: AiLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AiLogInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AiLog to update in case it exists.
+     */
+    where: AiLogWhereUniqueInput
+    /**
+     * In case the AiLog found by the `where` argument doesn't exist, create a new AiLog with this data.
+     */
+    create: XOR<AiLogCreateInput, AiLogUncheckedCreateInput>
+    /**
+     * In case the AiLog was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AiLogUpdateInput, AiLogUncheckedUpdateInput>
+  }
+
+  /**
+   * AiLog delete
+   */
+  export type AiLogDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AiLog
+     */
+    select?: AiLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AiLog
+     */
+    omit?: AiLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AiLogInclude<ExtArgs> | null
+    /**
+     * Filter which AiLog to delete.
+     */
+    where: AiLogWhereUniqueInput
+  }
+
+  /**
+   * AiLog deleteMany
+   */
+  export type AiLogDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AiLogs to delete
+     */
+    where?: AiLogWhereInput
+    /**
+     * Limit how many AiLogs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AiLog without action
+   */
+  export type AiLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AiLog
+     */
+    select?: AiLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AiLog
+     */
+    omit?: AiLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AiLogInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model TokenUsage
+   */
+
+  export type AggregateTokenUsage = {
+    _count: TokenUsageCountAggregateOutputType | null
+    _avg: TokenUsageAvgAggregateOutputType | null
+    _sum: TokenUsageSumAggregateOutputType | null
+    _min: TokenUsageMinAggregateOutputType | null
+    _max: TokenUsageMaxAggregateOutputType | null
+  }
+
+  export type TokenUsageAvgAggregateOutputType = {
+    tokens: number | null
+  }
+
+  export type TokenUsageSumAggregateOutputType = {
+    tokens: number | null
+  }
+
+  export type TokenUsageMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    purpose: string | null
+    tokens: number | null
+    createdAt: Date | null
+  }
+
+  export type TokenUsageMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    purpose: string | null
+    tokens: number | null
+    createdAt: Date | null
+  }
+
+  export type TokenUsageCountAggregateOutputType = {
+    id: number
+    userId: number
+    purpose: number
+    tokens: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type TokenUsageAvgAggregateInputType = {
+    tokens?: true
+  }
+
+  export type TokenUsageSumAggregateInputType = {
+    tokens?: true
+  }
+
+  export type TokenUsageMinAggregateInputType = {
+    id?: true
+    userId?: true
+    purpose?: true
+    tokens?: true
+    createdAt?: true
+  }
+
+  export type TokenUsageMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    purpose?: true
+    tokens?: true
+    createdAt?: true
+  }
+
+  export type TokenUsageCountAggregateInputType = {
+    id?: true
+    userId?: true
+    purpose?: true
+    tokens?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type TokenUsageAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TokenUsage to aggregate.
+     */
+    where?: TokenUsageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TokenUsages to fetch.
+     */
+    orderBy?: TokenUsageOrderByWithRelationInput | TokenUsageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TokenUsageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TokenUsages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TokenUsages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TokenUsages
+    **/
+    _count?: true | TokenUsageCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: TokenUsageAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: TokenUsageSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TokenUsageMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TokenUsageMaxAggregateInputType
+  }
+
+  export type GetTokenUsageAggregateType<T extends TokenUsageAggregateArgs> = {
+        [P in keyof T & keyof AggregateTokenUsage]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTokenUsage[P]>
+      : GetScalarType<T[P], AggregateTokenUsage[P]>
+  }
+
+
+
+
+  export type TokenUsageGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TokenUsageWhereInput
+    orderBy?: TokenUsageOrderByWithAggregationInput | TokenUsageOrderByWithAggregationInput[]
+    by: TokenUsageScalarFieldEnum[] | TokenUsageScalarFieldEnum
+    having?: TokenUsageScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TokenUsageCountAggregateInputType | true
+    _avg?: TokenUsageAvgAggregateInputType
+    _sum?: TokenUsageSumAggregateInputType
+    _min?: TokenUsageMinAggregateInputType
+    _max?: TokenUsageMaxAggregateInputType
+  }
+
+  export type TokenUsageGroupByOutputType = {
+    id: string
+    userId: string
+    purpose: string
+    tokens: number
+    createdAt: Date
+    _count: TokenUsageCountAggregateOutputType | null
+    _avg: TokenUsageAvgAggregateOutputType | null
+    _sum: TokenUsageSumAggregateOutputType | null
+    _min: TokenUsageMinAggregateOutputType | null
+    _max: TokenUsageMaxAggregateOutputType | null
+  }
+
+  type GetTokenUsageGroupByPayload<T extends TokenUsageGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TokenUsageGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TokenUsageGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TokenUsageGroupByOutputType[P]>
+            : GetScalarType<T[P], TokenUsageGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TokenUsageSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    purpose?: boolean
+    tokens?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["tokenUsage"]>
+
+  export type TokenUsageSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    purpose?: boolean
+    tokens?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["tokenUsage"]>
+
+  export type TokenUsageSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    purpose?: boolean
+    tokens?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["tokenUsage"]>
+
+  export type TokenUsageSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    purpose?: boolean
+    tokens?: boolean
+    createdAt?: boolean
+  }
+
+  export type TokenUsageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "purpose" | "tokens" | "createdAt", ExtArgs["result"]["tokenUsage"]>
+  export type TokenUsageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type TokenUsageIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type TokenUsageIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $TokenUsagePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TokenUsage"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      purpose: string
+      tokens: number
+      createdAt: Date
+    }, ExtArgs["result"]["tokenUsage"]>
+    composites: {}
+  }
+
+  type TokenUsageGetPayload<S extends boolean | null | undefined | TokenUsageDefaultArgs> = $Result.GetResult<Prisma.$TokenUsagePayload, S>
+
+  type TokenUsageCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TokenUsageFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TokenUsageCountAggregateInputType | true
+    }
+
+  export interface TokenUsageDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TokenUsage'], meta: { name: 'TokenUsage' } }
+    /**
+     * Find zero or one TokenUsage that matches the filter.
+     * @param {TokenUsageFindUniqueArgs} args - Arguments to find a TokenUsage
+     * @example
+     * // Get one TokenUsage
+     * const tokenUsage = await prisma.tokenUsage.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TokenUsageFindUniqueArgs>(args: SelectSubset<T, TokenUsageFindUniqueArgs<ExtArgs>>): Prisma__TokenUsageClient<$Result.GetResult<Prisma.$TokenUsagePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one TokenUsage that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TokenUsageFindUniqueOrThrowArgs} args - Arguments to find a TokenUsage
+     * @example
+     * // Get one TokenUsage
+     * const tokenUsage = await prisma.tokenUsage.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TokenUsageFindUniqueOrThrowArgs>(args: SelectSubset<T, TokenUsageFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TokenUsageClient<$Result.GetResult<Prisma.$TokenUsagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TokenUsage that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TokenUsageFindFirstArgs} args - Arguments to find a TokenUsage
+     * @example
+     * // Get one TokenUsage
+     * const tokenUsage = await prisma.tokenUsage.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TokenUsageFindFirstArgs>(args?: SelectSubset<T, TokenUsageFindFirstArgs<ExtArgs>>): Prisma__TokenUsageClient<$Result.GetResult<Prisma.$TokenUsagePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TokenUsage that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TokenUsageFindFirstOrThrowArgs} args - Arguments to find a TokenUsage
+     * @example
+     * // Get one TokenUsage
+     * const tokenUsage = await prisma.tokenUsage.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TokenUsageFindFirstOrThrowArgs>(args?: SelectSubset<T, TokenUsageFindFirstOrThrowArgs<ExtArgs>>): Prisma__TokenUsageClient<$Result.GetResult<Prisma.$TokenUsagePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more TokenUsages that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TokenUsageFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TokenUsages
+     * const tokenUsages = await prisma.tokenUsage.findMany()
+     * 
+     * // Get first 10 TokenUsages
+     * const tokenUsages = await prisma.tokenUsage.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const tokenUsageWithIdOnly = await prisma.tokenUsage.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TokenUsageFindManyArgs>(args?: SelectSubset<T, TokenUsageFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenUsagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a TokenUsage.
+     * @param {TokenUsageCreateArgs} args - Arguments to create a TokenUsage.
+     * @example
+     * // Create one TokenUsage
+     * const TokenUsage = await prisma.tokenUsage.create({
+     *   data: {
+     *     // ... data to create a TokenUsage
+     *   }
+     * })
+     * 
+     */
+    create<T extends TokenUsageCreateArgs>(args: SelectSubset<T, TokenUsageCreateArgs<ExtArgs>>): Prisma__TokenUsageClient<$Result.GetResult<Prisma.$TokenUsagePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many TokenUsages.
+     * @param {TokenUsageCreateManyArgs} args - Arguments to create many TokenUsages.
+     * @example
+     * // Create many TokenUsages
+     * const tokenUsage = await prisma.tokenUsage.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TokenUsageCreateManyArgs>(args?: SelectSubset<T, TokenUsageCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TokenUsages and returns the data saved in the database.
+     * @param {TokenUsageCreateManyAndReturnArgs} args - Arguments to create many TokenUsages.
+     * @example
+     * // Create many TokenUsages
+     * const tokenUsage = await prisma.tokenUsage.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TokenUsages and only return the `id`
+     * const tokenUsageWithIdOnly = await prisma.tokenUsage.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TokenUsageCreateManyAndReturnArgs>(args?: SelectSubset<T, TokenUsageCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenUsagePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a TokenUsage.
+     * @param {TokenUsageDeleteArgs} args - Arguments to delete one TokenUsage.
+     * @example
+     * // Delete one TokenUsage
+     * const TokenUsage = await prisma.tokenUsage.delete({
+     *   where: {
+     *     // ... filter to delete one TokenUsage
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TokenUsageDeleteArgs>(args: SelectSubset<T, TokenUsageDeleteArgs<ExtArgs>>): Prisma__TokenUsageClient<$Result.GetResult<Prisma.$TokenUsagePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one TokenUsage.
+     * @param {TokenUsageUpdateArgs} args - Arguments to update one TokenUsage.
+     * @example
+     * // Update one TokenUsage
+     * const tokenUsage = await prisma.tokenUsage.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TokenUsageUpdateArgs>(args: SelectSubset<T, TokenUsageUpdateArgs<ExtArgs>>): Prisma__TokenUsageClient<$Result.GetResult<Prisma.$TokenUsagePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more TokenUsages.
+     * @param {TokenUsageDeleteManyArgs} args - Arguments to filter TokenUsages to delete.
+     * @example
+     * // Delete a few TokenUsages
+     * const { count } = await prisma.tokenUsage.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TokenUsageDeleteManyArgs>(args?: SelectSubset<T, TokenUsageDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TokenUsages.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TokenUsageUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TokenUsages
+     * const tokenUsage = await prisma.tokenUsage.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TokenUsageUpdateManyArgs>(args: SelectSubset<T, TokenUsageUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TokenUsages and returns the data updated in the database.
+     * @param {TokenUsageUpdateManyAndReturnArgs} args - Arguments to update many TokenUsages.
+     * @example
+     * // Update many TokenUsages
+     * const tokenUsage = await prisma.tokenUsage.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more TokenUsages and only return the `id`
+     * const tokenUsageWithIdOnly = await prisma.tokenUsage.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends TokenUsageUpdateManyAndReturnArgs>(args: SelectSubset<T, TokenUsageUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenUsagePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one TokenUsage.
+     * @param {TokenUsageUpsertArgs} args - Arguments to update or create a TokenUsage.
+     * @example
+     * // Update or create a TokenUsage
+     * const tokenUsage = await prisma.tokenUsage.upsert({
+     *   create: {
+     *     // ... data to create a TokenUsage
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TokenUsage we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TokenUsageUpsertArgs>(args: SelectSubset<T, TokenUsageUpsertArgs<ExtArgs>>): Prisma__TokenUsageClient<$Result.GetResult<Prisma.$TokenUsagePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of TokenUsages.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TokenUsageCountArgs} args - Arguments to filter TokenUsages to count.
+     * @example
+     * // Count the number of TokenUsages
+     * const count = await prisma.tokenUsage.count({
+     *   where: {
+     *     // ... the filter for the TokenUsages we want to count
+     *   }
+     * })
+    **/
+    count<T extends TokenUsageCountArgs>(
+      args?: Subset<T, TokenUsageCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TokenUsageCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TokenUsage.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TokenUsageAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TokenUsageAggregateArgs>(args: Subset<T, TokenUsageAggregateArgs>): Prisma.PrismaPromise<GetTokenUsageAggregateType<T>>
+
+    /**
+     * Group by TokenUsage.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TokenUsageGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TokenUsageGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TokenUsageGroupByArgs['orderBy'] }
+        : { orderBy?: TokenUsageGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TokenUsageGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTokenUsageGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TokenUsage model
+   */
+  readonly fields: TokenUsageFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TokenUsage.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TokenUsageClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TokenUsage model
+   */
+  interface TokenUsageFieldRefs {
+    readonly id: FieldRef<"TokenUsage", 'String'>
+    readonly userId: FieldRef<"TokenUsage", 'String'>
+    readonly purpose: FieldRef<"TokenUsage", 'String'>
+    readonly tokens: FieldRef<"TokenUsage", 'Int'>
+    readonly createdAt: FieldRef<"TokenUsage", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TokenUsage findUnique
+   */
+  export type TokenUsageFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenUsage
+     */
+    select?: TokenUsageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TokenUsage
+     */
+    omit?: TokenUsageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TokenUsageInclude<ExtArgs> | null
+    /**
+     * Filter, which TokenUsage to fetch.
+     */
+    where: TokenUsageWhereUniqueInput
+  }
+
+  /**
+   * TokenUsage findUniqueOrThrow
+   */
+  export type TokenUsageFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenUsage
+     */
+    select?: TokenUsageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TokenUsage
+     */
+    omit?: TokenUsageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TokenUsageInclude<ExtArgs> | null
+    /**
+     * Filter, which TokenUsage to fetch.
+     */
+    where: TokenUsageWhereUniqueInput
+  }
+
+  /**
+   * TokenUsage findFirst
+   */
+  export type TokenUsageFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenUsage
+     */
+    select?: TokenUsageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TokenUsage
+     */
+    omit?: TokenUsageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TokenUsageInclude<ExtArgs> | null
+    /**
+     * Filter, which TokenUsage to fetch.
+     */
+    where?: TokenUsageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TokenUsages to fetch.
+     */
+    orderBy?: TokenUsageOrderByWithRelationInput | TokenUsageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TokenUsages.
+     */
+    cursor?: TokenUsageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TokenUsages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TokenUsages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TokenUsages.
+     */
+    distinct?: TokenUsageScalarFieldEnum | TokenUsageScalarFieldEnum[]
+  }
+
+  /**
+   * TokenUsage findFirstOrThrow
+   */
+  export type TokenUsageFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenUsage
+     */
+    select?: TokenUsageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TokenUsage
+     */
+    omit?: TokenUsageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TokenUsageInclude<ExtArgs> | null
+    /**
+     * Filter, which TokenUsage to fetch.
+     */
+    where?: TokenUsageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TokenUsages to fetch.
+     */
+    orderBy?: TokenUsageOrderByWithRelationInput | TokenUsageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TokenUsages.
+     */
+    cursor?: TokenUsageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TokenUsages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TokenUsages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TokenUsages.
+     */
+    distinct?: TokenUsageScalarFieldEnum | TokenUsageScalarFieldEnum[]
+  }
+
+  /**
+   * TokenUsage findMany
+   */
+  export type TokenUsageFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenUsage
+     */
+    select?: TokenUsageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TokenUsage
+     */
+    omit?: TokenUsageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TokenUsageInclude<ExtArgs> | null
+    /**
+     * Filter, which TokenUsages to fetch.
+     */
+    where?: TokenUsageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TokenUsages to fetch.
+     */
+    orderBy?: TokenUsageOrderByWithRelationInput | TokenUsageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TokenUsages.
+     */
+    cursor?: TokenUsageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TokenUsages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TokenUsages.
+     */
+    skip?: number
+    distinct?: TokenUsageScalarFieldEnum | TokenUsageScalarFieldEnum[]
+  }
+
+  /**
+   * TokenUsage create
+   */
+  export type TokenUsageCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenUsage
+     */
+    select?: TokenUsageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TokenUsage
+     */
+    omit?: TokenUsageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TokenUsageInclude<ExtArgs> | null
+    /**
+     * The data needed to create a TokenUsage.
+     */
+    data: XOR<TokenUsageCreateInput, TokenUsageUncheckedCreateInput>
+  }
+
+  /**
+   * TokenUsage createMany
+   */
+  export type TokenUsageCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TokenUsages.
+     */
+    data: TokenUsageCreateManyInput | TokenUsageCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TokenUsage createManyAndReturn
+   */
+  export type TokenUsageCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenUsage
+     */
+    select?: TokenUsageSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TokenUsage
+     */
+    omit?: TokenUsageOmit<ExtArgs> | null
+    /**
+     * The data used to create many TokenUsages.
+     */
+    data: TokenUsageCreateManyInput | TokenUsageCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TokenUsageIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TokenUsage update
+   */
+  export type TokenUsageUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenUsage
+     */
+    select?: TokenUsageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TokenUsage
+     */
+    omit?: TokenUsageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TokenUsageInclude<ExtArgs> | null
+    /**
+     * The data needed to update a TokenUsage.
+     */
+    data: XOR<TokenUsageUpdateInput, TokenUsageUncheckedUpdateInput>
+    /**
+     * Choose, which TokenUsage to update.
+     */
+    where: TokenUsageWhereUniqueInput
+  }
+
+  /**
+   * TokenUsage updateMany
+   */
+  export type TokenUsageUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TokenUsages.
+     */
+    data: XOR<TokenUsageUpdateManyMutationInput, TokenUsageUncheckedUpdateManyInput>
+    /**
+     * Filter which TokenUsages to update
+     */
+    where?: TokenUsageWhereInput
+    /**
+     * Limit how many TokenUsages to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TokenUsage updateManyAndReturn
+   */
+  export type TokenUsageUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenUsage
+     */
+    select?: TokenUsageSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TokenUsage
+     */
+    omit?: TokenUsageOmit<ExtArgs> | null
+    /**
+     * The data used to update TokenUsages.
+     */
+    data: XOR<TokenUsageUpdateManyMutationInput, TokenUsageUncheckedUpdateManyInput>
+    /**
+     * Filter which TokenUsages to update
+     */
+    where?: TokenUsageWhereInput
+    /**
+     * Limit how many TokenUsages to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TokenUsageIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TokenUsage upsert
+   */
+  export type TokenUsageUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenUsage
+     */
+    select?: TokenUsageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TokenUsage
+     */
+    omit?: TokenUsageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TokenUsageInclude<ExtArgs> | null
+    /**
+     * The filter to search for the TokenUsage to update in case it exists.
+     */
+    where: TokenUsageWhereUniqueInput
+    /**
+     * In case the TokenUsage found by the `where` argument doesn't exist, create a new TokenUsage with this data.
+     */
+    create: XOR<TokenUsageCreateInput, TokenUsageUncheckedCreateInput>
+    /**
+     * In case the TokenUsage was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TokenUsageUpdateInput, TokenUsageUncheckedUpdateInput>
+  }
+
+  /**
+   * TokenUsage delete
+   */
+  export type TokenUsageDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenUsage
+     */
+    select?: TokenUsageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TokenUsage
+     */
+    omit?: TokenUsageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TokenUsageInclude<ExtArgs> | null
+    /**
+     * Filter which TokenUsage to delete.
+     */
+    where: TokenUsageWhereUniqueInput
+  }
+
+  /**
+   * TokenUsage deleteMany
+   */
+  export type TokenUsageDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TokenUsages to delete
+     */
+    where?: TokenUsageWhereInput
+    /**
+     * Limit how many TokenUsages to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * TokenUsage without action
+   */
+  export type TokenUsageDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenUsage
+     */
+    select?: TokenUsageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TokenUsage
+     */
+    omit?: TokenUsageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TokenUsageInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Settings
+   */
+
+  export type AggregateSettings = {
+    _count: SettingsCountAggregateOutputType | null
+    _avg: SettingsAvgAggregateOutputType | null
+    _sum: SettingsSumAggregateOutputType | null
+    _min: SettingsMinAggregateOutputType | null
+    _max: SettingsMaxAggregateOutputType | null
+  }
+
+  export type SettingsAvgAggregateOutputType = {
+    dailyHours: number | null
+    deadlineDays: number | null
+  }
+
+  export type SettingsSumAggregateOutputType = {
+    dailyHours: number | null
+    deadlineDays: number | null
+  }
+
+  export type SettingsMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    dailyHours: number | null
+    deadlineDays: number | null
+    aiModel: string | null
+    emailNudges: boolean | null
+    isPublic: boolean | null
+    slug: string | null
+    bio: string | null
+    twitter: string | null
+  }
+
+  export type SettingsMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    dailyHours: number | null
+    deadlineDays: number | null
+    aiModel: string | null
+    emailNudges: boolean | null
+    isPublic: boolean | null
+    slug: string | null
+    bio: string | null
+    twitter: string | null
+  }
+
+  export type SettingsCountAggregateOutputType = {
+    id: number
+    userId: number
+    dailyHours: number
+    deadlineDays: number
+    aiModel: number
+    emailNudges: number
+    isPublic: number
+    slug: number
+    bio: number
+    twitter: number
+    _all: number
+  }
+
+
+  export type SettingsAvgAggregateInputType = {
+    dailyHours?: true
+    deadlineDays?: true
+  }
+
+  export type SettingsSumAggregateInputType = {
+    dailyHours?: true
+    deadlineDays?: true
+  }
+
+  export type SettingsMinAggregateInputType = {
+    id?: true
+    userId?: true
+    dailyHours?: true
+    deadlineDays?: true
+    aiModel?: true
+    emailNudges?: true
+    isPublic?: true
+    slug?: true
+    bio?: true
+    twitter?: true
+  }
+
+  export type SettingsMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    dailyHours?: true
+    deadlineDays?: true
+    aiModel?: true
+    emailNudges?: true
+    isPublic?: true
+    slug?: true
+    bio?: true
+    twitter?: true
+  }
+
+  export type SettingsCountAggregateInputType = {
+    id?: true
+    userId?: true
+    dailyHours?: true
+    deadlineDays?: true
+    aiModel?: true
+    emailNudges?: true
+    isPublic?: true
+    slug?: true
+    bio?: true
+    twitter?: true
+    _all?: true
+  }
+
+  export type SettingsAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Settings to aggregate.
+     */
+    where?: SettingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Settings to fetch.
+     */
+    orderBy?: SettingsOrderByWithRelationInput | SettingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SettingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Settings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Settings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Settings
+    **/
+    _count?: true | SettingsCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SettingsAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SettingsSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SettingsMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SettingsMaxAggregateInputType
+  }
+
+  export type GetSettingsAggregateType<T extends SettingsAggregateArgs> = {
+        [P in keyof T & keyof AggregateSettings]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSettings[P]>
+      : GetScalarType<T[P], AggregateSettings[P]>
+  }
+
+
+
+
+  export type SettingsGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SettingsWhereInput
+    orderBy?: SettingsOrderByWithAggregationInput | SettingsOrderByWithAggregationInput[]
+    by: SettingsScalarFieldEnum[] | SettingsScalarFieldEnum
+    having?: SettingsScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SettingsCountAggregateInputType | true
+    _avg?: SettingsAvgAggregateInputType
+    _sum?: SettingsSumAggregateInputType
+    _min?: SettingsMinAggregateInputType
+    _max?: SettingsMaxAggregateInputType
+  }
+
+  export type SettingsGroupByOutputType = {
+    id: string
+    userId: string
+    dailyHours: number
+    deadlineDays: number
+    aiModel: string
+    emailNudges: boolean
+    isPublic: boolean
+    slug: string | null
+    bio: string | null
+    twitter: string | null
+    _count: SettingsCountAggregateOutputType | null
+    _avg: SettingsAvgAggregateOutputType | null
+    _sum: SettingsSumAggregateOutputType | null
+    _min: SettingsMinAggregateOutputType | null
+    _max: SettingsMaxAggregateOutputType | null
+  }
+
+  type GetSettingsGroupByPayload<T extends SettingsGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SettingsGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SettingsGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SettingsGroupByOutputType[P]>
+            : GetScalarType<T[P], SettingsGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SettingsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    dailyHours?: boolean
+    deadlineDays?: boolean
+    aiModel?: boolean
+    emailNudges?: boolean
+    isPublic?: boolean
+    slug?: boolean
+    bio?: boolean
+    twitter?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["settings"]>
+
+  export type SettingsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    dailyHours?: boolean
+    deadlineDays?: boolean
+    aiModel?: boolean
+    emailNudges?: boolean
+    isPublic?: boolean
+    slug?: boolean
+    bio?: boolean
+    twitter?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["settings"]>
+
+  export type SettingsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    dailyHours?: boolean
+    deadlineDays?: boolean
+    aiModel?: boolean
+    emailNudges?: boolean
+    isPublic?: boolean
+    slug?: boolean
+    bio?: boolean
+    twitter?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["settings"]>
+
+  export type SettingsSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    dailyHours?: boolean
+    deadlineDays?: boolean
+    aiModel?: boolean
+    emailNudges?: boolean
+    isPublic?: boolean
+    slug?: boolean
+    bio?: boolean
+    twitter?: boolean
+  }
+
+  export type SettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "dailyHours" | "deadlineDays" | "aiModel" | "emailNudges" | "isPublic" | "slug" | "bio" | "twitter", ExtArgs["result"]["settings"]>
+  export type SettingsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SettingsIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SettingsIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $SettingsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Settings"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      dailyHours: number
+      deadlineDays: number
+      aiModel: string
+      emailNudges: boolean
+      isPublic: boolean
+      slug: string | null
+      bio: string | null
+      twitter: string | null
+    }, ExtArgs["result"]["settings"]>
+    composites: {}
+  }
+
+  type SettingsGetPayload<S extends boolean | null | undefined | SettingsDefaultArgs> = $Result.GetResult<Prisma.$SettingsPayload, S>
+
+  type SettingsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SettingsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SettingsCountAggregateInputType | true
+    }
+
+  export interface SettingsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Settings'], meta: { name: 'Settings' } }
+    /**
+     * Find zero or one Settings that matches the filter.
+     * @param {SettingsFindUniqueArgs} args - Arguments to find a Settings
+     * @example
+     * // Get one Settings
+     * const settings = await prisma.settings.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SettingsFindUniqueArgs>(args: SelectSubset<T, SettingsFindUniqueArgs<ExtArgs>>): Prisma__SettingsClient<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Settings that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SettingsFindUniqueOrThrowArgs} args - Arguments to find a Settings
+     * @example
+     * // Get one Settings
+     * const settings = await prisma.settings.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SettingsFindUniqueOrThrowArgs>(args: SelectSubset<T, SettingsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SettingsClient<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Settings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettingsFindFirstArgs} args - Arguments to find a Settings
+     * @example
+     * // Get one Settings
+     * const settings = await prisma.settings.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SettingsFindFirstArgs>(args?: SelectSubset<T, SettingsFindFirstArgs<ExtArgs>>): Prisma__SettingsClient<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Settings that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettingsFindFirstOrThrowArgs} args - Arguments to find a Settings
+     * @example
+     * // Get one Settings
+     * const settings = await prisma.settings.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SettingsFindFirstOrThrowArgs>(args?: SelectSubset<T, SettingsFindFirstOrThrowArgs<ExtArgs>>): Prisma__SettingsClient<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Settings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettingsFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Settings
+     * const settings = await prisma.settings.findMany()
+     * 
+     * // Get first 10 Settings
+     * const settings = await prisma.settings.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const settingsWithIdOnly = await prisma.settings.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SettingsFindManyArgs>(args?: SelectSubset<T, SettingsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Settings.
+     * @param {SettingsCreateArgs} args - Arguments to create a Settings.
+     * @example
+     * // Create one Settings
+     * const Settings = await prisma.settings.create({
+     *   data: {
+     *     // ... data to create a Settings
+     *   }
+     * })
+     * 
+     */
+    create<T extends SettingsCreateArgs>(args: SelectSubset<T, SettingsCreateArgs<ExtArgs>>): Prisma__SettingsClient<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Settings.
+     * @param {SettingsCreateManyArgs} args - Arguments to create many Settings.
+     * @example
+     * // Create many Settings
+     * const settings = await prisma.settings.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SettingsCreateManyArgs>(args?: SelectSubset<T, SettingsCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Settings and returns the data saved in the database.
+     * @param {SettingsCreateManyAndReturnArgs} args - Arguments to create many Settings.
+     * @example
+     * // Create many Settings
+     * const settings = await prisma.settings.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Settings and only return the `id`
+     * const settingsWithIdOnly = await prisma.settings.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SettingsCreateManyAndReturnArgs>(args?: SelectSubset<T, SettingsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Settings.
+     * @param {SettingsDeleteArgs} args - Arguments to delete one Settings.
+     * @example
+     * // Delete one Settings
+     * const Settings = await prisma.settings.delete({
+     *   where: {
+     *     // ... filter to delete one Settings
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SettingsDeleteArgs>(args: SelectSubset<T, SettingsDeleteArgs<ExtArgs>>): Prisma__SettingsClient<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Settings.
+     * @param {SettingsUpdateArgs} args - Arguments to update one Settings.
+     * @example
+     * // Update one Settings
+     * const settings = await prisma.settings.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SettingsUpdateArgs>(args: SelectSubset<T, SettingsUpdateArgs<ExtArgs>>): Prisma__SettingsClient<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Settings.
+     * @param {SettingsDeleteManyArgs} args - Arguments to filter Settings to delete.
+     * @example
+     * // Delete a few Settings
+     * const { count } = await prisma.settings.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SettingsDeleteManyArgs>(args?: SelectSubset<T, SettingsDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Settings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettingsUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Settings
+     * const settings = await prisma.settings.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SettingsUpdateManyArgs>(args: SelectSubset<T, SettingsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Settings and returns the data updated in the database.
+     * @param {SettingsUpdateManyAndReturnArgs} args - Arguments to update many Settings.
+     * @example
+     * // Update many Settings
+     * const settings = await prisma.settings.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Settings and only return the `id`
+     * const settingsWithIdOnly = await prisma.settings.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SettingsUpdateManyAndReturnArgs>(args: SelectSubset<T, SettingsUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Settings.
+     * @param {SettingsUpsertArgs} args - Arguments to update or create a Settings.
+     * @example
+     * // Update or create a Settings
+     * const settings = await prisma.settings.upsert({
+     *   create: {
+     *     // ... data to create a Settings
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Settings we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SettingsUpsertArgs>(args: SelectSubset<T, SettingsUpsertArgs<ExtArgs>>): Prisma__SettingsClient<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Settings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettingsCountArgs} args - Arguments to filter Settings to count.
+     * @example
+     * // Count the number of Settings
+     * const count = await prisma.settings.count({
+     *   where: {
+     *     // ... the filter for the Settings we want to count
+     *   }
+     * })
+    **/
+    count<T extends SettingsCountArgs>(
+      args?: Subset<T, SettingsCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SettingsCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Settings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettingsAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SettingsAggregateArgs>(args: Subset<T, SettingsAggregateArgs>): Prisma.PrismaPromise<GetSettingsAggregateType<T>>
+
+    /**
+     * Group by Settings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettingsGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SettingsGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SettingsGroupByArgs['orderBy'] }
+        : { orderBy?: SettingsGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SettingsGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSettingsGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Settings model
+   */
+  readonly fields: SettingsFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Settings.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SettingsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Settings model
+   */
+  interface SettingsFieldRefs {
+    readonly id: FieldRef<"Settings", 'String'>
+    readonly userId: FieldRef<"Settings", 'String'>
+    readonly dailyHours: FieldRef<"Settings", 'Float'>
+    readonly deadlineDays: FieldRef<"Settings", 'Int'>
+    readonly aiModel: FieldRef<"Settings", 'String'>
+    readonly emailNudges: FieldRef<"Settings", 'Boolean'>
+    readonly isPublic: FieldRef<"Settings", 'Boolean'>
+    readonly slug: FieldRef<"Settings", 'String'>
+    readonly bio: FieldRef<"Settings", 'String'>
+    readonly twitter: FieldRef<"Settings", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Settings findUnique
+   */
+  export type SettingsFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Settings
+     */
+    select?: SettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Settings
+     */
+    omit?: SettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettingsInclude<ExtArgs> | null
+    /**
+     * Filter, which Settings to fetch.
+     */
+    where: SettingsWhereUniqueInput
+  }
+
+  /**
+   * Settings findUniqueOrThrow
+   */
+  export type SettingsFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Settings
+     */
+    select?: SettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Settings
+     */
+    omit?: SettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettingsInclude<ExtArgs> | null
+    /**
+     * Filter, which Settings to fetch.
+     */
+    where: SettingsWhereUniqueInput
+  }
+
+  /**
+   * Settings findFirst
+   */
+  export type SettingsFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Settings
+     */
+    select?: SettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Settings
+     */
+    omit?: SettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettingsInclude<ExtArgs> | null
+    /**
+     * Filter, which Settings to fetch.
+     */
+    where?: SettingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Settings to fetch.
+     */
+    orderBy?: SettingsOrderByWithRelationInput | SettingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Settings.
+     */
+    cursor?: SettingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Settings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Settings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Settings.
+     */
+    distinct?: SettingsScalarFieldEnum | SettingsScalarFieldEnum[]
+  }
+
+  /**
+   * Settings findFirstOrThrow
+   */
+  export type SettingsFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Settings
+     */
+    select?: SettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Settings
+     */
+    omit?: SettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettingsInclude<ExtArgs> | null
+    /**
+     * Filter, which Settings to fetch.
+     */
+    where?: SettingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Settings to fetch.
+     */
+    orderBy?: SettingsOrderByWithRelationInput | SettingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Settings.
+     */
+    cursor?: SettingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Settings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Settings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Settings.
+     */
+    distinct?: SettingsScalarFieldEnum | SettingsScalarFieldEnum[]
+  }
+
+  /**
+   * Settings findMany
+   */
+  export type SettingsFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Settings
+     */
+    select?: SettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Settings
+     */
+    omit?: SettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettingsInclude<ExtArgs> | null
+    /**
+     * Filter, which Settings to fetch.
+     */
+    where?: SettingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Settings to fetch.
+     */
+    orderBy?: SettingsOrderByWithRelationInput | SettingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Settings.
+     */
+    cursor?: SettingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Settings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Settings.
+     */
+    skip?: number
+    distinct?: SettingsScalarFieldEnum | SettingsScalarFieldEnum[]
+  }
+
+  /**
+   * Settings create
+   */
+  export type SettingsCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Settings
+     */
+    select?: SettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Settings
+     */
+    omit?: SettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettingsInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Settings.
+     */
+    data: XOR<SettingsCreateInput, SettingsUncheckedCreateInput>
+  }
+
+  /**
+   * Settings createMany
+   */
+  export type SettingsCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Settings.
+     */
+    data: SettingsCreateManyInput | SettingsCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Settings createManyAndReturn
+   */
+  export type SettingsCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Settings
+     */
+    select?: SettingsSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Settings
+     */
+    omit?: SettingsOmit<ExtArgs> | null
+    /**
+     * The data used to create many Settings.
+     */
+    data: SettingsCreateManyInput | SettingsCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettingsIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Settings update
+   */
+  export type SettingsUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Settings
+     */
+    select?: SettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Settings
+     */
+    omit?: SettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettingsInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Settings.
+     */
+    data: XOR<SettingsUpdateInput, SettingsUncheckedUpdateInput>
+    /**
+     * Choose, which Settings to update.
+     */
+    where: SettingsWhereUniqueInput
+  }
+
+  /**
+   * Settings updateMany
+   */
+  export type SettingsUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Settings.
+     */
+    data: XOR<SettingsUpdateManyMutationInput, SettingsUncheckedUpdateManyInput>
+    /**
+     * Filter which Settings to update
+     */
+    where?: SettingsWhereInput
+    /**
+     * Limit how many Settings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Settings updateManyAndReturn
+   */
+  export type SettingsUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Settings
+     */
+    select?: SettingsSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Settings
+     */
+    omit?: SettingsOmit<ExtArgs> | null
+    /**
+     * The data used to update Settings.
+     */
+    data: XOR<SettingsUpdateManyMutationInput, SettingsUncheckedUpdateManyInput>
+    /**
+     * Filter which Settings to update
+     */
+    where?: SettingsWhereInput
+    /**
+     * Limit how many Settings to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettingsIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Settings upsert
+   */
+  export type SettingsUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Settings
+     */
+    select?: SettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Settings
+     */
+    omit?: SettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettingsInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Settings to update in case it exists.
+     */
+    where: SettingsWhereUniqueInput
+    /**
+     * In case the Settings found by the `where` argument doesn't exist, create a new Settings with this data.
+     */
+    create: XOR<SettingsCreateInput, SettingsUncheckedCreateInput>
+    /**
+     * In case the Settings was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SettingsUpdateInput, SettingsUncheckedUpdateInput>
+  }
+
+  /**
+   * Settings delete
+   */
+  export type SettingsDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Settings
+     */
+    select?: SettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Settings
+     */
+    omit?: SettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettingsInclude<ExtArgs> | null
+    /**
+     * Filter which Settings to delete.
+     */
+    where: SettingsWhereUniqueInput
+  }
+
+  /**
+   * Settings deleteMany
+   */
+  export type SettingsDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Settings to delete
+     */
+    where?: SettingsWhereInput
+    /**
+     * Limit how many Settings to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Settings without action
+   */
+  export type SettingsDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Settings
+     */
+    select?: SettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Settings
+     */
+    omit?: SettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SettingsInclude<ExtArgs> | null
   }
 
 
@@ -14558,10 +16053,10 @@ export namespace Prisma {
     email: 'email',
     name: 'name',
     username: 'username',
+    onboardingCompleted: 'onboardingCompleted',
     discovery: 'discovery',
     role: 'role',
     bestStreakOverall: 'bestStreakOverall',
-    activeProjectId: 'activeProjectId',
     createdAt: 'createdAt'
   };
 
@@ -14597,32 +16092,30 @@ export namespace Prisma {
   export const ProductScalarFieldEnum: {
     id: 'id',
     name: 'name',
+    slug: 'slug',
     description: 'description',
     problemStatement: 'problemStatement',
     targetAudience: 'targetAudience',
     userGoals: 'userGoals',
     uniqueValueProp: 'uniqueValueProp',
+    isMvpGenerated: 'isMvpGenerated',
+    isRoadmapGenerated: 'isRoadmapGenerated',
+    currentStreak: 'currentStreak',
+    AllTimeBestStreak: 'AllTimeBestStreak',
+    active: 'active',
     techStack: 'techStack',
     inspirationApps: 'inspirationApps',
     initialFeatures: 'initialFeatures',
+    startDate: 'startDate',
     deadline: 'deadline',
     dailyCommitmentHrs: 'dailyCommitmentHrs',
     userId: 'userId',
+    mvpSummary: 'mvpSummary',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
   export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
-
-
-  export const RoadmapScalarFieldEnum: {
-    id: 'id',
-    mvpSummary: 'mvpSummary',
-    productId: 'productId',
-    createdAt: 'createdAt'
-  };
-
-  export type RoadmapScalarFieldEnum = (typeof RoadmapScalarFieldEnum)[keyof typeof RoadmapScalarFieldEnum]
 
 
   export const FeatureScalarFieldEnum: {
@@ -14639,6 +16132,8 @@ export namespace Prisma {
   export const TaskScalarFieldEnum: {
     id: 'id',
     title: 'title',
+    estimatedHours: 'estimatedHours',
+    status: 'status',
     dayNumber: 'dayNumber',
     completed: 'completed',
     featureId: 'featureId'
@@ -14652,54 +16147,83 @@ export namespace Prisma {
     taskId: 'taskId',
     dayIndex: 'dayIndex',
     dueDate: 'dueDate',
+    completedAt: 'completedAt',
     category: 'category',
     description: 'description',
-    status: 'status'
+    status: 'status',
+    milestoneGoal: 'milestoneGoal',
+    shipCheck: 'shipCheck',
+    buildLogId: 'buildLogId'
   };
 
   export type DayTaskScalarFieldEnum = (typeof DayTaskScalarFieldEnum)[keyof typeof DayTaskScalarFieldEnum]
 
 
-  export const DailyLogScalarFieldEnum: {
-    id: 'id',
-    userId: 'userId',
-    projectId: 'projectId',
-    date: 'date',
-    completedTasks: 'completedTasks',
-    notes: 'notes',
-    createdAt: 'createdAt'
-  };
-
-  export type DailyLogScalarFieldEnum = (typeof DailyLogScalarFieldEnum)[keyof typeof DailyLogScalarFieldEnum]
-
-
   export const BuildLogScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
-    projectId: 'projectId',
+    productId: 'productId',
     logDate: 'logDate',
     tweet: 'tweet',
     dayIndex: 'dayIndex',
     summary: 'summary',
-    sourceTasks: 'sourceTasks',
     generatedAt: 'generatedAt'
   };
 
   export type BuildLogScalarFieldEnum = (typeof BuildLogScalarFieldEnum)[keyof typeof BuildLogScalarFieldEnum]
 
 
-  export const StreakScalarFieldEnum: {
+  export const DailyStreakScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
     productId: 'productId',
-    currentStreak: 'currentStreak',
-    bestStreak: 'bestStreak',
-    lastActiveDate: 'lastActiveDate',
-    streakStart: 'streakStart',
-    updatedAt: 'updatedAt'
+    date: 'date',
+    hasBuildLog: 'hasBuildLog',
+    createdAt: 'createdAt'
   };
 
-  export type StreakScalarFieldEnum = (typeof StreakScalarFieldEnum)[keyof typeof StreakScalarFieldEnum]
+  export type DailyStreakScalarFieldEnum = (typeof DailyStreakScalarFieldEnum)[keyof typeof DailyStreakScalarFieldEnum]
+
+
+  export const AiLogScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    productId: 'productId',
+    ai_model: 'ai_model',
+    type: 'type',
+    input: 'input',
+    output: 'output',
+    createdAt: 'createdAt'
+  };
+
+  export type AiLogScalarFieldEnum = (typeof AiLogScalarFieldEnum)[keyof typeof AiLogScalarFieldEnum]
+
+
+  export const TokenUsageScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    purpose: 'purpose',
+    tokens: 'tokens',
+    createdAt: 'createdAt'
+  };
+
+  export type TokenUsageScalarFieldEnum = (typeof TokenUsageScalarFieldEnum)[keyof typeof TokenUsageScalarFieldEnum]
+
+
+  export const SettingsScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    dailyHours: 'dailyHours',
+    deadlineDays: 'deadlineDays',
+    aiModel: 'aiModel',
+    emailNudges: 'emailNudges',
+    isPublic: 'isPublic',
+    slug: 'slug',
+    bio: 'bio',
+    twitter: 'twitter'
+  };
+
+  export type SettingsScalarFieldEnum = (typeof SettingsScalarFieldEnum)[keyof typeof SettingsScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -14762,6 +16286,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -14804,13 +16335,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -14821,6 +16345,20 @@ export namespace Prisma {
    * Reference to a field of type 'Float[]'
    */
   export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'TaskStatus'
+   */
+  export type EnumTaskStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaskStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'TaskStatus[]'
+   */
+  export type ListEnumTaskStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaskStatus[]'>
     
 
 
@@ -14850,17 +16388,18 @@ export namespace Prisma {
     email?: StringFilter<"User"> | string
     name?: StringFilter<"User"> | string
     username?: StringNullableFilter<"User"> | string | null
+    onboardingCompleted?: BoolFilter<"User"> | boolean
     discovery?: StringNullableFilter<"User"> | string | null
     role?: StringNullableFilter<"User"> | string | null
     bestStreakOverall?: IntFilter<"User"> | number
-    activeProjectId?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
-    activeProject?: XOR<ProductNullableScalarRelationFilter, ProductWhereInput> | null
     products?: ProductListRelationFilter
     buildLogs?: BuildLogListRelationFilter
-    dailyLogs?: DailyLogListRelationFilter
     trial?: XOR<TrialNullableScalarRelationFilter, TrialWhereInput> | null
-    streaks?: StreakListRelationFilter
+    DailyStreak?: DailyStreakListRelationFilter
+    aiLogs?: AiLogListRelationFilter
+    tokenUsages?: TokenUsageListRelationFilter
+    settings?: XOR<SettingsNullableScalarRelationFilter, SettingsWhereInput> | null
   }
 
   export type UserOrderByWithRelationInput = {
@@ -14869,17 +16408,18 @@ export namespace Prisma {
     email?: SortOrder
     name?: SortOrder
     username?: SortOrderInput | SortOrder
+    onboardingCompleted?: SortOrder
     discovery?: SortOrderInput | SortOrder
     role?: SortOrderInput | SortOrder
     bestStreakOverall?: SortOrder
-    activeProjectId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
-    activeProject?: ProductOrderByWithRelationInput
     products?: ProductOrderByRelationAggregateInput
     buildLogs?: BuildLogOrderByRelationAggregateInput
-    dailyLogs?: DailyLogOrderByRelationAggregateInput
     trial?: TrialOrderByWithRelationInput
-    streaks?: StreakOrderByRelationAggregateInput
+    DailyStreak?: DailyStreakOrderByRelationAggregateInput
+    aiLogs?: AiLogOrderByRelationAggregateInput
+    tokenUsages?: TokenUsageOrderByRelationAggregateInput
+    settings?: SettingsOrderByWithRelationInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -14891,17 +16431,18 @@ export namespace Prisma {
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     name?: StringFilter<"User"> | string
+    onboardingCompleted?: BoolFilter<"User"> | boolean
     discovery?: StringNullableFilter<"User"> | string | null
     role?: StringNullableFilter<"User"> | string | null
     bestStreakOverall?: IntFilter<"User"> | number
-    activeProjectId?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
-    activeProject?: XOR<ProductNullableScalarRelationFilter, ProductWhereInput> | null
     products?: ProductListRelationFilter
     buildLogs?: BuildLogListRelationFilter
-    dailyLogs?: DailyLogListRelationFilter
     trial?: XOR<TrialNullableScalarRelationFilter, TrialWhereInput> | null
-    streaks?: StreakListRelationFilter
+    DailyStreak?: DailyStreakListRelationFilter
+    aiLogs?: AiLogListRelationFilter
+    tokenUsages?: TokenUsageListRelationFilter
+    settings?: XOR<SettingsNullableScalarRelationFilter, SettingsWhereInput> | null
   }, "id" | "clerkId" | "email" | "username">
 
   export type UserOrderByWithAggregationInput = {
@@ -14910,10 +16451,10 @@ export namespace Prisma {
     email?: SortOrder
     name?: SortOrder
     username?: SortOrderInput | SortOrder
+    onboardingCompleted?: SortOrder
     discovery?: SortOrderInput | SortOrder
     role?: SortOrderInput | SortOrder
     bestStreakOverall?: SortOrder
-    activeProjectId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
     _avg?: UserAvgOrderByAggregateInput
@@ -14931,10 +16472,10 @@ export namespace Prisma {
     email?: StringWithAggregatesFilter<"User"> | string
     name?: StringWithAggregatesFilter<"User"> | string
     username?: StringNullableWithAggregatesFilter<"User"> | string | null
+    onboardingCompleted?: BoolWithAggregatesFilter<"User"> | boolean
     discovery?: StringNullableWithAggregatesFilter<"User"> | string | null
     role?: StringNullableWithAggregatesFilter<"User"> | string | null
     bestStreakOverall?: IntWithAggregatesFilter<"User"> | number
-    activeProjectId?: StringNullableWithAggregatesFilter<"User"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
 
@@ -15071,95 +16612,121 @@ export namespace Prisma {
     NOT?: ProductWhereInput | ProductWhereInput[]
     id?: StringFilter<"Product"> | string
     name?: StringFilter<"Product"> | string
-    description?: StringFilter<"Product"> | string
+    slug?: StringFilter<"Product"> | string
+    description?: StringNullableFilter<"Product"> | string | null
     problemStatement?: StringFilter<"Product"> | string
     targetAudience?: StringFilter<"Product"> | string
     userGoals?: StringFilter<"Product"> | string
     uniqueValueProp?: StringFilter<"Product"> | string
-    techStack?: StringFilter<"Product"> | string
-    inspirationApps?: StringFilter<"Product"> | string
-    initialFeatures?: StringFilter<"Product"> | string
+    isMvpGenerated?: BoolFilter<"Product"> | boolean
+    isRoadmapGenerated?: BoolFilter<"Product"> | boolean
+    currentStreak?: IntFilter<"Product"> | number
+    AllTimeBestStreak?: IntFilter<"Product"> | number
+    active?: BoolFilter<"Product"> | boolean
+    techStack?: StringNullableFilter<"Product"> | string | null
+    inspirationApps?: StringNullableFilter<"Product"> | string | null
+    initialFeatures?: StringNullableFilter<"Product"> | string | null
+    startDate?: DateTimeFilter<"Product"> | Date | string
     deadline?: DateTimeFilter<"Product"> | Date | string
     dailyCommitmentHrs?: FloatFilter<"Product"> | number
     userId?: StringFilter<"Product"> | string
+    mvpSummary?: StringNullableFilter<"Product"> | string | null
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-    roadmap?: XOR<RoadmapNullableScalarRelationFilter, RoadmapWhereInput> | null
     features?: FeatureListRelationFilter
     buildLogs?: BuildLogListRelationFilter
-    dailyLogs?: DailyLogListRelationFilter
-    streaks?: StreakListRelationFilter
-    User?: UserListRelationFilter
+    DailyStreak?: DailyStreakListRelationFilter
+    aiLogs?: AiLogListRelationFilter
   }
 
   export type ProductOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
-    description?: SortOrder
+    slug?: SortOrder
+    description?: SortOrderInput | SortOrder
     problemStatement?: SortOrder
     targetAudience?: SortOrder
     userGoals?: SortOrder
     uniqueValueProp?: SortOrder
-    techStack?: SortOrder
-    inspirationApps?: SortOrder
-    initialFeatures?: SortOrder
+    isMvpGenerated?: SortOrder
+    isRoadmapGenerated?: SortOrder
+    currentStreak?: SortOrder
+    AllTimeBestStreak?: SortOrder
+    active?: SortOrder
+    techStack?: SortOrderInput | SortOrder
+    inspirationApps?: SortOrderInput | SortOrder
+    initialFeatures?: SortOrderInput | SortOrder
+    startDate?: SortOrder
     deadline?: SortOrder
     dailyCommitmentHrs?: SortOrder
     userId?: SortOrder
+    mvpSummary?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
-    roadmap?: RoadmapOrderByWithRelationInput
     features?: FeatureOrderByRelationAggregateInput
     buildLogs?: BuildLogOrderByRelationAggregateInput
-    dailyLogs?: DailyLogOrderByRelationAggregateInput
-    streaks?: StreakOrderByRelationAggregateInput
-    User?: UserOrderByRelationAggregateInput
+    DailyStreak?: DailyStreakOrderByRelationAggregateInput
+    aiLogs?: AiLogOrderByRelationAggregateInput
   }
 
   export type ProductWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    slug?: string
     AND?: ProductWhereInput | ProductWhereInput[]
     OR?: ProductWhereInput[]
     NOT?: ProductWhereInput | ProductWhereInput[]
     name?: StringFilter<"Product"> | string
-    description?: StringFilter<"Product"> | string
+    description?: StringNullableFilter<"Product"> | string | null
     problemStatement?: StringFilter<"Product"> | string
     targetAudience?: StringFilter<"Product"> | string
     userGoals?: StringFilter<"Product"> | string
     uniqueValueProp?: StringFilter<"Product"> | string
-    techStack?: StringFilter<"Product"> | string
-    inspirationApps?: StringFilter<"Product"> | string
-    initialFeatures?: StringFilter<"Product"> | string
+    isMvpGenerated?: BoolFilter<"Product"> | boolean
+    isRoadmapGenerated?: BoolFilter<"Product"> | boolean
+    currentStreak?: IntFilter<"Product"> | number
+    AllTimeBestStreak?: IntFilter<"Product"> | number
+    active?: BoolFilter<"Product"> | boolean
+    techStack?: StringNullableFilter<"Product"> | string | null
+    inspirationApps?: StringNullableFilter<"Product"> | string | null
+    initialFeatures?: StringNullableFilter<"Product"> | string | null
+    startDate?: DateTimeFilter<"Product"> | Date | string
     deadline?: DateTimeFilter<"Product"> | Date | string
     dailyCommitmentHrs?: FloatFilter<"Product"> | number
     userId?: StringFilter<"Product"> | string
+    mvpSummary?: StringNullableFilter<"Product"> | string | null
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-    roadmap?: XOR<RoadmapNullableScalarRelationFilter, RoadmapWhereInput> | null
     features?: FeatureListRelationFilter
     buildLogs?: BuildLogListRelationFilter
-    dailyLogs?: DailyLogListRelationFilter
-    streaks?: StreakListRelationFilter
-    User?: UserListRelationFilter
-  }, "id">
+    DailyStreak?: DailyStreakListRelationFilter
+    aiLogs?: AiLogListRelationFilter
+  }, "id" | "slug">
 
   export type ProductOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
-    description?: SortOrder
+    slug?: SortOrder
+    description?: SortOrderInput | SortOrder
     problemStatement?: SortOrder
     targetAudience?: SortOrder
     userGoals?: SortOrder
     uniqueValueProp?: SortOrder
-    techStack?: SortOrder
-    inspirationApps?: SortOrder
-    initialFeatures?: SortOrder
+    isMvpGenerated?: SortOrder
+    isRoadmapGenerated?: SortOrder
+    currentStreak?: SortOrder
+    AllTimeBestStreak?: SortOrder
+    active?: SortOrder
+    techStack?: SortOrderInput | SortOrder
+    inspirationApps?: SortOrderInput | SortOrder
+    initialFeatures?: SortOrderInput | SortOrder
+    startDate?: SortOrder
     deadline?: SortOrder
     dailyCommitmentHrs?: SortOrder
     userId?: SortOrder
+    mvpSummary?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ProductCountOrderByAggregateInput
@@ -15175,69 +16742,27 @@ export namespace Prisma {
     NOT?: ProductScalarWhereWithAggregatesInput | ProductScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Product"> | string
     name?: StringWithAggregatesFilter<"Product"> | string
-    description?: StringWithAggregatesFilter<"Product"> | string
+    slug?: StringWithAggregatesFilter<"Product"> | string
+    description?: StringNullableWithAggregatesFilter<"Product"> | string | null
     problemStatement?: StringWithAggregatesFilter<"Product"> | string
     targetAudience?: StringWithAggregatesFilter<"Product"> | string
     userGoals?: StringWithAggregatesFilter<"Product"> | string
     uniqueValueProp?: StringWithAggregatesFilter<"Product"> | string
-    techStack?: StringWithAggregatesFilter<"Product"> | string
-    inspirationApps?: StringWithAggregatesFilter<"Product"> | string
-    initialFeatures?: StringWithAggregatesFilter<"Product"> | string
+    isMvpGenerated?: BoolWithAggregatesFilter<"Product"> | boolean
+    isRoadmapGenerated?: BoolWithAggregatesFilter<"Product"> | boolean
+    currentStreak?: IntWithAggregatesFilter<"Product"> | number
+    AllTimeBestStreak?: IntWithAggregatesFilter<"Product"> | number
+    active?: BoolWithAggregatesFilter<"Product"> | boolean
+    techStack?: StringNullableWithAggregatesFilter<"Product"> | string | null
+    inspirationApps?: StringNullableWithAggregatesFilter<"Product"> | string | null
+    initialFeatures?: StringNullableWithAggregatesFilter<"Product"> | string | null
+    startDate?: DateTimeWithAggregatesFilter<"Product"> | Date | string
     deadline?: DateTimeWithAggregatesFilter<"Product"> | Date | string
     dailyCommitmentHrs?: FloatWithAggregatesFilter<"Product"> | number
     userId?: StringWithAggregatesFilter<"Product"> | string
+    mvpSummary?: StringNullableWithAggregatesFilter<"Product"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
-  }
-
-  export type RoadmapWhereInput = {
-    AND?: RoadmapWhereInput | RoadmapWhereInput[]
-    OR?: RoadmapWhereInput[]
-    NOT?: RoadmapWhereInput | RoadmapWhereInput[]
-    id?: StringFilter<"Roadmap"> | string
-    mvpSummary?: StringFilter<"Roadmap"> | string
-    productId?: StringFilter<"Roadmap"> | string
-    createdAt?: DateTimeFilter<"Roadmap"> | Date | string
-    product?: XOR<ProductScalarRelationFilter, ProductWhereInput>
-  }
-
-  export type RoadmapOrderByWithRelationInput = {
-    id?: SortOrder
-    mvpSummary?: SortOrder
-    productId?: SortOrder
-    createdAt?: SortOrder
-    product?: ProductOrderByWithRelationInput
-  }
-
-  export type RoadmapWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    productId?: string
-    AND?: RoadmapWhereInput | RoadmapWhereInput[]
-    OR?: RoadmapWhereInput[]
-    NOT?: RoadmapWhereInput | RoadmapWhereInput[]
-    mvpSummary?: StringFilter<"Roadmap"> | string
-    createdAt?: DateTimeFilter<"Roadmap"> | Date | string
-    product?: XOR<ProductScalarRelationFilter, ProductWhereInput>
-  }, "id" | "productId">
-
-  export type RoadmapOrderByWithAggregationInput = {
-    id?: SortOrder
-    mvpSummary?: SortOrder
-    productId?: SortOrder
-    createdAt?: SortOrder
-    _count?: RoadmapCountOrderByAggregateInput
-    _max?: RoadmapMaxOrderByAggregateInput
-    _min?: RoadmapMinOrderByAggregateInput
-  }
-
-  export type RoadmapScalarWhereWithAggregatesInput = {
-    AND?: RoadmapScalarWhereWithAggregatesInput | RoadmapScalarWhereWithAggregatesInput[]
-    OR?: RoadmapScalarWhereWithAggregatesInput[]
-    NOT?: RoadmapScalarWhereWithAggregatesInput | RoadmapScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Roadmap"> | string
-    mvpSummary?: StringWithAggregatesFilter<"Roadmap"> | string
-    productId?: StringWithAggregatesFilter<"Roadmap"> | string
-    createdAt?: DateTimeWithAggregatesFilter<"Roadmap"> | Date | string
   }
 
   export type FeatureWhereInput = {
@@ -15306,6 +16831,8 @@ export namespace Prisma {
     NOT?: TaskWhereInput | TaskWhereInput[]
     id?: StringFilter<"Task"> | string
     title?: StringFilter<"Task"> | string
+    estimatedHours?: FloatNullableFilter<"Task"> | number | null
+    status?: EnumTaskStatusFilter<"Task"> | $Enums.TaskStatus
     dayNumber?: IntNullableFilter<"Task"> | number | null
     completed?: BoolFilter<"Task"> | boolean
     featureId?: StringFilter<"Task"> | string
@@ -15316,6 +16843,8 @@ export namespace Prisma {
   export type TaskOrderByWithRelationInput = {
     id?: SortOrder
     title?: SortOrder
+    estimatedHours?: SortOrderInput | SortOrder
+    status?: SortOrder
     dayNumber?: SortOrderInput | SortOrder
     completed?: SortOrder
     featureId?: SortOrder
@@ -15329,6 +16858,8 @@ export namespace Prisma {
     OR?: TaskWhereInput[]
     NOT?: TaskWhereInput | TaskWhereInput[]
     title?: StringFilter<"Task"> | string
+    estimatedHours?: FloatNullableFilter<"Task"> | number | null
+    status?: EnumTaskStatusFilter<"Task"> | $Enums.TaskStatus
     dayNumber?: IntNullableFilter<"Task"> | number | null
     completed?: BoolFilter<"Task"> | boolean
     featureId?: StringFilter<"Task"> | string
@@ -15339,6 +16870,8 @@ export namespace Prisma {
   export type TaskOrderByWithAggregationInput = {
     id?: SortOrder
     title?: SortOrder
+    estimatedHours?: SortOrderInput | SortOrder
+    status?: SortOrder
     dayNumber?: SortOrderInput | SortOrder
     completed?: SortOrder
     featureId?: SortOrder
@@ -15355,6 +16888,8 @@ export namespace Prisma {
     NOT?: TaskScalarWhereWithAggregatesInput | TaskScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Task"> | string
     title?: StringWithAggregatesFilter<"Task"> | string
+    estimatedHours?: FloatNullableWithAggregatesFilter<"Task"> | number | null
+    status?: EnumTaskStatusWithAggregatesFilter<"Task"> | $Enums.TaskStatus
     dayNumber?: IntNullableWithAggregatesFilter<"Task"> | number | null
     completed?: BoolWithAggregatesFilter<"Task"> | boolean
     featureId?: StringWithAggregatesFilter<"Task"> | string
@@ -15368,10 +16903,15 @@ export namespace Prisma {
     taskId?: StringFilter<"DayTask"> | string
     dayIndex?: IntFilter<"DayTask"> | number
     dueDate?: DateTimeFilter<"DayTask"> | Date | string
+    completedAt?: DateTimeNullableFilter<"DayTask"> | Date | string | null
     category?: StringFilter<"DayTask"> | string
     description?: StringFilter<"DayTask"> | string
     status?: StringFilter<"DayTask"> | string
+    milestoneGoal?: StringNullableFilter<"DayTask"> | string | null
+    shipCheck?: StringNullableFilter<"DayTask"> | string | null
+    buildLogId?: StringNullableFilter<"DayTask"> | string | null
     task?: XOR<TaskScalarRelationFilter, TaskWhereInput>
+    buildLog?: XOR<BuildLogNullableScalarRelationFilter, BuildLogWhereInput> | null
   }
 
   export type DayTaskOrderByWithRelationInput = {
@@ -15379,10 +16919,15 @@ export namespace Prisma {
     taskId?: SortOrder
     dayIndex?: SortOrder
     dueDate?: SortOrder
+    completedAt?: SortOrderInput | SortOrder
     category?: SortOrder
     description?: SortOrder
     status?: SortOrder
+    milestoneGoal?: SortOrderInput | SortOrder
+    shipCheck?: SortOrderInput | SortOrder
+    buildLogId?: SortOrderInput | SortOrder
     task?: TaskOrderByWithRelationInput
+    buildLog?: BuildLogOrderByWithRelationInput
   }
 
   export type DayTaskWhereUniqueInput = Prisma.AtLeast<{
@@ -15393,10 +16938,15 @@ export namespace Prisma {
     NOT?: DayTaskWhereInput | DayTaskWhereInput[]
     dayIndex?: IntFilter<"DayTask"> | number
     dueDate?: DateTimeFilter<"DayTask"> | Date | string
+    completedAt?: DateTimeNullableFilter<"DayTask"> | Date | string | null
     category?: StringFilter<"DayTask"> | string
     description?: StringFilter<"DayTask"> | string
     status?: StringFilter<"DayTask"> | string
+    milestoneGoal?: StringNullableFilter<"DayTask"> | string | null
+    shipCheck?: StringNullableFilter<"DayTask"> | string | null
+    buildLogId?: StringNullableFilter<"DayTask"> | string | null
     task?: XOR<TaskScalarRelationFilter, TaskWhereInput>
+    buildLog?: XOR<BuildLogNullableScalarRelationFilter, BuildLogWhereInput> | null
   }, "id" | "taskId">
 
   export type DayTaskOrderByWithAggregationInput = {
@@ -15404,9 +16954,13 @@ export namespace Prisma {
     taskId?: SortOrder
     dayIndex?: SortOrder
     dueDate?: SortOrder
+    completedAt?: SortOrderInput | SortOrder
     category?: SortOrder
     description?: SortOrder
     status?: SortOrder
+    milestoneGoal?: SortOrderInput | SortOrder
+    shipCheck?: SortOrderInput | SortOrder
+    buildLogId?: SortOrderInput | SortOrder
     _count?: DayTaskCountOrderByAggregateInput
     _avg?: DayTaskAvgOrderByAggregateInput
     _max?: DayTaskMaxOrderByAggregateInput
@@ -15422,77 +16976,13 @@ export namespace Prisma {
     taskId?: StringWithAggregatesFilter<"DayTask"> | string
     dayIndex?: IntWithAggregatesFilter<"DayTask"> | number
     dueDate?: DateTimeWithAggregatesFilter<"DayTask"> | Date | string
+    completedAt?: DateTimeNullableWithAggregatesFilter<"DayTask"> | Date | string | null
     category?: StringWithAggregatesFilter<"DayTask"> | string
     description?: StringWithAggregatesFilter<"DayTask"> | string
     status?: StringWithAggregatesFilter<"DayTask"> | string
-  }
-
-  export type DailyLogWhereInput = {
-    AND?: DailyLogWhereInput | DailyLogWhereInput[]
-    OR?: DailyLogWhereInput[]
-    NOT?: DailyLogWhereInput | DailyLogWhereInput[]
-    id?: StringFilter<"DailyLog"> | string
-    userId?: StringFilter<"DailyLog"> | string
-    projectId?: StringFilter<"DailyLog"> | string
-    date?: DateTimeFilter<"DailyLog"> | Date | string
-    completedTasks?: JsonFilter<"DailyLog">
-    notes?: StringNullableFilter<"DailyLog"> | string | null
-    createdAt?: DateTimeFilter<"DailyLog"> | Date | string
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
-    project?: XOR<ProductScalarRelationFilter, ProductWhereInput>
-  }
-
-  export type DailyLogOrderByWithRelationInput = {
-    id?: SortOrder
-    userId?: SortOrder
-    projectId?: SortOrder
-    date?: SortOrder
-    completedTasks?: SortOrder
-    notes?: SortOrderInput | SortOrder
-    createdAt?: SortOrder
-    user?: UserOrderByWithRelationInput
-    project?: ProductOrderByWithRelationInput
-  }
-
-  export type DailyLogWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    AND?: DailyLogWhereInput | DailyLogWhereInput[]
-    OR?: DailyLogWhereInput[]
-    NOT?: DailyLogWhereInput | DailyLogWhereInput[]
-    userId?: StringFilter<"DailyLog"> | string
-    projectId?: StringFilter<"DailyLog"> | string
-    date?: DateTimeFilter<"DailyLog"> | Date | string
-    completedTasks?: JsonFilter<"DailyLog">
-    notes?: StringNullableFilter<"DailyLog"> | string | null
-    createdAt?: DateTimeFilter<"DailyLog"> | Date | string
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
-    project?: XOR<ProductScalarRelationFilter, ProductWhereInput>
-  }, "id">
-
-  export type DailyLogOrderByWithAggregationInput = {
-    id?: SortOrder
-    userId?: SortOrder
-    projectId?: SortOrder
-    date?: SortOrder
-    completedTasks?: SortOrder
-    notes?: SortOrderInput | SortOrder
-    createdAt?: SortOrder
-    _count?: DailyLogCountOrderByAggregateInput
-    _max?: DailyLogMaxOrderByAggregateInput
-    _min?: DailyLogMinOrderByAggregateInput
-  }
-
-  export type DailyLogScalarWhereWithAggregatesInput = {
-    AND?: DailyLogScalarWhereWithAggregatesInput | DailyLogScalarWhereWithAggregatesInput[]
-    OR?: DailyLogScalarWhereWithAggregatesInput[]
-    NOT?: DailyLogScalarWhereWithAggregatesInput | DailyLogScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"DailyLog"> | string
-    userId?: StringWithAggregatesFilter<"DailyLog"> | string
-    projectId?: StringWithAggregatesFilter<"DailyLog"> | string
-    date?: DateTimeWithAggregatesFilter<"DailyLog"> | Date | string
-    completedTasks?: JsonWithAggregatesFilter<"DailyLog">
-    notes?: StringNullableWithAggregatesFilter<"DailyLog"> | string | null
-    createdAt?: DateTimeWithAggregatesFilter<"DailyLog"> | Date | string
+    milestoneGoal?: StringNullableWithAggregatesFilter<"DayTask"> | string | null
+    shipCheck?: StringNullableWithAggregatesFilter<"DayTask"> | string | null
+    buildLogId?: StringNullableWithAggregatesFilter<"DayTask"> | string | null
   }
 
   export type BuildLogWhereInput = {
@@ -15501,29 +16991,29 @@ export namespace Prisma {
     NOT?: BuildLogWhereInput | BuildLogWhereInput[]
     id?: StringFilter<"BuildLog"> | string
     userId?: StringFilter<"BuildLog"> | string
-    projectId?: StringFilter<"BuildLog"> | string
+    productId?: StringFilter<"BuildLog"> | string
     logDate?: DateTimeFilter<"BuildLog"> | Date | string
     tweet?: StringNullableFilter<"BuildLog"> | string | null
     dayIndex?: IntFilter<"BuildLog"> | number
     summary?: StringFilter<"BuildLog"> | string
-    sourceTasks?: JsonFilter<"BuildLog">
     generatedAt?: DateTimeFilter<"BuildLog"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-    project?: XOR<ProductScalarRelationFilter, ProductWhereInput>
+    product?: XOR<ProductScalarRelationFilter, ProductWhereInput>
+    DayTask?: DayTaskListRelationFilter
   }
 
   export type BuildLogOrderByWithRelationInput = {
     id?: SortOrder
     userId?: SortOrder
-    projectId?: SortOrder
+    productId?: SortOrder
     logDate?: SortOrder
     tweet?: SortOrderInput | SortOrder
     dayIndex?: SortOrder
     summary?: SortOrder
-    sourceTasks?: SortOrder
     generatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
-    project?: ProductOrderByWithRelationInput
+    product?: ProductOrderByWithRelationInput
+    DayTask?: DayTaskOrderByRelationAggregateInput
   }
 
   export type BuildLogWhereUniqueInput = Prisma.AtLeast<{
@@ -15532,26 +17022,25 @@ export namespace Prisma {
     OR?: BuildLogWhereInput[]
     NOT?: BuildLogWhereInput | BuildLogWhereInput[]
     userId?: StringFilter<"BuildLog"> | string
-    projectId?: StringFilter<"BuildLog"> | string
+    productId?: StringFilter<"BuildLog"> | string
     logDate?: DateTimeFilter<"BuildLog"> | Date | string
     tweet?: StringNullableFilter<"BuildLog"> | string | null
     dayIndex?: IntFilter<"BuildLog"> | number
     summary?: StringFilter<"BuildLog"> | string
-    sourceTasks?: JsonFilter<"BuildLog">
     generatedAt?: DateTimeFilter<"BuildLog"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-    project?: XOR<ProductScalarRelationFilter, ProductWhereInput>
+    product?: XOR<ProductScalarRelationFilter, ProductWhereInput>
+    DayTask?: DayTaskListRelationFilter
   }, "id">
 
   export type BuildLogOrderByWithAggregationInput = {
     id?: SortOrder
     userId?: SortOrder
-    projectId?: SortOrder
+    productId?: SortOrder
     logDate?: SortOrder
     tweet?: SortOrderInput | SortOrder
     dayIndex?: SortOrder
     summary?: SortOrder
-    sourceTasks?: SortOrder
     generatedAt?: SortOrder
     _count?: BuildLogCountOrderByAggregateInput
     _avg?: BuildLogAvgOrderByAggregateInput
@@ -15566,89 +17055,287 @@ export namespace Prisma {
     NOT?: BuildLogScalarWhereWithAggregatesInput | BuildLogScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"BuildLog"> | string
     userId?: StringWithAggregatesFilter<"BuildLog"> | string
-    projectId?: StringWithAggregatesFilter<"BuildLog"> | string
+    productId?: StringWithAggregatesFilter<"BuildLog"> | string
     logDate?: DateTimeWithAggregatesFilter<"BuildLog"> | Date | string
     tweet?: StringNullableWithAggregatesFilter<"BuildLog"> | string | null
     dayIndex?: IntWithAggregatesFilter<"BuildLog"> | number
     summary?: StringWithAggregatesFilter<"BuildLog"> | string
-    sourceTasks?: JsonWithAggregatesFilter<"BuildLog">
     generatedAt?: DateTimeWithAggregatesFilter<"BuildLog"> | Date | string
   }
 
-  export type StreakWhereInput = {
-    AND?: StreakWhereInput | StreakWhereInput[]
-    OR?: StreakWhereInput[]
-    NOT?: StreakWhereInput | StreakWhereInput[]
-    id?: StringFilter<"Streak"> | string
-    userId?: StringFilter<"Streak"> | string
-    productId?: StringFilter<"Streak"> | string
-    currentStreak?: IntFilter<"Streak"> | number
-    bestStreak?: IntFilter<"Streak"> | number
-    lastActiveDate?: DateTimeFilter<"Streak"> | Date | string
-    streakStart?: DateTimeFilter<"Streak"> | Date | string
-    updatedAt?: DateTimeFilter<"Streak"> | Date | string
+  export type DailyStreakWhereInput = {
+    AND?: DailyStreakWhereInput | DailyStreakWhereInput[]
+    OR?: DailyStreakWhereInput[]
+    NOT?: DailyStreakWhereInput | DailyStreakWhereInput[]
+    id?: StringFilter<"DailyStreak"> | string
+    userId?: StringFilter<"DailyStreak"> | string
+    productId?: StringFilter<"DailyStreak"> | string
+    date?: DateTimeFilter<"DailyStreak"> | Date | string
+    hasBuildLog?: BoolFilter<"DailyStreak"> | boolean
+    createdAt?: DateTimeFilter<"DailyStreak"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     product?: XOR<ProductScalarRelationFilter, ProductWhereInput>
   }
 
-  export type StreakOrderByWithRelationInput = {
+  export type DailyStreakOrderByWithRelationInput = {
     id?: SortOrder
     userId?: SortOrder
     productId?: SortOrder
-    currentStreak?: SortOrder
-    bestStreak?: SortOrder
-    lastActiveDate?: SortOrder
-    streakStart?: SortOrder
-    updatedAt?: SortOrder
+    date?: SortOrder
+    hasBuildLog?: SortOrder
+    createdAt?: SortOrder
     user?: UserOrderByWithRelationInput
     product?: ProductOrderByWithRelationInput
   }
 
-  export type StreakWhereUniqueInput = Prisma.AtLeast<{
+  export type DailyStreakWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    userId_productId?: StreakUserIdProductIdCompoundUniqueInput
-    AND?: StreakWhereInput | StreakWhereInput[]
-    OR?: StreakWhereInput[]
-    NOT?: StreakWhereInput | StreakWhereInput[]
-    userId?: StringFilter<"Streak"> | string
-    productId?: StringFilter<"Streak"> | string
-    currentStreak?: IntFilter<"Streak"> | number
-    bestStreak?: IntFilter<"Streak"> | number
-    lastActiveDate?: DateTimeFilter<"Streak"> | Date | string
-    streakStart?: DateTimeFilter<"Streak"> | Date | string
-    updatedAt?: DateTimeFilter<"Streak"> | Date | string
+    date?: Date | string
+    AND?: DailyStreakWhereInput | DailyStreakWhereInput[]
+    OR?: DailyStreakWhereInput[]
+    NOT?: DailyStreakWhereInput | DailyStreakWhereInput[]
+    userId?: StringFilter<"DailyStreak"> | string
+    productId?: StringFilter<"DailyStreak"> | string
+    hasBuildLog?: BoolFilter<"DailyStreak"> | boolean
+    createdAt?: DateTimeFilter<"DailyStreak"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     product?: XOR<ProductScalarRelationFilter, ProductWhereInput>
-  }, "id" | "userId_productId">
+  }, "id" | "date">
 
-  export type StreakOrderByWithAggregationInput = {
+  export type DailyStreakOrderByWithAggregationInput = {
     id?: SortOrder
     userId?: SortOrder
     productId?: SortOrder
-    currentStreak?: SortOrder
-    bestStreak?: SortOrder
-    lastActiveDate?: SortOrder
-    streakStart?: SortOrder
-    updatedAt?: SortOrder
-    _count?: StreakCountOrderByAggregateInput
-    _avg?: StreakAvgOrderByAggregateInput
-    _max?: StreakMaxOrderByAggregateInput
-    _min?: StreakMinOrderByAggregateInput
-    _sum?: StreakSumOrderByAggregateInput
+    date?: SortOrder
+    hasBuildLog?: SortOrder
+    createdAt?: SortOrder
+    _count?: DailyStreakCountOrderByAggregateInput
+    _max?: DailyStreakMaxOrderByAggregateInput
+    _min?: DailyStreakMinOrderByAggregateInput
   }
 
-  export type StreakScalarWhereWithAggregatesInput = {
-    AND?: StreakScalarWhereWithAggregatesInput | StreakScalarWhereWithAggregatesInput[]
-    OR?: StreakScalarWhereWithAggregatesInput[]
-    NOT?: StreakScalarWhereWithAggregatesInput | StreakScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Streak"> | string
-    userId?: StringWithAggregatesFilter<"Streak"> | string
-    productId?: StringWithAggregatesFilter<"Streak"> | string
-    currentStreak?: IntWithAggregatesFilter<"Streak"> | number
-    bestStreak?: IntWithAggregatesFilter<"Streak"> | number
-    lastActiveDate?: DateTimeWithAggregatesFilter<"Streak"> | Date | string
-    streakStart?: DateTimeWithAggregatesFilter<"Streak"> | Date | string
-    updatedAt?: DateTimeWithAggregatesFilter<"Streak"> | Date | string
+  export type DailyStreakScalarWhereWithAggregatesInput = {
+    AND?: DailyStreakScalarWhereWithAggregatesInput | DailyStreakScalarWhereWithAggregatesInput[]
+    OR?: DailyStreakScalarWhereWithAggregatesInput[]
+    NOT?: DailyStreakScalarWhereWithAggregatesInput | DailyStreakScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DailyStreak"> | string
+    userId?: StringWithAggregatesFilter<"DailyStreak"> | string
+    productId?: StringWithAggregatesFilter<"DailyStreak"> | string
+    date?: DateTimeWithAggregatesFilter<"DailyStreak"> | Date | string
+    hasBuildLog?: BoolWithAggregatesFilter<"DailyStreak"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"DailyStreak"> | Date | string
+  }
+
+  export type AiLogWhereInput = {
+    AND?: AiLogWhereInput | AiLogWhereInput[]
+    OR?: AiLogWhereInput[]
+    NOT?: AiLogWhereInput | AiLogWhereInput[]
+    id?: StringFilter<"AiLog"> | string
+    userId?: StringFilter<"AiLog"> | string
+    productId?: StringFilter<"AiLog"> | string
+    ai_model?: StringFilter<"AiLog"> | string
+    type?: StringFilter<"AiLog"> | string
+    input?: JsonFilter<"AiLog">
+    output?: JsonFilter<"AiLog">
+    createdAt?: DateTimeFilter<"AiLog"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    product?: XOR<ProductScalarRelationFilter, ProductWhereInput>
+  }
+
+  export type AiLogOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    productId?: SortOrder
+    ai_model?: SortOrder
+    type?: SortOrder
+    input?: SortOrder
+    output?: SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    product?: ProductOrderByWithRelationInput
+  }
+
+  export type AiLogWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AiLogWhereInput | AiLogWhereInput[]
+    OR?: AiLogWhereInput[]
+    NOT?: AiLogWhereInput | AiLogWhereInput[]
+    userId?: StringFilter<"AiLog"> | string
+    productId?: StringFilter<"AiLog"> | string
+    ai_model?: StringFilter<"AiLog"> | string
+    type?: StringFilter<"AiLog"> | string
+    input?: JsonFilter<"AiLog">
+    output?: JsonFilter<"AiLog">
+    createdAt?: DateTimeFilter<"AiLog"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    product?: XOR<ProductScalarRelationFilter, ProductWhereInput>
+  }, "id">
+
+  export type AiLogOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    productId?: SortOrder
+    ai_model?: SortOrder
+    type?: SortOrder
+    input?: SortOrder
+    output?: SortOrder
+    createdAt?: SortOrder
+    _count?: AiLogCountOrderByAggregateInput
+    _max?: AiLogMaxOrderByAggregateInput
+    _min?: AiLogMinOrderByAggregateInput
+  }
+
+  export type AiLogScalarWhereWithAggregatesInput = {
+    AND?: AiLogScalarWhereWithAggregatesInput | AiLogScalarWhereWithAggregatesInput[]
+    OR?: AiLogScalarWhereWithAggregatesInput[]
+    NOT?: AiLogScalarWhereWithAggregatesInput | AiLogScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AiLog"> | string
+    userId?: StringWithAggregatesFilter<"AiLog"> | string
+    productId?: StringWithAggregatesFilter<"AiLog"> | string
+    ai_model?: StringWithAggregatesFilter<"AiLog"> | string
+    type?: StringWithAggregatesFilter<"AiLog"> | string
+    input?: JsonWithAggregatesFilter<"AiLog">
+    output?: JsonWithAggregatesFilter<"AiLog">
+    createdAt?: DateTimeWithAggregatesFilter<"AiLog"> | Date | string
+  }
+
+  export type TokenUsageWhereInput = {
+    AND?: TokenUsageWhereInput | TokenUsageWhereInput[]
+    OR?: TokenUsageWhereInput[]
+    NOT?: TokenUsageWhereInput | TokenUsageWhereInput[]
+    id?: StringFilter<"TokenUsage"> | string
+    userId?: StringFilter<"TokenUsage"> | string
+    purpose?: StringFilter<"TokenUsage"> | string
+    tokens?: IntFilter<"TokenUsage"> | number
+    createdAt?: DateTimeFilter<"TokenUsage"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type TokenUsageOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    purpose?: SortOrder
+    tokens?: SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type TokenUsageWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: TokenUsageWhereInput | TokenUsageWhereInput[]
+    OR?: TokenUsageWhereInput[]
+    NOT?: TokenUsageWhereInput | TokenUsageWhereInput[]
+    userId?: StringFilter<"TokenUsage"> | string
+    purpose?: StringFilter<"TokenUsage"> | string
+    tokens?: IntFilter<"TokenUsage"> | number
+    createdAt?: DateTimeFilter<"TokenUsage"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type TokenUsageOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    purpose?: SortOrder
+    tokens?: SortOrder
+    createdAt?: SortOrder
+    _count?: TokenUsageCountOrderByAggregateInput
+    _avg?: TokenUsageAvgOrderByAggregateInput
+    _max?: TokenUsageMaxOrderByAggregateInput
+    _min?: TokenUsageMinOrderByAggregateInput
+    _sum?: TokenUsageSumOrderByAggregateInput
+  }
+
+  export type TokenUsageScalarWhereWithAggregatesInput = {
+    AND?: TokenUsageScalarWhereWithAggregatesInput | TokenUsageScalarWhereWithAggregatesInput[]
+    OR?: TokenUsageScalarWhereWithAggregatesInput[]
+    NOT?: TokenUsageScalarWhereWithAggregatesInput | TokenUsageScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"TokenUsage"> | string
+    userId?: StringWithAggregatesFilter<"TokenUsage"> | string
+    purpose?: StringWithAggregatesFilter<"TokenUsage"> | string
+    tokens?: IntWithAggregatesFilter<"TokenUsage"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"TokenUsage"> | Date | string
+  }
+
+  export type SettingsWhereInput = {
+    AND?: SettingsWhereInput | SettingsWhereInput[]
+    OR?: SettingsWhereInput[]
+    NOT?: SettingsWhereInput | SettingsWhereInput[]
+    id?: StringFilter<"Settings"> | string
+    userId?: StringFilter<"Settings"> | string
+    dailyHours?: FloatFilter<"Settings"> | number
+    deadlineDays?: IntFilter<"Settings"> | number
+    aiModel?: StringFilter<"Settings"> | string
+    emailNudges?: BoolFilter<"Settings"> | boolean
+    isPublic?: BoolFilter<"Settings"> | boolean
+    slug?: StringNullableFilter<"Settings"> | string | null
+    bio?: StringNullableFilter<"Settings"> | string | null
+    twitter?: StringNullableFilter<"Settings"> | string | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type SettingsOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    dailyHours?: SortOrder
+    deadlineDays?: SortOrder
+    aiModel?: SortOrder
+    emailNudges?: SortOrder
+    isPublic?: SortOrder
+    slug?: SortOrderInput | SortOrder
+    bio?: SortOrderInput | SortOrder
+    twitter?: SortOrderInput | SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type SettingsWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId?: string
+    slug?: string
+    AND?: SettingsWhereInput | SettingsWhereInput[]
+    OR?: SettingsWhereInput[]
+    NOT?: SettingsWhereInput | SettingsWhereInput[]
+    dailyHours?: FloatFilter<"Settings"> | number
+    deadlineDays?: IntFilter<"Settings"> | number
+    aiModel?: StringFilter<"Settings"> | string
+    emailNudges?: BoolFilter<"Settings"> | boolean
+    isPublic?: BoolFilter<"Settings"> | boolean
+    bio?: StringNullableFilter<"Settings"> | string | null
+    twitter?: StringNullableFilter<"Settings"> | string | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "userId" | "slug">
+
+  export type SettingsOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    dailyHours?: SortOrder
+    deadlineDays?: SortOrder
+    aiModel?: SortOrder
+    emailNudges?: SortOrder
+    isPublic?: SortOrder
+    slug?: SortOrderInput | SortOrder
+    bio?: SortOrderInput | SortOrder
+    twitter?: SortOrderInput | SortOrder
+    _count?: SettingsCountOrderByAggregateInput
+    _avg?: SettingsAvgOrderByAggregateInput
+    _max?: SettingsMaxOrderByAggregateInput
+    _min?: SettingsMinOrderByAggregateInput
+    _sum?: SettingsSumOrderByAggregateInput
+  }
+
+  export type SettingsScalarWhereWithAggregatesInput = {
+    AND?: SettingsScalarWhereWithAggregatesInput | SettingsScalarWhereWithAggregatesInput[]
+    OR?: SettingsScalarWhereWithAggregatesInput[]
+    NOT?: SettingsScalarWhereWithAggregatesInput | SettingsScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Settings"> | string
+    userId?: StringWithAggregatesFilter<"Settings"> | string
+    dailyHours?: FloatWithAggregatesFilter<"Settings"> | number
+    deadlineDays?: IntWithAggregatesFilter<"Settings"> | number
+    aiModel?: StringWithAggregatesFilter<"Settings"> | string
+    emailNudges?: BoolWithAggregatesFilter<"Settings"> | boolean
+    isPublic?: BoolWithAggregatesFilter<"Settings"> | boolean
+    slug?: StringNullableWithAggregatesFilter<"Settings"> | string | null
+    bio?: StringNullableWithAggregatesFilter<"Settings"> | string | null
+    twitter?: StringNullableWithAggregatesFilter<"Settings"> | string | null
   }
 
   export type UserCreateInput = {
@@ -15657,16 +17344,18 @@ export namespace Prisma {
     email: string
     name: string
     username?: string | null
+    onboardingCompleted?: boolean
     discovery?: string | null
     role?: string | null
     bestStreakOverall?: number
     createdAt?: Date | string
-    activeProject?: ProductCreateNestedOneWithoutUserInput
     products?: ProductCreateNestedManyWithoutUserInput
     buildLogs?: BuildLogCreateNestedManyWithoutUserInput
-    dailyLogs?: DailyLogCreateNestedManyWithoutUserInput
     trial?: TrialCreateNestedOneWithoutUserInput
-    streaks?: StreakCreateNestedManyWithoutUserInput
+    DailyStreak?: DailyStreakCreateNestedManyWithoutUserInput
+    aiLogs?: AiLogCreateNestedManyWithoutUserInput
+    tokenUsages?: TokenUsageCreateNestedManyWithoutUserInput
+    settings?: SettingsCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -15675,16 +17364,18 @@ export namespace Prisma {
     email: string
     name: string
     username?: string | null
+    onboardingCompleted?: boolean
     discovery?: string | null
     role?: string | null
     bestStreakOverall?: number
-    activeProjectId?: string | null
     createdAt?: Date | string
     products?: ProductUncheckedCreateNestedManyWithoutUserInput
     buildLogs?: BuildLogUncheckedCreateNestedManyWithoutUserInput
-    dailyLogs?: DailyLogUncheckedCreateNestedManyWithoutUserInput
     trial?: TrialUncheckedCreateNestedOneWithoutUserInput
-    streaks?: StreakUncheckedCreateNestedManyWithoutUserInput
+    DailyStreak?: DailyStreakUncheckedCreateNestedManyWithoutUserInput
+    aiLogs?: AiLogUncheckedCreateNestedManyWithoutUserInput
+    tokenUsages?: TokenUsageUncheckedCreateNestedManyWithoutUserInput
+    settings?: SettingsUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -15693,16 +17384,18 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     username?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     discovery?: NullableStringFieldUpdateOperationsInput | string | null
     role?: NullableStringFieldUpdateOperationsInput | string | null
     bestStreakOverall?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activeProject?: ProductUpdateOneWithoutUserNestedInput
     products?: ProductUpdateManyWithoutUserNestedInput
     buildLogs?: BuildLogUpdateManyWithoutUserNestedInput
-    dailyLogs?: DailyLogUpdateManyWithoutUserNestedInput
     trial?: TrialUpdateOneWithoutUserNestedInput
-    streaks?: StreakUpdateManyWithoutUserNestedInput
+    DailyStreak?: DailyStreakUpdateManyWithoutUserNestedInput
+    aiLogs?: AiLogUpdateManyWithoutUserNestedInput
+    tokenUsages?: TokenUsageUpdateManyWithoutUserNestedInput
+    settings?: SettingsUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -15711,16 +17404,18 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     username?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     discovery?: NullableStringFieldUpdateOperationsInput | string | null
     role?: NullableStringFieldUpdateOperationsInput | string | null
     bestStreakOverall?: IntFieldUpdateOperationsInput | number
-    activeProjectId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     products?: ProductUncheckedUpdateManyWithoutUserNestedInput
     buildLogs?: BuildLogUncheckedUpdateManyWithoutUserNestedInput
-    dailyLogs?: DailyLogUncheckedUpdateManyWithoutUserNestedInput
     trial?: TrialUncheckedUpdateOneWithoutUserNestedInput
-    streaks?: StreakUncheckedUpdateManyWithoutUserNestedInput
+    DailyStreak?: DailyStreakUncheckedUpdateManyWithoutUserNestedInput
+    aiLogs?: AiLogUncheckedUpdateManyWithoutUserNestedInput
+    tokenUsages?: TokenUsageUncheckedUpdateManyWithoutUserNestedInput
+    settings?: SettingsUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -15729,10 +17424,10 @@ export namespace Prisma {
     email: string
     name: string
     username?: string | null
+    onboardingCompleted?: boolean
     discovery?: string | null
     role?: string | null
     bestStreakOverall?: number
-    activeProjectId?: string | null
     createdAt?: Date | string
   }
 
@@ -15742,6 +17437,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     username?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     discovery?: NullableStringFieldUpdateOperationsInput | string | null
     role?: NullableStringFieldUpdateOperationsInput | string | null
     bestStreakOverall?: IntFieldUpdateOperationsInput | number
@@ -15754,10 +17450,10 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     username?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     discovery?: NullableStringFieldUpdateOperationsInput | string | null
     role?: NullableStringFieldUpdateOperationsInput | string | null
     bestStreakOverall?: IntFieldUpdateOperationsInput | number
-    activeProjectId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -15903,113 +17599,145 @@ export namespace Prisma {
   export type ProductCreateInput = {
     id?: string
     name: string
-    description: string
+    slug: string
+    description?: string | null
     problemStatement: string
     targetAudience: string
     userGoals: string
     uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
+    isMvpGenerated?: boolean
+    isRoadmapGenerated?: boolean
+    currentStreak?: number
+    AllTimeBestStreak?: number
+    active?: boolean
+    techStack?: string | null
+    inspirationApps?: string | null
+    initialFeatures?: string | null
+    startDate?: Date | string
     deadline: Date | string
-    dailyCommitmentHrs: number
+    dailyCommitmentHrs?: number
+    mvpSummary?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProductsInput
-    roadmap?: RoadmapCreateNestedOneWithoutProductInput
     features?: FeatureCreateNestedManyWithoutProductInput
-    buildLogs?: BuildLogCreateNestedManyWithoutProjectInput
-    dailyLogs?: DailyLogCreateNestedManyWithoutProjectInput
-    streaks?: StreakCreateNestedManyWithoutProductInput
-    User?: UserCreateNestedManyWithoutActiveProjectInput
+    buildLogs?: BuildLogCreateNestedManyWithoutProductInput
+    DailyStreak?: DailyStreakCreateNestedManyWithoutProductInput
+    aiLogs?: AiLogCreateNestedManyWithoutProductInput
   }
 
   export type ProductUncheckedCreateInput = {
     id?: string
     name: string
-    description: string
+    slug: string
+    description?: string | null
     problemStatement: string
     targetAudience: string
     userGoals: string
     uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
+    isMvpGenerated?: boolean
+    isRoadmapGenerated?: boolean
+    currentStreak?: number
+    AllTimeBestStreak?: number
+    active?: boolean
+    techStack?: string | null
+    inspirationApps?: string | null
+    initialFeatures?: string | null
+    startDate?: Date | string
     deadline: Date | string
-    dailyCommitmentHrs: number
+    dailyCommitmentHrs?: number
     userId: string
+    mvpSummary?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    roadmap?: RoadmapUncheckedCreateNestedOneWithoutProductInput
     features?: FeatureUncheckedCreateNestedManyWithoutProductInput
-    buildLogs?: BuildLogUncheckedCreateNestedManyWithoutProjectInput
-    dailyLogs?: DailyLogUncheckedCreateNestedManyWithoutProjectInput
-    streaks?: StreakUncheckedCreateNestedManyWithoutProductInput
-    User?: UserUncheckedCreateNestedManyWithoutActiveProjectInput
+    buildLogs?: BuildLogUncheckedCreateNestedManyWithoutProductInput
+    DailyStreak?: DailyStreakUncheckedCreateNestedManyWithoutProductInput
+    aiLogs?: AiLogUncheckedCreateNestedManyWithoutProductInput
   }
 
   export type ProductUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     problemStatement?: StringFieldUpdateOperationsInput | string
     targetAudience?: StringFieldUpdateOperationsInput | string
     userGoals?: StringFieldUpdateOperationsInput | string
     uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
+    isMvpGenerated?: BoolFieldUpdateOperationsInput | boolean
+    isRoadmapGenerated?: BoolFieldUpdateOperationsInput | boolean
+    currentStreak?: IntFieldUpdateOperationsInput | number
+    AllTimeBestStreak?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    techStack?: NullableStringFieldUpdateOperationsInput | string | null
+    inspirationApps?: NullableStringFieldUpdateOperationsInput | string | null
+    initialFeatures?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     deadline?: DateTimeFieldUpdateOperationsInput | Date | string
     dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
+    mvpSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProductsNestedInput
-    roadmap?: RoadmapUpdateOneWithoutProductNestedInput
     features?: FeatureUpdateManyWithoutProductNestedInput
-    buildLogs?: BuildLogUpdateManyWithoutProjectNestedInput
-    dailyLogs?: DailyLogUpdateManyWithoutProjectNestedInput
-    streaks?: StreakUpdateManyWithoutProductNestedInput
-    User?: UserUpdateManyWithoutActiveProjectNestedInput
+    buildLogs?: BuildLogUpdateManyWithoutProductNestedInput
+    DailyStreak?: DailyStreakUpdateManyWithoutProductNestedInput
+    aiLogs?: AiLogUpdateManyWithoutProductNestedInput
   }
 
   export type ProductUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     problemStatement?: StringFieldUpdateOperationsInput | string
     targetAudience?: StringFieldUpdateOperationsInput | string
     userGoals?: StringFieldUpdateOperationsInput | string
     uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
+    isMvpGenerated?: BoolFieldUpdateOperationsInput | boolean
+    isRoadmapGenerated?: BoolFieldUpdateOperationsInput | boolean
+    currentStreak?: IntFieldUpdateOperationsInput | number
+    AllTimeBestStreak?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    techStack?: NullableStringFieldUpdateOperationsInput | string | null
+    inspirationApps?: NullableStringFieldUpdateOperationsInput | string | null
+    initialFeatures?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     deadline?: DateTimeFieldUpdateOperationsInput | Date | string
     dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
     userId?: StringFieldUpdateOperationsInput | string
+    mvpSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    roadmap?: RoadmapUncheckedUpdateOneWithoutProductNestedInput
     features?: FeatureUncheckedUpdateManyWithoutProductNestedInput
-    buildLogs?: BuildLogUncheckedUpdateManyWithoutProjectNestedInput
-    dailyLogs?: DailyLogUncheckedUpdateManyWithoutProjectNestedInput
-    streaks?: StreakUncheckedUpdateManyWithoutProductNestedInput
-    User?: UserUncheckedUpdateManyWithoutActiveProjectNestedInput
+    buildLogs?: BuildLogUncheckedUpdateManyWithoutProductNestedInput
+    DailyStreak?: DailyStreakUncheckedUpdateManyWithoutProductNestedInput
+    aiLogs?: AiLogUncheckedUpdateManyWithoutProductNestedInput
   }
 
   export type ProductCreateManyInput = {
     id?: string
     name: string
-    description: string
+    slug: string
+    description?: string | null
     problemStatement: string
     targetAudience: string
     userGoals: string
     uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
+    isMvpGenerated?: boolean
+    isRoadmapGenerated?: boolean
+    currentStreak?: number
+    AllTimeBestStreak?: number
+    active?: boolean
+    techStack?: string | null
+    inspirationApps?: string | null
+    initialFeatures?: string | null
+    startDate?: Date | string
     deadline: Date | string
-    dailyCommitmentHrs: number
+    dailyCommitmentHrs?: number
     userId: string
+    mvpSummary?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -16017,16 +17745,24 @@ export namespace Prisma {
   export type ProductUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     problemStatement?: StringFieldUpdateOperationsInput | string
     targetAudience?: StringFieldUpdateOperationsInput | string
     userGoals?: StringFieldUpdateOperationsInput | string
     uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
+    isMvpGenerated?: BoolFieldUpdateOperationsInput | boolean
+    isRoadmapGenerated?: BoolFieldUpdateOperationsInput | boolean
+    currentStreak?: IntFieldUpdateOperationsInput | number
+    AllTimeBestStreak?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    techStack?: NullableStringFieldUpdateOperationsInput | string | null
+    inspirationApps?: NullableStringFieldUpdateOperationsInput | string | null
+    initialFeatures?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     deadline?: DateTimeFieldUpdateOperationsInput | Date | string
     dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
+    mvpSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -16034,67 +17770,27 @@ export namespace Prisma {
   export type ProductUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     problemStatement?: StringFieldUpdateOperationsInput | string
     targetAudience?: StringFieldUpdateOperationsInput | string
     userGoals?: StringFieldUpdateOperationsInput | string
     uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
+    isMvpGenerated?: BoolFieldUpdateOperationsInput | boolean
+    isRoadmapGenerated?: BoolFieldUpdateOperationsInput | boolean
+    currentStreak?: IntFieldUpdateOperationsInput | number
+    AllTimeBestStreak?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    techStack?: NullableStringFieldUpdateOperationsInput | string | null
+    inspirationApps?: NullableStringFieldUpdateOperationsInput | string | null
+    initialFeatures?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     deadline?: DateTimeFieldUpdateOperationsInput | Date | string
     dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
     userId?: StringFieldUpdateOperationsInput | string
+    mvpSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type RoadmapCreateInput = {
-    id?: string
-    mvpSummary: string
-    createdAt?: Date | string
-    product: ProductCreateNestedOneWithoutRoadmapInput
-  }
-
-  export type RoadmapUncheckedCreateInput = {
-    id?: string
-    mvpSummary: string
-    productId: string
-    createdAt?: Date | string
-  }
-
-  export type RoadmapUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    mvpSummary?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    product?: ProductUpdateOneRequiredWithoutRoadmapNestedInput
-  }
-
-  export type RoadmapUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    mvpSummary?: StringFieldUpdateOperationsInput | string
-    productId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type RoadmapCreateManyInput = {
-    id?: string
-    mvpSummary: string
-    productId: string
-    createdAt?: Date | string
-  }
-
-  export type RoadmapUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    mvpSummary?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type RoadmapUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    mvpSummary?: StringFieldUpdateOperationsInput | string
-    productId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type FeatureCreateInput = {
@@ -16159,6 +17855,8 @@ export namespace Prisma {
   export type TaskCreateInput = {
     id?: string
     title: string
+    estimatedHours?: number | null
+    status?: $Enums.TaskStatus
     dayNumber?: number | null
     completed?: boolean
     feature: FeatureCreateNestedOneWithoutTasksInput
@@ -16168,6 +17866,8 @@ export namespace Prisma {
   export type TaskUncheckedCreateInput = {
     id?: string
     title: string
+    estimatedHours?: number | null
+    status?: $Enums.TaskStatus
     dayNumber?: number | null
     completed?: boolean
     featureId: string
@@ -16177,6 +17877,8 @@ export namespace Prisma {
   export type TaskUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    estimatedHours?: NullableFloatFieldUpdateOperationsInput | number | null
+    status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     dayNumber?: NullableIntFieldUpdateOperationsInput | number | null
     completed?: BoolFieldUpdateOperationsInput | boolean
     feature?: FeatureUpdateOneRequiredWithoutTasksNestedInput
@@ -16186,6 +17888,8 @@ export namespace Prisma {
   export type TaskUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    estimatedHours?: NullableFloatFieldUpdateOperationsInput | number | null
+    status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     dayNumber?: NullableIntFieldUpdateOperationsInput | number | null
     completed?: BoolFieldUpdateOperationsInput | boolean
     featureId?: StringFieldUpdateOperationsInput | string
@@ -16195,6 +17899,8 @@ export namespace Prisma {
   export type TaskCreateManyInput = {
     id?: string
     title: string
+    estimatedHours?: number | null
+    status?: $Enums.TaskStatus
     dayNumber?: number | null
     completed?: boolean
     featureId: string
@@ -16203,6 +17909,8 @@ export namespace Prisma {
   export type TaskUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    estimatedHours?: NullableFloatFieldUpdateOperationsInput | number | null
+    status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     dayNumber?: NullableIntFieldUpdateOperationsInput | number | null
     completed?: BoolFieldUpdateOperationsInput | boolean
   }
@@ -16210,6 +17918,8 @@ export namespace Prisma {
   export type TaskUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    estimatedHours?: NullableFloatFieldUpdateOperationsInput | number | null
+    status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     dayNumber?: NullableIntFieldUpdateOperationsInput | number | null
     completed?: BoolFieldUpdateOperationsInput | boolean
     featureId?: StringFieldUpdateOperationsInput | string
@@ -16219,10 +17929,14 @@ export namespace Prisma {
     id?: string
     dayIndex: number
     dueDate: Date | string
+    completedAt?: Date | string | null
     category: string
     description: string
     status?: string
+    milestoneGoal?: string | null
+    shipCheck?: string | null
     task: TaskCreateNestedOneWithoutDayTaskInput
+    buildLog?: BuildLogCreateNestedOneWithoutDayTaskInput
   }
 
   export type DayTaskUncheckedCreateInput = {
@@ -16230,19 +17944,27 @@ export namespace Prisma {
     taskId: string
     dayIndex: number
     dueDate: Date | string
+    completedAt?: Date | string | null
     category: string
     description: string
     status?: string
+    milestoneGoal?: string | null
+    shipCheck?: string | null
+    buildLogId?: string | null
   }
 
   export type DayTaskUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     dayIndex?: IntFieldUpdateOperationsInput | number
     dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     category?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    milestoneGoal?: NullableStringFieldUpdateOperationsInput | string | null
+    shipCheck?: NullableStringFieldUpdateOperationsInput | string | null
     task?: TaskUpdateOneRequiredWithoutDayTaskNestedInput
+    buildLog?: BuildLogUpdateOneWithoutDayTaskNestedInput
   }
 
   export type DayTaskUncheckedUpdateInput = {
@@ -16250,9 +17972,13 @@ export namespace Prisma {
     taskId?: StringFieldUpdateOperationsInput | string
     dayIndex?: IntFieldUpdateOperationsInput | number
     dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     category?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    milestoneGoal?: NullableStringFieldUpdateOperationsInput | string | null
+    shipCheck?: NullableStringFieldUpdateOperationsInput | string | null
+    buildLogId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type DayTaskCreateManyInput = {
@@ -16260,18 +17986,25 @@ export namespace Prisma {
     taskId: string
     dayIndex: number
     dueDate: Date | string
+    completedAt?: Date | string | null
     category: string
     description: string
     status?: string
+    milestoneGoal?: string | null
+    shipCheck?: string | null
+    buildLogId?: string | null
   }
 
   export type DayTaskUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     dayIndex?: IntFieldUpdateOperationsInput | number
     dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     category?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    milestoneGoal?: NullableStringFieldUpdateOperationsInput | string | null
+    shipCheck?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type DayTaskUncheckedUpdateManyInput = {
@@ -16279,77 +18012,13 @@ export namespace Prisma {
     taskId?: StringFieldUpdateOperationsInput | string
     dayIndex?: IntFieldUpdateOperationsInput | number
     dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     category?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type DailyLogCreateInput = {
-    id?: string
-    date: Date | string
-    completedTasks: JsonNullValueInput | InputJsonValue
-    notes?: string | null
-    createdAt?: Date | string
-    user: UserCreateNestedOneWithoutDailyLogsInput
-    project: ProductCreateNestedOneWithoutDailyLogsInput
-  }
-
-  export type DailyLogUncheckedCreateInput = {
-    id?: string
-    userId: string
-    projectId: string
-    date: Date | string
-    completedTasks: JsonNullValueInput | InputJsonValue
-    notes?: string | null
-    createdAt?: Date | string
-  }
-
-  export type DailyLogUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    date?: DateTimeFieldUpdateOperationsInput | Date | string
-    completedTasks?: JsonNullValueInput | InputJsonValue
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutDailyLogsNestedInput
-    project?: ProductUpdateOneRequiredWithoutDailyLogsNestedInput
-  }
-
-  export type DailyLogUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    projectId?: StringFieldUpdateOperationsInput | string
-    date?: DateTimeFieldUpdateOperationsInput | Date | string
-    completedTasks?: JsonNullValueInput | InputJsonValue
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type DailyLogCreateManyInput = {
-    id?: string
-    userId: string
-    projectId: string
-    date: Date | string
-    completedTasks: JsonNullValueInput | InputJsonValue
-    notes?: string | null
-    createdAt?: Date | string
-  }
-
-  export type DailyLogUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    date?: DateTimeFieldUpdateOperationsInput | Date | string
-    completedTasks?: JsonNullValueInput | InputJsonValue
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type DailyLogUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    projectId?: StringFieldUpdateOperationsInput | string
-    date?: DateTimeFieldUpdateOperationsInput | Date | string
-    completedTasks?: JsonNullValueInput | InputJsonValue
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    milestoneGoal?: NullableStringFieldUpdateOperationsInput | string | null
+    shipCheck?: NullableStringFieldUpdateOperationsInput | string | null
+    buildLogId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type BuildLogCreateInput = {
@@ -16358,22 +18027,22 @@ export namespace Prisma {
     tweet?: string | null
     dayIndex?: number
     summary: string
-    sourceTasks: JsonNullValueInput | InputJsonValue
     generatedAt?: Date | string
     user: UserCreateNestedOneWithoutBuildLogsInput
-    project: ProductCreateNestedOneWithoutBuildLogsInput
+    product: ProductCreateNestedOneWithoutBuildLogsInput
+    DayTask?: DayTaskCreateNestedManyWithoutBuildLogInput
   }
 
   export type BuildLogUncheckedCreateInput = {
     id?: string
     userId: string
-    projectId: string
+    productId: string
     logDate: Date | string
     tweet?: string | null
     dayIndex?: number
     summary: string
-    sourceTasks: JsonNullValueInput | InputJsonValue
     generatedAt?: Date | string
+    DayTask?: DayTaskUncheckedCreateNestedManyWithoutBuildLogInput
   }
 
   export type BuildLogUpdateInput = {
@@ -16382,33 +18051,32 @@ export namespace Prisma {
     tweet?: NullableStringFieldUpdateOperationsInput | string | null
     dayIndex?: IntFieldUpdateOperationsInput | number
     summary?: StringFieldUpdateOperationsInput | string
-    sourceTasks?: JsonNullValueInput | InputJsonValue
     generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutBuildLogsNestedInput
-    project?: ProductUpdateOneRequiredWithoutBuildLogsNestedInput
+    product?: ProductUpdateOneRequiredWithoutBuildLogsNestedInput
+    DayTask?: DayTaskUpdateManyWithoutBuildLogNestedInput
   }
 
   export type BuildLogUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    projectId?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
     logDate?: DateTimeFieldUpdateOperationsInput | Date | string
     tweet?: NullableStringFieldUpdateOperationsInput | string | null
     dayIndex?: IntFieldUpdateOperationsInput | number
     summary?: StringFieldUpdateOperationsInput | string
-    sourceTasks?: JsonNullValueInput | InputJsonValue
     generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    DayTask?: DayTaskUncheckedUpdateManyWithoutBuildLogNestedInput
   }
 
   export type BuildLogCreateManyInput = {
     id?: string
     userId: string
-    projectId: string
+    productId: string
     logDate: Date | string
     tweet?: string | null
     dayIndex?: number
     summary: string
-    sourceTasks: JsonNullValueInput | InputJsonValue
     generatedAt?: Date | string
   }
 
@@ -16418,95 +18086,299 @@ export namespace Prisma {
     tweet?: NullableStringFieldUpdateOperationsInput | string | null
     dayIndex?: IntFieldUpdateOperationsInput | number
     summary?: StringFieldUpdateOperationsInput | string
-    sourceTasks?: JsonNullValueInput | InputJsonValue
     generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type BuildLogUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    projectId?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
     logDate?: DateTimeFieldUpdateOperationsInput | Date | string
     tweet?: NullableStringFieldUpdateOperationsInput | string | null
     dayIndex?: IntFieldUpdateOperationsInput | number
     summary?: StringFieldUpdateOperationsInput | string
-    sourceTasks?: JsonNullValueInput | InputJsonValue
     generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StreakCreateInput = {
+  export type DailyStreakCreateInput = {
     id?: string
-    currentStreak?: number
-    bestStreak?: number
-    lastActiveDate: Date | string
-    streakStart: Date | string
-    updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutStreaksInput
-    product: ProductCreateNestedOneWithoutStreaksInput
+    date: Date | string
+    hasBuildLog?: boolean
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutDailyStreakInput
+    product: ProductCreateNestedOneWithoutDailyStreakInput
   }
 
-  export type StreakUncheckedCreateInput = {
+  export type DailyStreakUncheckedCreateInput = {
     id?: string
     userId: string
     productId: string
-    currentStreak?: number
-    bestStreak?: number
-    lastActiveDate: Date | string
-    streakStart: Date | string
-    updatedAt?: Date | string
+    date: Date | string
+    hasBuildLog?: boolean
+    createdAt?: Date | string
   }
 
-  export type StreakUpdateInput = {
+  export type DailyStreakUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    currentStreak?: IntFieldUpdateOperationsInput | number
-    bestStreak?: IntFieldUpdateOperationsInput | number
-    lastActiveDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    streakStart?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutStreaksNestedInput
-    product?: ProductUpdateOneRequiredWithoutStreaksNestedInput
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    hasBuildLog?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutDailyStreakNestedInput
+    product?: ProductUpdateOneRequiredWithoutDailyStreakNestedInput
   }
 
-  export type StreakUncheckedUpdateInput = {
+  export type DailyStreakUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     productId?: StringFieldUpdateOperationsInput | string
-    currentStreak?: IntFieldUpdateOperationsInput | number
-    bestStreak?: IntFieldUpdateOperationsInput | number
-    lastActiveDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    streakStart?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    hasBuildLog?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StreakCreateManyInput = {
+  export type DailyStreakCreateManyInput = {
     id?: string
     userId: string
     productId: string
-    currentStreak?: number
-    bestStreak?: number
-    lastActiveDate: Date | string
-    streakStart: Date | string
-    updatedAt?: Date | string
+    date: Date | string
+    hasBuildLog?: boolean
+    createdAt?: Date | string
   }
 
-  export type StreakUpdateManyMutationInput = {
+  export type DailyStreakUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    currentStreak?: IntFieldUpdateOperationsInput | number
-    bestStreak?: IntFieldUpdateOperationsInput | number
-    lastActiveDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    streakStart?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    hasBuildLog?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StreakUncheckedUpdateManyInput = {
+  export type DailyStreakUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     productId?: StringFieldUpdateOperationsInput | string
-    currentStreak?: IntFieldUpdateOperationsInput | number
-    bestStreak?: IntFieldUpdateOperationsInput | number
-    lastActiveDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    streakStart?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    hasBuildLog?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AiLogCreateInput = {
+    id?: string
+    ai_model: string
+    type: string
+    input: JsonNullValueInput | InputJsonValue
+    output: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutAiLogsInput
+    product: ProductCreateNestedOneWithoutAiLogsInput
+  }
+
+  export type AiLogUncheckedCreateInput = {
+    id?: string
+    userId: string
+    productId: string
+    ai_model: string
+    type: string
+    input: JsonNullValueInput | InputJsonValue
+    output: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type AiLogUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ai_model?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    input?: JsonNullValueInput | InputJsonValue
+    output?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutAiLogsNestedInput
+    product?: ProductUpdateOneRequiredWithoutAiLogsNestedInput
+  }
+
+  export type AiLogUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    ai_model?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    input?: JsonNullValueInput | InputJsonValue
+    output?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AiLogCreateManyInput = {
+    id?: string
+    userId: string
+    productId: string
+    ai_model: string
+    type: string
+    input: JsonNullValueInput | InputJsonValue
+    output: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type AiLogUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ai_model?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    input?: JsonNullValueInput | InputJsonValue
+    output?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AiLogUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    ai_model?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    input?: JsonNullValueInput | InputJsonValue
+    output?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TokenUsageCreateInput = {
+    id?: string
+    purpose: string
+    tokens: number
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutTokenUsagesInput
+  }
+
+  export type TokenUsageUncheckedCreateInput = {
+    id?: string
+    userId: string
+    purpose: string
+    tokens: number
+    createdAt?: Date | string
+  }
+
+  export type TokenUsageUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    purpose?: StringFieldUpdateOperationsInput | string
+    tokens?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutTokenUsagesNestedInput
+  }
+
+  export type TokenUsageUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    purpose?: StringFieldUpdateOperationsInput | string
+    tokens?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TokenUsageCreateManyInput = {
+    id?: string
+    userId: string
+    purpose: string
+    tokens: number
+    createdAt?: Date | string
+  }
+
+  export type TokenUsageUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    purpose?: StringFieldUpdateOperationsInput | string
+    tokens?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TokenUsageUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    purpose?: StringFieldUpdateOperationsInput | string
+    tokens?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SettingsCreateInput = {
+    id?: string
+    dailyHours?: number
+    deadlineDays?: number
+    aiModel?: string
+    emailNudges?: boolean
+    isPublic?: boolean
+    slug?: string | null
+    bio?: string | null
+    twitter?: string | null
+    user: UserCreateNestedOneWithoutSettingsInput
+  }
+
+  export type SettingsUncheckedCreateInput = {
+    id?: string
+    userId: string
+    dailyHours?: number
+    deadlineDays?: number
+    aiModel?: string
+    emailNudges?: boolean
+    isPublic?: boolean
+    slug?: string | null
+    bio?: string | null
+    twitter?: string | null
+  }
+
+  export type SettingsUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dailyHours?: FloatFieldUpdateOperationsInput | number
+    deadlineDays?: IntFieldUpdateOperationsInput | number
+    aiModel?: StringFieldUpdateOperationsInput | string
+    emailNudges?: BoolFieldUpdateOperationsInput | boolean
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    slug?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneRequiredWithoutSettingsNestedInput
+  }
+
+  export type SettingsUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    dailyHours?: FloatFieldUpdateOperationsInput | number
+    deadlineDays?: IntFieldUpdateOperationsInput | number
+    aiModel?: StringFieldUpdateOperationsInput | string
+    emailNudges?: BoolFieldUpdateOperationsInput | boolean
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    slug?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type SettingsCreateManyInput = {
+    id?: string
+    userId: string
+    dailyHours?: number
+    deadlineDays?: number
+    aiModel?: string
+    emailNudges?: boolean
+    isPublic?: boolean
+    slug?: string | null
+    bio?: string | null
+    twitter?: string | null
+  }
+
+  export type SettingsUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dailyHours?: FloatFieldUpdateOperationsInput | number
+    deadlineDays?: IntFieldUpdateOperationsInput | number
+    aiModel?: StringFieldUpdateOperationsInput | string
+    emailNudges?: BoolFieldUpdateOperationsInput | boolean
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    slug?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type SettingsUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    dailyHours?: FloatFieldUpdateOperationsInput | number
+    deadlineDays?: IntFieldUpdateOperationsInput | number
+    aiModel?: StringFieldUpdateOperationsInput | string
+    emailNudges?: BoolFieldUpdateOperationsInput | boolean
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    slug?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -16539,6 +18411,11 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -16561,11 +18438,6 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
-  export type ProductNullableScalarRelationFilter = {
-    is?: ProductWhereInput | null
-    isNot?: ProductWhereInput | null
-  }
-
   export type ProductListRelationFilter = {
     every?: ProductWhereInput
     some?: ProductWhereInput
@@ -16578,21 +18450,32 @@ export namespace Prisma {
     none?: BuildLogWhereInput
   }
 
-  export type DailyLogListRelationFilter = {
-    every?: DailyLogWhereInput
-    some?: DailyLogWhereInput
-    none?: DailyLogWhereInput
-  }
-
   export type TrialNullableScalarRelationFilter = {
     is?: TrialWhereInput | null
     isNot?: TrialWhereInput | null
   }
 
-  export type StreakListRelationFilter = {
-    every?: StreakWhereInput
-    some?: StreakWhereInput
-    none?: StreakWhereInput
+  export type DailyStreakListRelationFilter = {
+    every?: DailyStreakWhereInput
+    some?: DailyStreakWhereInput
+    none?: DailyStreakWhereInput
+  }
+
+  export type AiLogListRelationFilter = {
+    every?: AiLogWhereInput
+    some?: AiLogWhereInput
+    none?: AiLogWhereInput
+  }
+
+  export type TokenUsageListRelationFilter = {
+    every?: TokenUsageWhereInput
+    some?: TokenUsageWhereInput
+    none?: TokenUsageWhereInput
+  }
+
+  export type SettingsNullableScalarRelationFilter = {
+    is?: SettingsWhereInput | null
+    isNot?: SettingsWhereInput | null
   }
 
   export type SortOrderInput = {
@@ -16608,11 +18491,15 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
-  export type DailyLogOrderByRelationAggregateInput = {
+  export type DailyStreakOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
-  export type StreakOrderByRelationAggregateInput = {
+  export type AiLogOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type TokenUsageOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -16622,10 +18509,10 @@ export namespace Prisma {
     email?: SortOrder
     name?: SortOrder
     username?: SortOrder
+    onboardingCompleted?: SortOrder
     discovery?: SortOrder
     role?: SortOrder
     bestStreakOverall?: SortOrder
-    activeProjectId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -16639,10 +18526,10 @@ export namespace Prisma {
     email?: SortOrder
     name?: SortOrder
     username?: SortOrder
+    onboardingCompleted?: SortOrder
     discovery?: SortOrder
     role?: SortOrder
     bestStreakOverall?: SortOrder
-    activeProjectId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -16652,10 +18539,10 @@ export namespace Prisma {
     email?: SortOrder
     name?: SortOrder
     username?: SortOrder
+    onboardingCompleted?: SortOrder
     discovery?: SortOrder
     role?: SortOrder
     bestStreakOverall?: SortOrder
-    activeProjectId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -16699,6 +18586,14 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -16734,11 +18629,6 @@ export namespace Prisma {
     in?: $Enums.AccessTier[] | ListEnumAccessTierFieldRefInput<$PrismaModel>
     notIn?: $Enums.AccessTier[] | ListEnumAccessTierFieldRefInput<$PrismaModel>
     not?: NestedEnumAccessTierFilter<$PrismaModel> | $Enums.AccessTier
-  }
-
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type DateTimeNullableFilter<$PrismaModel = never> = {
@@ -16793,14 +18683,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumAccessTierFilter<$PrismaModel>
     _max?: NestedEnumAccessTierFilter<$PrismaModel>
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -16860,67 +18742,70 @@ export namespace Prisma {
     not?: NestedFloatFilter<$PrismaModel> | number
   }
 
-  export type RoadmapNullableScalarRelationFilter = {
-    is?: RoadmapWhereInput | null
-    isNot?: RoadmapWhereInput | null
-  }
-
   export type FeatureListRelationFilter = {
     every?: FeatureWhereInput
     some?: FeatureWhereInput
     none?: FeatureWhereInput
   }
 
-  export type UserListRelationFilter = {
-    every?: UserWhereInput
-    some?: UserWhereInput
-    none?: UserWhereInput
-  }
-
   export type FeatureOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type UserOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type ProductCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    slug?: SortOrder
     description?: SortOrder
     problemStatement?: SortOrder
     targetAudience?: SortOrder
     userGoals?: SortOrder
     uniqueValueProp?: SortOrder
+    isMvpGenerated?: SortOrder
+    isRoadmapGenerated?: SortOrder
+    currentStreak?: SortOrder
+    AllTimeBestStreak?: SortOrder
+    active?: SortOrder
     techStack?: SortOrder
     inspirationApps?: SortOrder
     initialFeatures?: SortOrder
+    startDate?: SortOrder
     deadline?: SortOrder
     dailyCommitmentHrs?: SortOrder
     userId?: SortOrder
+    mvpSummary?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type ProductAvgOrderByAggregateInput = {
+    currentStreak?: SortOrder
+    AllTimeBestStreak?: SortOrder
     dailyCommitmentHrs?: SortOrder
   }
 
   export type ProductMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    slug?: SortOrder
     description?: SortOrder
     problemStatement?: SortOrder
     targetAudience?: SortOrder
     userGoals?: SortOrder
     uniqueValueProp?: SortOrder
+    isMvpGenerated?: SortOrder
+    isRoadmapGenerated?: SortOrder
+    currentStreak?: SortOrder
+    AllTimeBestStreak?: SortOrder
+    active?: SortOrder
     techStack?: SortOrder
     inspirationApps?: SortOrder
     initialFeatures?: SortOrder
+    startDate?: SortOrder
     deadline?: SortOrder
     dailyCommitmentHrs?: SortOrder
     userId?: SortOrder
+    mvpSummary?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -16928,22 +18813,32 @@ export namespace Prisma {
   export type ProductMinOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    slug?: SortOrder
     description?: SortOrder
     problemStatement?: SortOrder
     targetAudience?: SortOrder
     userGoals?: SortOrder
     uniqueValueProp?: SortOrder
+    isMvpGenerated?: SortOrder
+    isRoadmapGenerated?: SortOrder
+    currentStreak?: SortOrder
+    AllTimeBestStreak?: SortOrder
+    active?: SortOrder
     techStack?: SortOrder
     inspirationApps?: SortOrder
     initialFeatures?: SortOrder
+    startDate?: SortOrder
     deadline?: SortOrder
     dailyCommitmentHrs?: SortOrder
     userId?: SortOrder
+    mvpSummary?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type ProductSumOrderByAggregateInput = {
+    currentStreak?: SortOrder
+    AllTimeBestStreak?: SortOrder
     dailyCommitmentHrs?: SortOrder
   }
 
@@ -16966,27 +18861,6 @@ export namespace Prisma {
   export type ProductScalarRelationFilter = {
     is?: ProductWhereInput
     isNot?: ProductWhereInput
-  }
-
-  export type RoadmapCountOrderByAggregateInput = {
-    id?: SortOrder
-    mvpSummary?: SortOrder
-    productId?: SortOrder
-    createdAt?: SortOrder
-  }
-
-  export type RoadmapMaxOrderByAggregateInput = {
-    id?: SortOrder
-    mvpSummary?: SortOrder
-    productId?: SortOrder
-    createdAt?: SortOrder
-  }
-
-  export type RoadmapMinOrderByAggregateInput = {
-    id?: SortOrder
-    mvpSummary?: SortOrder
-    productId?: SortOrder
-    createdAt?: SortOrder
   }
 
   export type TaskListRelationFilter = {
@@ -17031,6 +18905,24 @@ export namespace Prisma {
     rank?: SortOrder
   }
 
+  export type FloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type EnumTaskStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.TaskStatus | EnumTaskStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TaskStatus[] | ListEnumTaskStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TaskStatus[] | ListEnumTaskStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumTaskStatusFilter<$PrismaModel> | $Enums.TaskStatus
+  }
+
   export type IntNullableFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
@@ -17055,18 +18947,23 @@ export namespace Prisma {
   export type TaskCountOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
+    estimatedHours?: SortOrder
+    status?: SortOrder
     dayNumber?: SortOrder
     completed?: SortOrder
     featureId?: SortOrder
   }
 
   export type TaskAvgOrderByAggregateInput = {
+    estimatedHours?: SortOrder
     dayNumber?: SortOrder
   }
 
   export type TaskMaxOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
+    estimatedHours?: SortOrder
+    status?: SortOrder
     dayNumber?: SortOrder
     completed?: SortOrder
     featureId?: SortOrder
@@ -17075,13 +18972,42 @@ export namespace Prisma {
   export type TaskMinOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
+    estimatedHours?: SortOrder
+    status?: SortOrder
     dayNumber?: SortOrder
     completed?: SortOrder
     featureId?: SortOrder
   }
 
   export type TaskSumOrderByAggregateInput = {
+    estimatedHours?: SortOrder
     dayNumber?: SortOrder
+  }
+
+  export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedFloatNullableFilter<$PrismaModel>
+    _min?: NestedFloatNullableFilter<$PrismaModel>
+    _max?: NestedFloatNullableFilter<$PrismaModel>
+  }
+
+  export type EnumTaskStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TaskStatus | EnumTaskStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TaskStatus[] | ListEnumTaskStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TaskStatus[] | ListEnumTaskStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumTaskStatusWithAggregatesFilter<$PrismaModel> | $Enums.TaskStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTaskStatusFilter<$PrismaModel>
+    _max?: NestedEnumTaskStatusFilter<$PrismaModel>
   }
 
   export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -17105,14 +19031,23 @@ export namespace Prisma {
     isNot?: TaskWhereInput
   }
 
+  export type BuildLogNullableScalarRelationFilter = {
+    is?: BuildLogWhereInput | null
+    isNot?: BuildLogWhereInput | null
+  }
+
   export type DayTaskCountOrderByAggregateInput = {
     id?: SortOrder
     taskId?: SortOrder
     dayIndex?: SortOrder
     dueDate?: SortOrder
+    completedAt?: SortOrder
     category?: SortOrder
     description?: SortOrder
     status?: SortOrder
+    milestoneGoal?: SortOrder
+    shipCheck?: SortOrder
+    buildLogId?: SortOrder
   }
 
   export type DayTaskAvgOrderByAggregateInput = {
@@ -17124,9 +19059,13 @@ export namespace Prisma {
     taskId?: SortOrder
     dayIndex?: SortOrder
     dueDate?: SortOrder
+    completedAt?: SortOrder
     category?: SortOrder
     description?: SortOrder
     status?: SortOrder
+    milestoneGoal?: SortOrder
+    shipCheck?: SortOrder
+    buildLogId?: SortOrder
   }
 
   export type DayTaskMinOrderByAggregateInput = {
@@ -17134,13 +19073,95 @@ export namespace Prisma {
     taskId?: SortOrder
     dayIndex?: SortOrder
     dueDate?: SortOrder
+    completedAt?: SortOrder
     category?: SortOrder
     description?: SortOrder
     status?: SortOrder
+    milestoneGoal?: SortOrder
+    shipCheck?: SortOrder
+    buildLogId?: SortOrder
   }
 
   export type DayTaskSumOrderByAggregateInput = {
     dayIndex?: SortOrder
+  }
+
+  export type DayTaskListRelationFilter = {
+    every?: DayTaskWhereInput
+    some?: DayTaskWhereInput
+    none?: DayTaskWhereInput
+  }
+
+  export type DayTaskOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type BuildLogCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    productId?: SortOrder
+    logDate?: SortOrder
+    tweet?: SortOrder
+    dayIndex?: SortOrder
+    summary?: SortOrder
+    generatedAt?: SortOrder
+  }
+
+  export type BuildLogAvgOrderByAggregateInput = {
+    dayIndex?: SortOrder
+  }
+
+  export type BuildLogMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    productId?: SortOrder
+    logDate?: SortOrder
+    tweet?: SortOrder
+    dayIndex?: SortOrder
+    summary?: SortOrder
+    generatedAt?: SortOrder
+  }
+
+  export type BuildLogMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    productId?: SortOrder
+    logDate?: SortOrder
+    tweet?: SortOrder
+    dayIndex?: SortOrder
+    summary?: SortOrder
+    generatedAt?: SortOrder
+  }
+
+  export type BuildLogSumOrderByAggregateInput = {
+    dayIndex?: SortOrder
+  }
+
+  export type DailyStreakCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    productId?: SortOrder
+    date?: SortOrder
+    hasBuildLog?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DailyStreakMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    productId?: SortOrder
+    date?: SortOrder
+    hasBuildLog?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DailyStreakMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    productId?: SortOrder
+    date?: SortOrder
+    hasBuildLog?: SortOrder
+    createdAt?: SortOrder
   }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -17166,31 +19187,32 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
-  export type DailyLogCountOrderByAggregateInput = {
+  export type AiLogCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-    projectId?: SortOrder
-    date?: SortOrder
-    completedTasks?: SortOrder
-    notes?: SortOrder
+    productId?: SortOrder
+    ai_model?: SortOrder
+    type?: SortOrder
+    input?: SortOrder
+    output?: SortOrder
     createdAt?: SortOrder
   }
 
-  export type DailyLogMaxOrderByAggregateInput = {
+  export type AiLogMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-    projectId?: SortOrder
-    date?: SortOrder
-    notes?: SortOrder
+    productId?: SortOrder
+    ai_model?: SortOrder
+    type?: SortOrder
     createdAt?: SortOrder
   }
 
-  export type DailyLogMinOrderByAggregateInput = {
+  export type AiLogMinOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-    projectId?: SortOrder
-    date?: SortOrder
-    notes?: SortOrder
+    productId?: SortOrder
+    ai_model?: SortOrder
+    type?: SortOrder
     createdAt?: SortOrder
   }
   export type JsonWithAggregatesFilter<$PrismaModel = never> =
@@ -17220,100 +19242,85 @@ export namespace Prisma {
     _max?: NestedJsonFilter<$PrismaModel>
   }
 
-  export type BuildLogCountOrderByAggregateInput = {
+  export type TokenUsageCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-    projectId?: SortOrder
-    logDate?: SortOrder
-    tweet?: SortOrder
-    dayIndex?: SortOrder
-    summary?: SortOrder
-    sourceTasks?: SortOrder
-    generatedAt?: SortOrder
+    purpose?: SortOrder
+    tokens?: SortOrder
+    createdAt?: SortOrder
   }
 
-  export type BuildLogAvgOrderByAggregateInput = {
-    dayIndex?: SortOrder
+  export type TokenUsageAvgOrderByAggregateInput = {
+    tokens?: SortOrder
   }
 
-  export type BuildLogMaxOrderByAggregateInput = {
+  export type TokenUsageMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-    projectId?: SortOrder
-    logDate?: SortOrder
-    tweet?: SortOrder
-    dayIndex?: SortOrder
-    summary?: SortOrder
-    generatedAt?: SortOrder
+    purpose?: SortOrder
+    tokens?: SortOrder
+    createdAt?: SortOrder
   }
 
-  export type BuildLogMinOrderByAggregateInput = {
+  export type TokenUsageMinOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-    projectId?: SortOrder
-    logDate?: SortOrder
-    tweet?: SortOrder
-    dayIndex?: SortOrder
-    summary?: SortOrder
-    generatedAt?: SortOrder
+    purpose?: SortOrder
+    tokens?: SortOrder
+    createdAt?: SortOrder
   }
 
-  export type BuildLogSumOrderByAggregateInput = {
-    dayIndex?: SortOrder
+  export type TokenUsageSumOrderByAggregateInput = {
+    tokens?: SortOrder
   }
 
-  export type StreakUserIdProductIdCompoundUniqueInput = {
-    userId: string
-    productId: string
-  }
-
-  export type StreakCountOrderByAggregateInput = {
+  export type SettingsCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-    productId?: SortOrder
-    currentStreak?: SortOrder
-    bestStreak?: SortOrder
-    lastActiveDate?: SortOrder
-    streakStart?: SortOrder
-    updatedAt?: SortOrder
+    dailyHours?: SortOrder
+    deadlineDays?: SortOrder
+    aiModel?: SortOrder
+    emailNudges?: SortOrder
+    isPublic?: SortOrder
+    slug?: SortOrder
+    bio?: SortOrder
+    twitter?: SortOrder
   }
 
-  export type StreakAvgOrderByAggregateInput = {
-    currentStreak?: SortOrder
-    bestStreak?: SortOrder
+  export type SettingsAvgOrderByAggregateInput = {
+    dailyHours?: SortOrder
+    deadlineDays?: SortOrder
   }
 
-  export type StreakMaxOrderByAggregateInput = {
+  export type SettingsMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-    productId?: SortOrder
-    currentStreak?: SortOrder
-    bestStreak?: SortOrder
-    lastActiveDate?: SortOrder
-    streakStart?: SortOrder
-    updatedAt?: SortOrder
+    dailyHours?: SortOrder
+    deadlineDays?: SortOrder
+    aiModel?: SortOrder
+    emailNudges?: SortOrder
+    isPublic?: SortOrder
+    slug?: SortOrder
+    bio?: SortOrder
+    twitter?: SortOrder
   }
 
-  export type StreakMinOrderByAggregateInput = {
+  export type SettingsMinOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-    productId?: SortOrder
-    currentStreak?: SortOrder
-    bestStreak?: SortOrder
-    lastActiveDate?: SortOrder
-    streakStart?: SortOrder
-    updatedAt?: SortOrder
+    dailyHours?: SortOrder
+    deadlineDays?: SortOrder
+    aiModel?: SortOrder
+    emailNudges?: SortOrder
+    isPublic?: SortOrder
+    slug?: SortOrder
+    bio?: SortOrder
+    twitter?: SortOrder
   }
 
-  export type StreakSumOrderByAggregateInput = {
-    currentStreak?: SortOrder
-    bestStreak?: SortOrder
-  }
-
-  export type ProductCreateNestedOneWithoutUserInput = {
-    create?: XOR<ProductCreateWithoutUserInput, ProductUncheckedCreateWithoutUserInput>
-    connectOrCreate?: ProductCreateOrConnectWithoutUserInput
-    connect?: ProductWhereUniqueInput
+  export type SettingsSumOrderByAggregateInput = {
+    dailyHours?: SortOrder
+    deadlineDays?: SortOrder
   }
 
   export type ProductCreateNestedManyWithoutUserInput = {
@@ -17330,24 +19337,37 @@ export namespace Prisma {
     connect?: BuildLogWhereUniqueInput | BuildLogWhereUniqueInput[]
   }
 
-  export type DailyLogCreateNestedManyWithoutUserInput = {
-    create?: XOR<DailyLogCreateWithoutUserInput, DailyLogUncheckedCreateWithoutUserInput> | DailyLogCreateWithoutUserInput[] | DailyLogUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: DailyLogCreateOrConnectWithoutUserInput | DailyLogCreateOrConnectWithoutUserInput[]
-    createMany?: DailyLogCreateManyUserInputEnvelope
-    connect?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
-  }
-
   export type TrialCreateNestedOneWithoutUserInput = {
     create?: XOR<TrialCreateWithoutUserInput, TrialUncheckedCreateWithoutUserInput>
     connectOrCreate?: TrialCreateOrConnectWithoutUserInput
     connect?: TrialWhereUniqueInput
   }
 
-  export type StreakCreateNestedManyWithoutUserInput = {
-    create?: XOR<StreakCreateWithoutUserInput, StreakUncheckedCreateWithoutUserInput> | StreakCreateWithoutUserInput[] | StreakUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: StreakCreateOrConnectWithoutUserInput | StreakCreateOrConnectWithoutUserInput[]
-    createMany?: StreakCreateManyUserInputEnvelope
-    connect?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
+  export type DailyStreakCreateNestedManyWithoutUserInput = {
+    create?: XOR<DailyStreakCreateWithoutUserInput, DailyStreakUncheckedCreateWithoutUserInput> | DailyStreakCreateWithoutUserInput[] | DailyStreakUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DailyStreakCreateOrConnectWithoutUserInput | DailyStreakCreateOrConnectWithoutUserInput[]
+    createMany?: DailyStreakCreateManyUserInputEnvelope
+    connect?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
+  }
+
+  export type AiLogCreateNestedManyWithoutUserInput = {
+    create?: XOR<AiLogCreateWithoutUserInput, AiLogUncheckedCreateWithoutUserInput> | AiLogCreateWithoutUserInput[] | AiLogUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AiLogCreateOrConnectWithoutUserInput | AiLogCreateOrConnectWithoutUserInput[]
+    createMany?: AiLogCreateManyUserInputEnvelope
+    connect?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
+  }
+
+  export type TokenUsageCreateNestedManyWithoutUserInput = {
+    create?: XOR<TokenUsageCreateWithoutUserInput, TokenUsageUncheckedCreateWithoutUserInput> | TokenUsageCreateWithoutUserInput[] | TokenUsageUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TokenUsageCreateOrConnectWithoutUserInput | TokenUsageCreateOrConnectWithoutUserInput[]
+    createMany?: TokenUsageCreateManyUserInputEnvelope
+    connect?: TokenUsageWhereUniqueInput | TokenUsageWhereUniqueInput[]
+  }
+
+  export type SettingsCreateNestedOneWithoutUserInput = {
+    create?: XOR<SettingsCreateWithoutUserInput, SettingsUncheckedCreateWithoutUserInput>
+    connectOrCreate?: SettingsCreateOrConnectWithoutUserInput
+    connect?: SettingsWhereUniqueInput
   }
 
   export type ProductUncheckedCreateNestedManyWithoutUserInput = {
@@ -17364,24 +19384,37 @@ export namespace Prisma {
     connect?: BuildLogWhereUniqueInput | BuildLogWhereUniqueInput[]
   }
 
-  export type DailyLogUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<DailyLogCreateWithoutUserInput, DailyLogUncheckedCreateWithoutUserInput> | DailyLogCreateWithoutUserInput[] | DailyLogUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: DailyLogCreateOrConnectWithoutUserInput | DailyLogCreateOrConnectWithoutUserInput[]
-    createMany?: DailyLogCreateManyUserInputEnvelope
-    connect?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
-  }
-
   export type TrialUncheckedCreateNestedOneWithoutUserInput = {
     create?: XOR<TrialCreateWithoutUserInput, TrialUncheckedCreateWithoutUserInput>
     connectOrCreate?: TrialCreateOrConnectWithoutUserInput
     connect?: TrialWhereUniqueInput
   }
 
-  export type StreakUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<StreakCreateWithoutUserInput, StreakUncheckedCreateWithoutUserInput> | StreakCreateWithoutUserInput[] | StreakUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: StreakCreateOrConnectWithoutUserInput | StreakCreateOrConnectWithoutUserInput[]
-    createMany?: StreakCreateManyUserInputEnvelope
-    connect?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
+  export type DailyStreakUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<DailyStreakCreateWithoutUserInput, DailyStreakUncheckedCreateWithoutUserInput> | DailyStreakCreateWithoutUserInput[] | DailyStreakUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DailyStreakCreateOrConnectWithoutUserInput | DailyStreakCreateOrConnectWithoutUserInput[]
+    createMany?: DailyStreakCreateManyUserInputEnvelope
+    connect?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
+  }
+
+  export type AiLogUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<AiLogCreateWithoutUserInput, AiLogUncheckedCreateWithoutUserInput> | AiLogCreateWithoutUserInput[] | AiLogUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AiLogCreateOrConnectWithoutUserInput | AiLogCreateOrConnectWithoutUserInput[]
+    createMany?: AiLogCreateManyUserInputEnvelope
+    connect?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
+  }
+
+  export type TokenUsageUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<TokenUsageCreateWithoutUserInput, TokenUsageUncheckedCreateWithoutUserInput> | TokenUsageCreateWithoutUserInput[] | TokenUsageUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TokenUsageCreateOrConnectWithoutUserInput | TokenUsageCreateOrConnectWithoutUserInput[]
+    createMany?: TokenUsageCreateManyUserInputEnvelope
+    connect?: TokenUsageWhereUniqueInput | TokenUsageWhereUniqueInput[]
+  }
+
+  export type SettingsUncheckedCreateNestedOneWithoutUserInput = {
+    create?: XOR<SettingsCreateWithoutUserInput, SettingsUncheckedCreateWithoutUserInput>
+    connectOrCreate?: SettingsCreateOrConnectWithoutUserInput
+    connect?: SettingsWhereUniqueInput
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -17390,6 +19423,10 @@ export namespace Prisma {
 
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -17402,16 +19439,6 @@ export namespace Prisma {
 
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
-  }
-
-  export type ProductUpdateOneWithoutUserNestedInput = {
-    create?: XOR<ProductCreateWithoutUserInput, ProductUncheckedCreateWithoutUserInput>
-    connectOrCreate?: ProductCreateOrConnectWithoutUserInput
-    upsert?: ProductUpsertWithoutUserInput
-    disconnect?: ProductWhereInput | boolean
-    delete?: ProductWhereInput | boolean
-    connect?: ProductWhereUniqueInput
-    update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutUserInput, ProductUpdateWithoutUserInput>, ProductUncheckedUpdateWithoutUserInput>
   }
 
   export type ProductUpdateManyWithoutUserNestedInput = {
@@ -17442,20 +19469,6 @@ export namespace Prisma {
     deleteMany?: BuildLogScalarWhereInput | BuildLogScalarWhereInput[]
   }
 
-  export type DailyLogUpdateManyWithoutUserNestedInput = {
-    create?: XOR<DailyLogCreateWithoutUserInput, DailyLogUncheckedCreateWithoutUserInput> | DailyLogCreateWithoutUserInput[] | DailyLogUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: DailyLogCreateOrConnectWithoutUserInput | DailyLogCreateOrConnectWithoutUserInput[]
-    upsert?: DailyLogUpsertWithWhereUniqueWithoutUserInput | DailyLogUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: DailyLogCreateManyUserInputEnvelope
-    set?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
-    disconnect?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
-    delete?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
-    connect?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
-    update?: DailyLogUpdateWithWhereUniqueWithoutUserInput | DailyLogUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: DailyLogUpdateManyWithWhereWithoutUserInput | DailyLogUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: DailyLogScalarWhereInput | DailyLogScalarWhereInput[]
-  }
-
   export type TrialUpdateOneWithoutUserNestedInput = {
     create?: XOR<TrialCreateWithoutUserInput, TrialUncheckedCreateWithoutUserInput>
     connectOrCreate?: TrialCreateOrConnectWithoutUserInput
@@ -17466,18 +19479,56 @@ export namespace Prisma {
     update?: XOR<XOR<TrialUpdateToOneWithWhereWithoutUserInput, TrialUpdateWithoutUserInput>, TrialUncheckedUpdateWithoutUserInput>
   }
 
-  export type StreakUpdateManyWithoutUserNestedInput = {
-    create?: XOR<StreakCreateWithoutUserInput, StreakUncheckedCreateWithoutUserInput> | StreakCreateWithoutUserInput[] | StreakUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: StreakCreateOrConnectWithoutUserInput | StreakCreateOrConnectWithoutUserInput[]
-    upsert?: StreakUpsertWithWhereUniqueWithoutUserInput | StreakUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: StreakCreateManyUserInputEnvelope
-    set?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
-    disconnect?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
-    delete?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
-    connect?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
-    update?: StreakUpdateWithWhereUniqueWithoutUserInput | StreakUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: StreakUpdateManyWithWhereWithoutUserInput | StreakUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: StreakScalarWhereInput | StreakScalarWhereInput[]
+  export type DailyStreakUpdateManyWithoutUserNestedInput = {
+    create?: XOR<DailyStreakCreateWithoutUserInput, DailyStreakUncheckedCreateWithoutUserInput> | DailyStreakCreateWithoutUserInput[] | DailyStreakUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DailyStreakCreateOrConnectWithoutUserInput | DailyStreakCreateOrConnectWithoutUserInput[]
+    upsert?: DailyStreakUpsertWithWhereUniqueWithoutUserInput | DailyStreakUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: DailyStreakCreateManyUserInputEnvelope
+    set?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
+    disconnect?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
+    delete?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
+    connect?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
+    update?: DailyStreakUpdateWithWhereUniqueWithoutUserInput | DailyStreakUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: DailyStreakUpdateManyWithWhereWithoutUserInput | DailyStreakUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: DailyStreakScalarWhereInput | DailyStreakScalarWhereInput[]
+  }
+
+  export type AiLogUpdateManyWithoutUserNestedInput = {
+    create?: XOR<AiLogCreateWithoutUserInput, AiLogUncheckedCreateWithoutUserInput> | AiLogCreateWithoutUserInput[] | AiLogUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AiLogCreateOrConnectWithoutUserInput | AiLogCreateOrConnectWithoutUserInput[]
+    upsert?: AiLogUpsertWithWhereUniqueWithoutUserInput | AiLogUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: AiLogCreateManyUserInputEnvelope
+    set?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
+    disconnect?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
+    delete?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
+    connect?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
+    update?: AiLogUpdateWithWhereUniqueWithoutUserInput | AiLogUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: AiLogUpdateManyWithWhereWithoutUserInput | AiLogUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: AiLogScalarWhereInput | AiLogScalarWhereInput[]
+  }
+
+  export type TokenUsageUpdateManyWithoutUserNestedInput = {
+    create?: XOR<TokenUsageCreateWithoutUserInput, TokenUsageUncheckedCreateWithoutUserInput> | TokenUsageCreateWithoutUserInput[] | TokenUsageUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TokenUsageCreateOrConnectWithoutUserInput | TokenUsageCreateOrConnectWithoutUserInput[]
+    upsert?: TokenUsageUpsertWithWhereUniqueWithoutUserInput | TokenUsageUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: TokenUsageCreateManyUserInputEnvelope
+    set?: TokenUsageWhereUniqueInput | TokenUsageWhereUniqueInput[]
+    disconnect?: TokenUsageWhereUniqueInput | TokenUsageWhereUniqueInput[]
+    delete?: TokenUsageWhereUniqueInput | TokenUsageWhereUniqueInput[]
+    connect?: TokenUsageWhereUniqueInput | TokenUsageWhereUniqueInput[]
+    update?: TokenUsageUpdateWithWhereUniqueWithoutUserInput | TokenUsageUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: TokenUsageUpdateManyWithWhereWithoutUserInput | TokenUsageUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: TokenUsageScalarWhereInput | TokenUsageScalarWhereInput[]
+  }
+
+  export type SettingsUpdateOneWithoutUserNestedInput = {
+    create?: XOR<SettingsCreateWithoutUserInput, SettingsUncheckedCreateWithoutUserInput>
+    connectOrCreate?: SettingsCreateOrConnectWithoutUserInput
+    upsert?: SettingsUpsertWithoutUserInput
+    disconnect?: SettingsWhereInput | boolean
+    delete?: SettingsWhereInput | boolean
+    connect?: SettingsWhereUniqueInput
+    update?: XOR<XOR<SettingsUpdateToOneWithWhereWithoutUserInput, SettingsUpdateWithoutUserInput>, SettingsUncheckedUpdateWithoutUserInput>
   }
 
   export type ProductUncheckedUpdateManyWithoutUserNestedInput = {
@@ -17508,20 +19559,6 @@ export namespace Prisma {
     deleteMany?: BuildLogScalarWhereInput | BuildLogScalarWhereInput[]
   }
 
-  export type DailyLogUncheckedUpdateManyWithoutUserNestedInput = {
-    create?: XOR<DailyLogCreateWithoutUserInput, DailyLogUncheckedCreateWithoutUserInput> | DailyLogCreateWithoutUserInput[] | DailyLogUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: DailyLogCreateOrConnectWithoutUserInput | DailyLogCreateOrConnectWithoutUserInput[]
-    upsert?: DailyLogUpsertWithWhereUniqueWithoutUserInput | DailyLogUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: DailyLogCreateManyUserInputEnvelope
-    set?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
-    disconnect?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
-    delete?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
-    connect?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
-    update?: DailyLogUpdateWithWhereUniqueWithoutUserInput | DailyLogUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: DailyLogUpdateManyWithWhereWithoutUserInput | DailyLogUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: DailyLogScalarWhereInput | DailyLogScalarWhereInput[]
-  }
-
   export type TrialUncheckedUpdateOneWithoutUserNestedInput = {
     create?: XOR<TrialCreateWithoutUserInput, TrialUncheckedCreateWithoutUserInput>
     connectOrCreate?: TrialCreateOrConnectWithoutUserInput
@@ -17532,26 +19569,60 @@ export namespace Prisma {
     update?: XOR<XOR<TrialUpdateToOneWithWhereWithoutUserInput, TrialUpdateWithoutUserInput>, TrialUncheckedUpdateWithoutUserInput>
   }
 
-  export type StreakUncheckedUpdateManyWithoutUserNestedInput = {
-    create?: XOR<StreakCreateWithoutUserInput, StreakUncheckedCreateWithoutUserInput> | StreakCreateWithoutUserInput[] | StreakUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: StreakCreateOrConnectWithoutUserInput | StreakCreateOrConnectWithoutUserInput[]
-    upsert?: StreakUpsertWithWhereUniqueWithoutUserInput | StreakUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: StreakCreateManyUserInputEnvelope
-    set?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
-    disconnect?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
-    delete?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
-    connect?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
-    update?: StreakUpdateWithWhereUniqueWithoutUserInput | StreakUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: StreakUpdateManyWithWhereWithoutUserInput | StreakUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: StreakScalarWhereInput | StreakScalarWhereInput[]
+  export type DailyStreakUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<DailyStreakCreateWithoutUserInput, DailyStreakUncheckedCreateWithoutUserInput> | DailyStreakCreateWithoutUserInput[] | DailyStreakUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DailyStreakCreateOrConnectWithoutUserInput | DailyStreakCreateOrConnectWithoutUserInput[]
+    upsert?: DailyStreakUpsertWithWhereUniqueWithoutUserInput | DailyStreakUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: DailyStreakCreateManyUserInputEnvelope
+    set?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
+    disconnect?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
+    delete?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
+    connect?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
+    update?: DailyStreakUpdateWithWhereUniqueWithoutUserInput | DailyStreakUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: DailyStreakUpdateManyWithWhereWithoutUserInput | DailyStreakUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: DailyStreakScalarWhereInput | DailyStreakScalarWhereInput[]
+  }
+
+  export type AiLogUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<AiLogCreateWithoutUserInput, AiLogUncheckedCreateWithoutUserInput> | AiLogCreateWithoutUserInput[] | AiLogUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AiLogCreateOrConnectWithoutUserInput | AiLogCreateOrConnectWithoutUserInput[]
+    upsert?: AiLogUpsertWithWhereUniqueWithoutUserInput | AiLogUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: AiLogCreateManyUserInputEnvelope
+    set?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
+    disconnect?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
+    delete?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
+    connect?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
+    update?: AiLogUpdateWithWhereUniqueWithoutUserInput | AiLogUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: AiLogUpdateManyWithWhereWithoutUserInput | AiLogUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: AiLogScalarWhereInput | AiLogScalarWhereInput[]
+  }
+
+  export type TokenUsageUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<TokenUsageCreateWithoutUserInput, TokenUsageUncheckedCreateWithoutUserInput> | TokenUsageCreateWithoutUserInput[] | TokenUsageUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TokenUsageCreateOrConnectWithoutUserInput | TokenUsageCreateOrConnectWithoutUserInput[]
+    upsert?: TokenUsageUpsertWithWhereUniqueWithoutUserInput | TokenUsageUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: TokenUsageCreateManyUserInputEnvelope
+    set?: TokenUsageWhereUniqueInput | TokenUsageWhereUniqueInput[]
+    disconnect?: TokenUsageWhereUniqueInput | TokenUsageWhereUniqueInput[]
+    delete?: TokenUsageWhereUniqueInput | TokenUsageWhereUniqueInput[]
+    connect?: TokenUsageWhereUniqueInput | TokenUsageWhereUniqueInput[]
+    update?: TokenUsageUpdateWithWhereUniqueWithoutUserInput | TokenUsageUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: TokenUsageUpdateManyWithWhereWithoutUserInput | TokenUsageUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: TokenUsageScalarWhereInput | TokenUsageScalarWhereInput[]
+  }
+
+  export type SettingsUncheckedUpdateOneWithoutUserNestedInput = {
+    create?: XOR<SettingsCreateWithoutUserInput, SettingsUncheckedCreateWithoutUserInput>
+    connectOrCreate?: SettingsCreateOrConnectWithoutUserInput
+    upsert?: SettingsUpsertWithoutUserInput
+    disconnect?: SettingsWhereInput | boolean
+    delete?: SettingsWhereInput | boolean
+    connect?: SettingsWhereUniqueInput
+    update?: XOR<XOR<SettingsUpdateToOneWithWhereWithoutUserInput, SettingsUpdateWithoutUserInput>, SettingsUncheckedUpdateWithoutUserInput>
   }
 
   export type EnumAccessTierFieldUpdateOperationsInput = {
     set?: $Enums.AccessTier
-  }
-
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -17578,12 +19649,6 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
-  export type RoadmapCreateNestedOneWithoutProductInput = {
-    create?: XOR<RoadmapCreateWithoutProductInput, RoadmapUncheckedCreateWithoutProductInput>
-    connectOrCreate?: RoadmapCreateOrConnectWithoutProductInput
-    connect?: RoadmapWhereUniqueInput
-  }
-
   export type FeatureCreateNestedManyWithoutProductInput = {
     create?: XOR<FeatureCreateWithoutProductInput, FeatureUncheckedCreateWithoutProductInput> | FeatureCreateWithoutProductInput[] | FeatureUncheckedCreateWithoutProductInput[]
     connectOrCreate?: FeatureCreateOrConnectWithoutProductInput | FeatureCreateOrConnectWithoutProductInput[]
@@ -17591,38 +19656,25 @@ export namespace Prisma {
     connect?: FeatureWhereUniqueInput | FeatureWhereUniqueInput[]
   }
 
-  export type BuildLogCreateNestedManyWithoutProjectInput = {
-    create?: XOR<BuildLogCreateWithoutProjectInput, BuildLogUncheckedCreateWithoutProjectInput> | BuildLogCreateWithoutProjectInput[] | BuildLogUncheckedCreateWithoutProjectInput[]
-    connectOrCreate?: BuildLogCreateOrConnectWithoutProjectInput | BuildLogCreateOrConnectWithoutProjectInput[]
-    createMany?: BuildLogCreateManyProjectInputEnvelope
+  export type BuildLogCreateNestedManyWithoutProductInput = {
+    create?: XOR<BuildLogCreateWithoutProductInput, BuildLogUncheckedCreateWithoutProductInput> | BuildLogCreateWithoutProductInput[] | BuildLogUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: BuildLogCreateOrConnectWithoutProductInput | BuildLogCreateOrConnectWithoutProductInput[]
+    createMany?: BuildLogCreateManyProductInputEnvelope
     connect?: BuildLogWhereUniqueInput | BuildLogWhereUniqueInput[]
   }
 
-  export type DailyLogCreateNestedManyWithoutProjectInput = {
-    create?: XOR<DailyLogCreateWithoutProjectInput, DailyLogUncheckedCreateWithoutProjectInput> | DailyLogCreateWithoutProjectInput[] | DailyLogUncheckedCreateWithoutProjectInput[]
-    connectOrCreate?: DailyLogCreateOrConnectWithoutProjectInput | DailyLogCreateOrConnectWithoutProjectInput[]
-    createMany?: DailyLogCreateManyProjectInputEnvelope
-    connect?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
+  export type DailyStreakCreateNestedManyWithoutProductInput = {
+    create?: XOR<DailyStreakCreateWithoutProductInput, DailyStreakUncheckedCreateWithoutProductInput> | DailyStreakCreateWithoutProductInput[] | DailyStreakUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: DailyStreakCreateOrConnectWithoutProductInput | DailyStreakCreateOrConnectWithoutProductInput[]
+    createMany?: DailyStreakCreateManyProductInputEnvelope
+    connect?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
   }
 
-  export type StreakCreateNestedManyWithoutProductInput = {
-    create?: XOR<StreakCreateWithoutProductInput, StreakUncheckedCreateWithoutProductInput> | StreakCreateWithoutProductInput[] | StreakUncheckedCreateWithoutProductInput[]
-    connectOrCreate?: StreakCreateOrConnectWithoutProductInput | StreakCreateOrConnectWithoutProductInput[]
-    createMany?: StreakCreateManyProductInputEnvelope
-    connect?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
-  }
-
-  export type UserCreateNestedManyWithoutActiveProjectInput = {
-    create?: XOR<UserCreateWithoutActiveProjectInput, UserUncheckedCreateWithoutActiveProjectInput> | UserCreateWithoutActiveProjectInput[] | UserUncheckedCreateWithoutActiveProjectInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutActiveProjectInput | UserCreateOrConnectWithoutActiveProjectInput[]
-    createMany?: UserCreateManyActiveProjectInputEnvelope
-    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-  }
-
-  export type RoadmapUncheckedCreateNestedOneWithoutProductInput = {
-    create?: XOR<RoadmapCreateWithoutProductInput, RoadmapUncheckedCreateWithoutProductInput>
-    connectOrCreate?: RoadmapCreateOrConnectWithoutProductInput
-    connect?: RoadmapWhereUniqueInput
+  export type AiLogCreateNestedManyWithoutProductInput = {
+    create?: XOR<AiLogCreateWithoutProductInput, AiLogUncheckedCreateWithoutProductInput> | AiLogCreateWithoutProductInput[] | AiLogUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: AiLogCreateOrConnectWithoutProductInput | AiLogCreateOrConnectWithoutProductInput[]
+    createMany?: AiLogCreateManyProductInputEnvelope
+    connect?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
   }
 
   export type FeatureUncheckedCreateNestedManyWithoutProductInput = {
@@ -17632,32 +19684,25 @@ export namespace Prisma {
     connect?: FeatureWhereUniqueInput | FeatureWhereUniqueInput[]
   }
 
-  export type BuildLogUncheckedCreateNestedManyWithoutProjectInput = {
-    create?: XOR<BuildLogCreateWithoutProjectInput, BuildLogUncheckedCreateWithoutProjectInput> | BuildLogCreateWithoutProjectInput[] | BuildLogUncheckedCreateWithoutProjectInput[]
-    connectOrCreate?: BuildLogCreateOrConnectWithoutProjectInput | BuildLogCreateOrConnectWithoutProjectInput[]
-    createMany?: BuildLogCreateManyProjectInputEnvelope
+  export type BuildLogUncheckedCreateNestedManyWithoutProductInput = {
+    create?: XOR<BuildLogCreateWithoutProductInput, BuildLogUncheckedCreateWithoutProductInput> | BuildLogCreateWithoutProductInput[] | BuildLogUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: BuildLogCreateOrConnectWithoutProductInput | BuildLogCreateOrConnectWithoutProductInput[]
+    createMany?: BuildLogCreateManyProductInputEnvelope
     connect?: BuildLogWhereUniqueInput | BuildLogWhereUniqueInput[]
   }
 
-  export type DailyLogUncheckedCreateNestedManyWithoutProjectInput = {
-    create?: XOR<DailyLogCreateWithoutProjectInput, DailyLogUncheckedCreateWithoutProjectInput> | DailyLogCreateWithoutProjectInput[] | DailyLogUncheckedCreateWithoutProjectInput[]
-    connectOrCreate?: DailyLogCreateOrConnectWithoutProjectInput | DailyLogCreateOrConnectWithoutProjectInput[]
-    createMany?: DailyLogCreateManyProjectInputEnvelope
-    connect?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
+  export type DailyStreakUncheckedCreateNestedManyWithoutProductInput = {
+    create?: XOR<DailyStreakCreateWithoutProductInput, DailyStreakUncheckedCreateWithoutProductInput> | DailyStreakCreateWithoutProductInput[] | DailyStreakUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: DailyStreakCreateOrConnectWithoutProductInput | DailyStreakCreateOrConnectWithoutProductInput[]
+    createMany?: DailyStreakCreateManyProductInputEnvelope
+    connect?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
   }
 
-  export type StreakUncheckedCreateNestedManyWithoutProductInput = {
-    create?: XOR<StreakCreateWithoutProductInput, StreakUncheckedCreateWithoutProductInput> | StreakCreateWithoutProductInput[] | StreakUncheckedCreateWithoutProductInput[]
-    connectOrCreate?: StreakCreateOrConnectWithoutProductInput | StreakCreateOrConnectWithoutProductInput[]
-    createMany?: StreakCreateManyProductInputEnvelope
-    connect?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
-  }
-
-  export type UserUncheckedCreateNestedManyWithoutActiveProjectInput = {
-    create?: XOR<UserCreateWithoutActiveProjectInput, UserUncheckedCreateWithoutActiveProjectInput> | UserCreateWithoutActiveProjectInput[] | UserUncheckedCreateWithoutActiveProjectInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutActiveProjectInput | UserCreateOrConnectWithoutActiveProjectInput[]
-    createMany?: UserCreateManyActiveProjectInputEnvelope
-    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  export type AiLogUncheckedCreateNestedManyWithoutProductInput = {
+    create?: XOR<AiLogCreateWithoutProductInput, AiLogUncheckedCreateWithoutProductInput> | AiLogCreateWithoutProductInput[] | AiLogUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: AiLogCreateOrConnectWithoutProductInput | AiLogCreateOrConnectWithoutProductInput[]
+    createMany?: AiLogCreateManyProductInputEnvelope
+    connect?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
   }
 
   export type FloatFieldUpdateOperationsInput = {
@@ -17676,16 +19721,6 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutProductsInput, UserUpdateWithoutProductsInput>, UserUncheckedUpdateWithoutProductsInput>
   }
 
-  export type RoadmapUpdateOneWithoutProductNestedInput = {
-    create?: XOR<RoadmapCreateWithoutProductInput, RoadmapUncheckedCreateWithoutProductInput>
-    connectOrCreate?: RoadmapCreateOrConnectWithoutProductInput
-    upsert?: RoadmapUpsertWithoutProductInput
-    disconnect?: RoadmapWhereInput | boolean
-    delete?: RoadmapWhereInput | boolean
-    connect?: RoadmapWhereUniqueInput
-    update?: XOR<XOR<RoadmapUpdateToOneWithWhereWithoutProductInput, RoadmapUpdateWithoutProductInput>, RoadmapUncheckedUpdateWithoutProductInput>
-  }
-
   export type FeatureUpdateManyWithoutProductNestedInput = {
     create?: XOR<FeatureCreateWithoutProductInput, FeatureUncheckedCreateWithoutProductInput> | FeatureCreateWithoutProductInput[] | FeatureUncheckedCreateWithoutProductInput[]
     connectOrCreate?: FeatureCreateOrConnectWithoutProductInput | FeatureCreateOrConnectWithoutProductInput[]
@@ -17700,70 +19735,46 @@ export namespace Prisma {
     deleteMany?: FeatureScalarWhereInput | FeatureScalarWhereInput[]
   }
 
-  export type BuildLogUpdateManyWithoutProjectNestedInput = {
-    create?: XOR<BuildLogCreateWithoutProjectInput, BuildLogUncheckedCreateWithoutProjectInput> | BuildLogCreateWithoutProjectInput[] | BuildLogUncheckedCreateWithoutProjectInput[]
-    connectOrCreate?: BuildLogCreateOrConnectWithoutProjectInput | BuildLogCreateOrConnectWithoutProjectInput[]
-    upsert?: BuildLogUpsertWithWhereUniqueWithoutProjectInput | BuildLogUpsertWithWhereUniqueWithoutProjectInput[]
-    createMany?: BuildLogCreateManyProjectInputEnvelope
+  export type BuildLogUpdateManyWithoutProductNestedInput = {
+    create?: XOR<BuildLogCreateWithoutProductInput, BuildLogUncheckedCreateWithoutProductInput> | BuildLogCreateWithoutProductInput[] | BuildLogUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: BuildLogCreateOrConnectWithoutProductInput | BuildLogCreateOrConnectWithoutProductInput[]
+    upsert?: BuildLogUpsertWithWhereUniqueWithoutProductInput | BuildLogUpsertWithWhereUniqueWithoutProductInput[]
+    createMany?: BuildLogCreateManyProductInputEnvelope
     set?: BuildLogWhereUniqueInput | BuildLogWhereUniqueInput[]
     disconnect?: BuildLogWhereUniqueInput | BuildLogWhereUniqueInput[]
     delete?: BuildLogWhereUniqueInput | BuildLogWhereUniqueInput[]
     connect?: BuildLogWhereUniqueInput | BuildLogWhereUniqueInput[]
-    update?: BuildLogUpdateWithWhereUniqueWithoutProjectInput | BuildLogUpdateWithWhereUniqueWithoutProjectInput[]
-    updateMany?: BuildLogUpdateManyWithWhereWithoutProjectInput | BuildLogUpdateManyWithWhereWithoutProjectInput[]
+    update?: BuildLogUpdateWithWhereUniqueWithoutProductInput | BuildLogUpdateWithWhereUniqueWithoutProductInput[]
+    updateMany?: BuildLogUpdateManyWithWhereWithoutProductInput | BuildLogUpdateManyWithWhereWithoutProductInput[]
     deleteMany?: BuildLogScalarWhereInput | BuildLogScalarWhereInput[]
   }
 
-  export type DailyLogUpdateManyWithoutProjectNestedInput = {
-    create?: XOR<DailyLogCreateWithoutProjectInput, DailyLogUncheckedCreateWithoutProjectInput> | DailyLogCreateWithoutProjectInput[] | DailyLogUncheckedCreateWithoutProjectInput[]
-    connectOrCreate?: DailyLogCreateOrConnectWithoutProjectInput | DailyLogCreateOrConnectWithoutProjectInput[]
-    upsert?: DailyLogUpsertWithWhereUniqueWithoutProjectInput | DailyLogUpsertWithWhereUniqueWithoutProjectInput[]
-    createMany?: DailyLogCreateManyProjectInputEnvelope
-    set?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
-    disconnect?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
-    delete?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
-    connect?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
-    update?: DailyLogUpdateWithWhereUniqueWithoutProjectInput | DailyLogUpdateWithWhereUniqueWithoutProjectInput[]
-    updateMany?: DailyLogUpdateManyWithWhereWithoutProjectInput | DailyLogUpdateManyWithWhereWithoutProjectInput[]
-    deleteMany?: DailyLogScalarWhereInput | DailyLogScalarWhereInput[]
+  export type DailyStreakUpdateManyWithoutProductNestedInput = {
+    create?: XOR<DailyStreakCreateWithoutProductInput, DailyStreakUncheckedCreateWithoutProductInput> | DailyStreakCreateWithoutProductInput[] | DailyStreakUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: DailyStreakCreateOrConnectWithoutProductInput | DailyStreakCreateOrConnectWithoutProductInput[]
+    upsert?: DailyStreakUpsertWithWhereUniqueWithoutProductInput | DailyStreakUpsertWithWhereUniqueWithoutProductInput[]
+    createMany?: DailyStreakCreateManyProductInputEnvelope
+    set?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
+    disconnect?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
+    delete?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
+    connect?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
+    update?: DailyStreakUpdateWithWhereUniqueWithoutProductInput | DailyStreakUpdateWithWhereUniqueWithoutProductInput[]
+    updateMany?: DailyStreakUpdateManyWithWhereWithoutProductInput | DailyStreakUpdateManyWithWhereWithoutProductInput[]
+    deleteMany?: DailyStreakScalarWhereInput | DailyStreakScalarWhereInput[]
   }
 
-  export type StreakUpdateManyWithoutProductNestedInput = {
-    create?: XOR<StreakCreateWithoutProductInput, StreakUncheckedCreateWithoutProductInput> | StreakCreateWithoutProductInput[] | StreakUncheckedCreateWithoutProductInput[]
-    connectOrCreate?: StreakCreateOrConnectWithoutProductInput | StreakCreateOrConnectWithoutProductInput[]
-    upsert?: StreakUpsertWithWhereUniqueWithoutProductInput | StreakUpsertWithWhereUniqueWithoutProductInput[]
-    createMany?: StreakCreateManyProductInputEnvelope
-    set?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
-    disconnect?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
-    delete?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
-    connect?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
-    update?: StreakUpdateWithWhereUniqueWithoutProductInput | StreakUpdateWithWhereUniqueWithoutProductInput[]
-    updateMany?: StreakUpdateManyWithWhereWithoutProductInput | StreakUpdateManyWithWhereWithoutProductInput[]
-    deleteMany?: StreakScalarWhereInput | StreakScalarWhereInput[]
-  }
-
-  export type UserUpdateManyWithoutActiveProjectNestedInput = {
-    create?: XOR<UserCreateWithoutActiveProjectInput, UserUncheckedCreateWithoutActiveProjectInput> | UserCreateWithoutActiveProjectInput[] | UserUncheckedCreateWithoutActiveProjectInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutActiveProjectInput | UserCreateOrConnectWithoutActiveProjectInput[]
-    upsert?: UserUpsertWithWhereUniqueWithoutActiveProjectInput | UserUpsertWithWhereUniqueWithoutActiveProjectInput[]
-    createMany?: UserCreateManyActiveProjectInputEnvelope
-    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    update?: UserUpdateWithWhereUniqueWithoutActiveProjectInput | UserUpdateWithWhereUniqueWithoutActiveProjectInput[]
-    updateMany?: UserUpdateManyWithWhereWithoutActiveProjectInput | UserUpdateManyWithWhereWithoutActiveProjectInput[]
-    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
-  }
-
-  export type RoadmapUncheckedUpdateOneWithoutProductNestedInput = {
-    create?: XOR<RoadmapCreateWithoutProductInput, RoadmapUncheckedCreateWithoutProductInput>
-    connectOrCreate?: RoadmapCreateOrConnectWithoutProductInput
-    upsert?: RoadmapUpsertWithoutProductInput
-    disconnect?: RoadmapWhereInput | boolean
-    delete?: RoadmapWhereInput | boolean
-    connect?: RoadmapWhereUniqueInput
-    update?: XOR<XOR<RoadmapUpdateToOneWithWhereWithoutProductInput, RoadmapUpdateWithoutProductInput>, RoadmapUncheckedUpdateWithoutProductInput>
+  export type AiLogUpdateManyWithoutProductNestedInput = {
+    create?: XOR<AiLogCreateWithoutProductInput, AiLogUncheckedCreateWithoutProductInput> | AiLogCreateWithoutProductInput[] | AiLogUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: AiLogCreateOrConnectWithoutProductInput | AiLogCreateOrConnectWithoutProductInput[]
+    upsert?: AiLogUpsertWithWhereUniqueWithoutProductInput | AiLogUpsertWithWhereUniqueWithoutProductInput[]
+    createMany?: AiLogCreateManyProductInputEnvelope
+    set?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
+    disconnect?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
+    delete?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
+    connect?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
+    update?: AiLogUpdateWithWhereUniqueWithoutProductInput | AiLogUpdateWithWhereUniqueWithoutProductInput[]
+    updateMany?: AiLogUpdateManyWithWhereWithoutProductInput | AiLogUpdateManyWithWhereWithoutProductInput[]
+    deleteMany?: AiLogScalarWhereInput | AiLogScalarWhereInput[]
   }
 
   export type FeatureUncheckedUpdateManyWithoutProductNestedInput = {
@@ -17780,74 +19791,46 @@ export namespace Prisma {
     deleteMany?: FeatureScalarWhereInput | FeatureScalarWhereInput[]
   }
 
-  export type BuildLogUncheckedUpdateManyWithoutProjectNestedInput = {
-    create?: XOR<BuildLogCreateWithoutProjectInput, BuildLogUncheckedCreateWithoutProjectInput> | BuildLogCreateWithoutProjectInput[] | BuildLogUncheckedCreateWithoutProjectInput[]
-    connectOrCreate?: BuildLogCreateOrConnectWithoutProjectInput | BuildLogCreateOrConnectWithoutProjectInput[]
-    upsert?: BuildLogUpsertWithWhereUniqueWithoutProjectInput | BuildLogUpsertWithWhereUniqueWithoutProjectInput[]
-    createMany?: BuildLogCreateManyProjectInputEnvelope
+  export type BuildLogUncheckedUpdateManyWithoutProductNestedInput = {
+    create?: XOR<BuildLogCreateWithoutProductInput, BuildLogUncheckedCreateWithoutProductInput> | BuildLogCreateWithoutProductInput[] | BuildLogUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: BuildLogCreateOrConnectWithoutProductInput | BuildLogCreateOrConnectWithoutProductInput[]
+    upsert?: BuildLogUpsertWithWhereUniqueWithoutProductInput | BuildLogUpsertWithWhereUniqueWithoutProductInput[]
+    createMany?: BuildLogCreateManyProductInputEnvelope
     set?: BuildLogWhereUniqueInput | BuildLogWhereUniqueInput[]
     disconnect?: BuildLogWhereUniqueInput | BuildLogWhereUniqueInput[]
     delete?: BuildLogWhereUniqueInput | BuildLogWhereUniqueInput[]
     connect?: BuildLogWhereUniqueInput | BuildLogWhereUniqueInput[]
-    update?: BuildLogUpdateWithWhereUniqueWithoutProjectInput | BuildLogUpdateWithWhereUniqueWithoutProjectInput[]
-    updateMany?: BuildLogUpdateManyWithWhereWithoutProjectInput | BuildLogUpdateManyWithWhereWithoutProjectInput[]
+    update?: BuildLogUpdateWithWhereUniqueWithoutProductInput | BuildLogUpdateWithWhereUniqueWithoutProductInput[]
+    updateMany?: BuildLogUpdateManyWithWhereWithoutProductInput | BuildLogUpdateManyWithWhereWithoutProductInput[]
     deleteMany?: BuildLogScalarWhereInput | BuildLogScalarWhereInput[]
   }
 
-  export type DailyLogUncheckedUpdateManyWithoutProjectNestedInput = {
-    create?: XOR<DailyLogCreateWithoutProjectInput, DailyLogUncheckedCreateWithoutProjectInput> | DailyLogCreateWithoutProjectInput[] | DailyLogUncheckedCreateWithoutProjectInput[]
-    connectOrCreate?: DailyLogCreateOrConnectWithoutProjectInput | DailyLogCreateOrConnectWithoutProjectInput[]
-    upsert?: DailyLogUpsertWithWhereUniqueWithoutProjectInput | DailyLogUpsertWithWhereUniqueWithoutProjectInput[]
-    createMany?: DailyLogCreateManyProjectInputEnvelope
-    set?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
-    disconnect?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
-    delete?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
-    connect?: DailyLogWhereUniqueInput | DailyLogWhereUniqueInput[]
-    update?: DailyLogUpdateWithWhereUniqueWithoutProjectInput | DailyLogUpdateWithWhereUniqueWithoutProjectInput[]
-    updateMany?: DailyLogUpdateManyWithWhereWithoutProjectInput | DailyLogUpdateManyWithWhereWithoutProjectInput[]
-    deleteMany?: DailyLogScalarWhereInput | DailyLogScalarWhereInput[]
+  export type DailyStreakUncheckedUpdateManyWithoutProductNestedInput = {
+    create?: XOR<DailyStreakCreateWithoutProductInput, DailyStreakUncheckedCreateWithoutProductInput> | DailyStreakCreateWithoutProductInput[] | DailyStreakUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: DailyStreakCreateOrConnectWithoutProductInput | DailyStreakCreateOrConnectWithoutProductInput[]
+    upsert?: DailyStreakUpsertWithWhereUniqueWithoutProductInput | DailyStreakUpsertWithWhereUniqueWithoutProductInput[]
+    createMany?: DailyStreakCreateManyProductInputEnvelope
+    set?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
+    disconnect?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
+    delete?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
+    connect?: DailyStreakWhereUniqueInput | DailyStreakWhereUniqueInput[]
+    update?: DailyStreakUpdateWithWhereUniqueWithoutProductInput | DailyStreakUpdateWithWhereUniqueWithoutProductInput[]
+    updateMany?: DailyStreakUpdateManyWithWhereWithoutProductInput | DailyStreakUpdateManyWithWhereWithoutProductInput[]
+    deleteMany?: DailyStreakScalarWhereInput | DailyStreakScalarWhereInput[]
   }
 
-  export type StreakUncheckedUpdateManyWithoutProductNestedInput = {
-    create?: XOR<StreakCreateWithoutProductInput, StreakUncheckedCreateWithoutProductInput> | StreakCreateWithoutProductInput[] | StreakUncheckedCreateWithoutProductInput[]
-    connectOrCreate?: StreakCreateOrConnectWithoutProductInput | StreakCreateOrConnectWithoutProductInput[]
-    upsert?: StreakUpsertWithWhereUniqueWithoutProductInput | StreakUpsertWithWhereUniqueWithoutProductInput[]
-    createMany?: StreakCreateManyProductInputEnvelope
-    set?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
-    disconnect?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
-    delete?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
-    connect?: StreakWhereUniqueInput | StreakWhereUniqueInput[]
-    update?: StreakUpdateWithWhereUniqueWithoutProductInput | StreakUpdateWithWhereUniqueWithoutProductInput[]
-    updateMany?: StreakUpdateManyWithWhereWithoutProductInput | StreakUpdateManyWithWhereWithoutProductInput[]
-    deleteMany?: StreakScalarWhereInput | StreakScalarWhereInput[]
-  }
-
-  export type UserUncheckedUpdateManyWithoutActiveProjectNestedInput = {
-    create?: XOR<UserCreateWithoutActiveProjectInput, UserUncheckedCreateWithoutActiveProjectInput> | UserCreateWithoutActiveProjectInput[] | UserUncheckedCreateWithoutActiveProjectInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutActiveProjectInput | UserCreateOrConnectWithoutActiveProjectInput[]
-    upsert?: UserUpsertWithWhereUniqueWithoutActiveProjectInput | UserUpsertWithWhereUniqueWithoutActiveProjectInput[]
-    createMany?: UserCreateManyActiveProjectInputEnvelope
-    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    update?: UserUpdateWithWhereUniqueWithoutActiveProjectInput | UserUpdateWithWhereUniqueWithoutActiveProjectInput[]
-    updateMany?: UserUpdateManyWithWhereWithoutActiveProjectInput | UserUpdateManyWithWhereWithoutActiveProjectInput[]
-    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
-  }
-
-  export type ProductCreateNestedOneWithoutRoadmapInput = {
-    create?: XOR<ProductCreateWithoutRoadmapInput, ProductUncheckedCreateWithoutRoadmapInput>
-    connectOrCreate?: ProductCreateOrConnectWithoutRoadmapInput
-    connect?: ProductWhereUniqueInput
-  }
-
-  export type ProductUpdateOneRequiredWithoutRoadmapNestedInput = {
-    create?: XOR<ProductCreateWithoutRoadmapInput, ProductUncheckedCreateWithoutRoadmapInput>
-    connectOrCreate?: ProductCreateOrConnectWithoutRoadmapInput
-    upsert?: ProductUpsertWithoutRoadmapInput
-    connect?: ProductWhereUniqueInput
-    update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutRoadmapInput, ProductUpdateWithoutRoadmapInput>, ProductUncheckedUpdateWithoutRoadmapInput>
+  export type AiLogUncheckedUpdateManyWithoutProductNestedInput = {
+    create?: XOR<AiLogCreateWithoutProductInput, AiLogUncheckedCreateWithoutProductInput> | AiLogCreateWithoutProductInput[] | AiLogUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: AiLogCreateOrConnectWithoutProductInput | AiLogCreateOrConnectWithoutProductInput[]
+    upsert?: AiLogUpsertWithWhereUniqueWithoutProductInput | AiLogUpsertWithWhereUniqueWithoutProductInput[]
+    createMany?: AiLogCreateManyProductInputEnvelope
+    set?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
+    disconnect?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
+    delete?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
+    connect?: AiLogWhereUniqueInput | AiLogWhereUniqueInput[]
+    update?: AiLogUpdateWithWhereUniqueWithoutProductInput | AiLogUpdateWithWhereUniqueWithoutProductInput[]
+    updateMany?: AiLogUpdateManyWithWhereWithoutProductInput | AiLogUpdateManyWithWhereWithoutProductInput[]
+    deleteMany?: AiLogScalarWhereInput | AiLogScalarWhereInput[]
   }
 
   export type ProductCreateNestedOneWithoutFeaturesInput = {
@@ -17924,6 +19907,18 @@ export namespace Prisma {
     connect?: DayTaskWhereUniqueInput
   }
 
+  export type NullableFloatFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type EnumTaskStatusFieldUpdateOperationsInput = {
+    set?: $Enums.TaskStatus
+  }
+
   export type NullableIntFieldUpdateOperationsInput = {
     set?: number | null
     increment?: number
@@ -17966,6 +19961,12 @@ export namespace Prisma {
     connect?: TaskWhereUniqueInput
   }
 
+  export type BuildLogCreateNestedOneWithoutDayTaskInput = {
+    create?: XOR<BuildLogCreateWithoutDayTaskInput, BuildLogUncheckedCreateWithoutDayTaskInput>
+    connectOrCreate?: BuildLogCreateOrConnectWithoutDayTaskInput
+    connect?: BuildLogWhereUniqueInput
+  }
+
   export type TaskUpdateOneRequiredWithoutDayTaskNestedInput = {
     create?: XOR<TaskCreateWithoutDayTaskInput, TaskUncheckedCreateWithoutDayTaskInput>
     connectOrCreate?: TaskCreateOrConnectWithoutDayTaskInput
@@ -17974,32 +19975,14 @@ export namespace Prisma {
     update?: XOR<XOR<TaskUpdateToOneWithWhereWithoutDayTaskInput, TaskUpdateWithoutDayTaskInput>, TaskUncheckedUpdateWithoutDayTaskInput>
   }
 
-  export type UserCreateNestedOneWithoutDailyLogsInput = {
-    create?: XOR<UserCreateWithoutDailyLogsInput, UserUncheckedCreateWithoutDailyLogsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutDailyLogsInput
-    connect?: UserWhereUniqueInput
-  }
-
-  export type ProductCreateNestedOneWithoutDailyLogsInput = {
-    create?: XOR<ProductCreateWithoutDailyLogsInput, ProductUncheckedCreateWithoutDailyLogsInput>
-    connectOrCreate?: ProductCreateOrConnectWithoutDailyLogsInput
-    connect?: ProductWhereUniqueInput
-  }
-
-  export type UserUpdateOneRequiredWithoutDailyLogsNestedInput = {
-    create?: XOR<UserCreateWithoutDailyLogsInput, UserUncheckedCreateWithoutDailyLogsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutDailyLogsInput
-    upsert?: UserUpsertWithoutDailyLogsInput
-    connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutDailyLogsInput, UserUpdateWithoutDailyLogsInput>, UserUncheckedUpdateWithoutDailyLogsInput>
-  }
-
-  export type ProductUpdateOneRequiredWithoutDailyLogsNestedInput = {
-    create?: XOR<ProductCreateWithoutDailyLogsInput, ProductUncheckedCreateWithoutDailyLogsInput>
-    connectOrCreate?: ProductCreateOrConnectWithoutDailyLogsInput
-    upsert?: ProductUpsertWithoutDailyLogsInput
-    connect?: ProductWhereUniqueInput
-    update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutDailyLogsInput, ProductUpdateWithoutDailyLogsInput>, ProductUncheckedUpdateWithoutDailyLogsInput>
+  export type BuildLogUpdateOneWithoutDayTaskNestedInput = {
+    create?: XOR<BuildLogCreateWithoutDayTaskInput, BuildLogUncheckedCreateWithoutDayTaskInput>
+    connectOrCreate?: BuildLogCreateOrConnectWithoutDayTaskInput
+    upsert?: BuildLogUpsertWithoutDayTaskInput
+    disconnect?: BuildLogWhereInput | boolean
+    delete?: BuildLogWhereInput | boolean
+    connect?: BuildLogWhereUniqueInput
+    update?: XOR<XOR<BuildLogUpdateToOneWithWhereWithoutDayTaskInput, BuildLogUpdateWithoutDayTaskInput>, BuildLogUncheckedUpdateWithoutDayTaskInput>
   }
 
   export type UserCreateNestedOneWithoutBuildLogsInput = {
@@ -18012,6 +19995,20 @@ export namespace Prisma {
     create?: XOR<ProductCreateWithoutBuildLogsInput, ProductUncheckedCreateWithoutBuildLogsInput>
     connectOrCreate?: ProductCreateOrConnectWithoutBuildLogsInput
     connect?: ProductWhereUniqueInput
+  }
+
+  export type DayTaskCreateNestedManyWithoutBuildLogInput = {
+    create?: XOR<DayTaskCreateWithoutBuildLogInput, DayTaskUncheckedCreateWithoutBuildLogInput> | DayTaskCreateWithoutBuildLogInput[] | DayTaskUncheckedCreateWithoutBuildLogInput[]
+    connectOrCreate?: DayTaskCreateOrConnectWithoutBuildLogInput | DayTaskCreateOrConnectWithoutBuildLogInput[]
+    createMany?: DayTaskCreateManyBuildLogInputEnvelope
+    connect?: DayTaskWhereUniqueInput | DayTaskWhereUniqueInput[]
+  }
+
+  export type DayTaskUncheckedCreateNestedManyWithoutBuildLogInput = {
+    create?: XOR<DayTaskCreateWithoutBuildLogInput, DayTaskUncheckedCreateWithoutBuildLogInput> | DayTaskCreateWithoutBuildLogInput[] | DayTaskUncheckedCreateWithoutBuildLogInput[]
+    connectOrCreate?: DayTaskCreateOrConnectWithoutBuildLogInput | DayTaskCreateOrConnectWithoutBuildLogInput[]
+    createMany?: DayTaskCreateManyBuildLogInputEnvelope
+    connect?: DayTaskWhereUniqueInput | DayTaskWhereUniqueInput[]
   }
 
   export type UserUpdateOneRequiredWithoutBuildLogsNestedInput = {
@@ -18030,32 +20027,116 @@ export namespace Prisma {
     update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutBuildLogsInput, ProductUpdateWithoutBuildLogsInput>, ProductUncheckedUpdateWithoutBuildLogsInput>
   }
 
-  export type UserCreateNestedOneWithoutStreaksInput = {
-    create?: XOR<UserCreateWithoutStreaksInput, UserUncheckedCreateWithoutStreaksInput>
-    connectOrCreate?: UserCreateOrConnectWithoutStreaksInput
+  export type DayTaskUpdateManyWithoutBuildLogNestedInput = {
+    create?: XOR<DayTaskCreateWithoutBuildLogInput, DayTaskUncheckedCreateWithoutBuildLogInput> | DayTaskCreateWithoutBuildLogInput[] | DayTaskUncheckedCreateWithoutBuildLogInput[]
+    connectOrCreate?: DayTaskCreateOrConnectWithoutBuildLogInput | DayTaskCreateOrConnectWithoutBuildLogInput[]
+    upsert?: DayTaskUpsertWithWhereUniqueWithoutBuildLogInput | DayTaskUpsertWithWhereUniqueWithoutBuildLogInput[]
+    createMany?: DayTaskCreateManyBuildLogInputEnvelope
+    set?: DayTaskWhereUniqueInput | DayTaskWhereUniqueInput[]
+    disconnect?: DayTaskWhereUniqueInput | DayTaskWhereUniqueInput[]
+    delete?: DayTaskWhereUniqueInput | DayTaskWhereUniqueInput[]
+    connect?: DayTaskWhereUniqueInput | DayTaskWhereUniqueInput[]
+    update?: DayTaskUpdateWithWhereUniqueWithoutBuildLogInput | DayTaskUpdateWithWhereUniqueWithoutBuildLogInput[]
+    updateMany?: DayTaskUpdateManyWithWhereWithoutBuildLogInput | DayTaskUpdateManyWithWhereWithoutBuildLogInput[]
+    deleteMany?: DayTaskScalarWhereInput | DayTaskScalarWhereInput[]
+  }
+
+  export type DayTaskUncheckedUpdateManyWithoutBuildLogNestedInput = {
+    create?: XOR<DayTaskCreateWithoutBuildLogInput, DayTaskUncheckedCreateWithoutBuildLogInput> | DayTaskCreateWithoutBuildLogInput[] | DayTaskUncheckedCreateWithoutBuildLogInput[]
+    connectOrCreate?: DayTaskCreateOrConnectWithoutBuildLogInput | DayTaskCreateOrConnectWithoutBuildLogInput[]
+    upsert?: DayTaskUpsertWithWhereUniqueWithoutBuildLogInput | DayTaskUpsertWithWhereUniqueWithoutBuildLogInput[]
+    createMany?: DayTaskCreateManyBuildLogInputEnvelope
+    set?: DayTaskWhereUniqueInput | DayTaskWhereUniqueInput[]
+    disconnect?: DayTaskWhereUniqueInput | DayTaskWhereUniqueInput[]
+    delete?: DayTaskWhereUniqueInput | DayTaskWhereUniqueInput[]
+    connect?: DayTaskWhereUniqueInput | DayTaskWhereUniqueInput[]
+    update?: DayTaskUpdateWithWhereUniqueWithoutBuildLogInput | DayTaskUpdateWithWhereUniqueWithoutBuildLogInput[]
+    updateMany?: DayTaskUpdateManyWithWhereWithoutBuildLogInput | DayTaskUpdateManyWithWhereWithoutBuildLogInput[]
+    deleteMany?: DayTaskScalarWhereInput | DayTaskScalarWhereInput[]
+  }
+
+  export type UserCreateNestedOneWithoutDailyStreakInput = {
+    create?: XOR<UserCreateWithoutDailyStreakInput, UserUncheckedCreateWithoutDailyStreakInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDailyStreakInput
     connect?: UserWhereUniqueInput
   }
 
-  export type ProductCreateNestedOneWithoutStreaksInput = {
-    create?: XOR<ProductCreateWithoutStreaksInput, ProductUncheckedCreateWithoutStreaksInput>
-    connectOrCreate?: ProductCreateOrConnectWithoutStreaksInput
+  export type ProductCreateNestedOneWithoutDailyStreakInput = {
+    create?: XOR<ProductCreateWithoutDailyStreakInput, ProductUncheckedCreateWithoutDailyStreakInput>
+    connectOrCreate?: ProductCreateOrConnectWithoutDailyStreakInput
     connect?: ProductWhereUniqueInput
   }
 
-  export type UserUpdateOneRequiredWithoutStreaksNestedInput = {
-    create?: XOR<UserCreateWithoutStreaksInput, UserUncheckedCreateWithoutStreaksInput>
-    connectOrCreate?: UserCreateOrConnectWithoutStreaksInput
-    upsert?: UserUpsertWithoutStreaksInput
+  export type UserUpdateOneRequiredWithoutDailyStreakNestedInput = {
+    create?: XOR<UserCreateWithoutDailyStreakInput, UserUncheckedCreateWithoutDailyStreakInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDailyStreakInput
+    upsert?: UserUpsertWithoutDailyStreakInput
     connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutStreaksInput, UserUpdateWithoutStreaksInput>, UserUncheckedUpdateWithoutStreaksInput>
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutDailyStreakInput, UserUpdateWithoutDailyStreakInput>, UserUncheckedUpdateWithoutDailyStreakInput>
   }
 
-  export type ProductUpdateOneRequiredWithoutStreaksNestedInput = {
-    create?: XOR<ProductCreateWithoutStreaksInput, ProductUncheckedCreateWithoutStreaksInput>
-    connectOrCreate?: ProductCreateOrConnectWithoutStreaksInput
-    upsert?: ProductUpsertWithoutStreaksInput
+  export type ProductUpdateOneRequiredWithoutDailyStreakNestedInput = {
+    create?: XOR<ProductCreateWithoutDailyStreakInput, ProductUncheckedCreateWithoutDailyStreakInput>
+    connectOrCreate?: ProductCreateOrConnectWithoutDailyStreakInput
+    upsert?: ProductUpsertWithoutDailyStreakInput
     connect?: ProductWhereUniqueInput
-    update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutStreaksInput, ProductUpdateWithoutStreaksInput>, ProductUncheckedUpdateWithoutStreaksInput>
+    update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutDailyStreakInput, ProductUpdateWithoutDailyStreakInput>, ProductUncheckedUpdateWithoutDailyStreakInput>
+  }
+
+  export type UserCreateNestedOneWithoutAiLogsInput = {
+    create?: XOR<UserCreateWithoutAiLogsInput, UserUncheckedCreateWithoutAiLogsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutAiLogsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ProductCreateNestedOneWithoutAiLogsInput = {
+    create?: XOR<ProductCreateWithoutAiLogsInput, ProductUncheckedCreateWithoutAiLogsInput>
+    connectOrCreate?: ProductCreateOrConnectWithoutAiLogsInput
+    connect?: ProductWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutAiLogsNestedInput = {
+    create?: XOR<UserCreateWithoutAiLogsInput, UserUncheckedCreateWithoutAiLogsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutAiLogsInput
+    upsert?: UserUpsertWithoutAiLogsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAiLogsInput, UserUpdateWithoutAiLogsInput>, UserUncheckedUpdateWithoutAiLogsInput>
+  }
+
+  export type ProductUpdateOneRequiredWithoutAiLogsNestedInput = {
+    create?: XOR<ProductCreateWithoutAiLogsInput, ProductUncheckedCreateWithoutAiLogsInput>
+    connectOrCreate?: ProductCreateOrConnectWithoutAiLogsInput
+    upsert?: ProductUpsertWithoutAiLogsInput
+    connect?: ProductWhereUniqueInput
+    update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutAiLogsInput, ProductUpdateWithoutAiLogsInput>, ProductUncheckedUpdateWithoutAiLogsInput>
+  }
+
+  export type UserCreateNestedOneWithoutTokenUsagesInput = {
+    create?: XOR<UserCreateWithoutTokenUsagesInput, UserUncheckedCreateWithoutTokenUsagesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTokenUsagesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutTokenUsagesNestedInput = {
+    create?: XOR<UserCreateWithoutTokenUsagesInput, UserUncheckedCreateWithoutTokenUsagesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTokenUsagesInput
+    upsert?: UserUpsertWithoutTokenUsagesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutTokenUsagesInput, UserUpdateWithoutTokenUsagesInput>, UserUncheckedUpdateWithoutTokenUsagesInput>
+  }
+
+  export type UserCreateNestedOneWithoutSettingsInput = {
+    create?: XOR<UserCreateWithoutSettingsInput, UserUncheckedCreateWithoutSettingsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSettingsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutSettingsNestedInput = {
+    create?: XOR<UserCreateWithoutSettingsInput, UserUncheckedCreateWithoutSettingsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSettingsInput
+    upsert?: UserUpsertWithoutSettingsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSettingsInput, UserUpdateWithoutSettingsInput>, UserUncheckedUpdateWithoutSettingsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -18084,6 +20165,11 @@ export namespace Prisma {
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -18153,6 +20239,14 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -18201,11 +20295,6 @@ export namespace Prisma {
     not?: NestedEnumAccessTierFilter<$PrismaModel> | $Enums.AccessTier
   }
 
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
   export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
@@ -18225,14 +20314,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumAccessTierFilter<$PrismaModel>
     _max?: NestedEnumAccessTierFilter<$PrismaModel>
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -18265,6 +20346,50 @@ export namespace Prisma {
     _max?: NestedFloatFilter<$PrismaModel>
   }
 
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedEnumTaskStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.TaskStatus | EnumTaskStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TaskStatus[] | ListEnumTaskStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TaskStatus[] | ListEnumTaskStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumTaskStatusFilter<$PrismaModel> | $Enums.TaskStatus
+  }
+
+  export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedFloatNullableFilter<$PrismaModel>
+    _min?: NestedFloatNullableFilter<$PrismaModel>
+    _max?: NestedFloatNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumTaskStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TaskStatus | EnumTaskStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TaskStatus[] | ListEnumTaskStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TaskStatus[] | ListEnumTaskStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumTaskStatusWithAggregatesFilter<$PrismaModel> | $Enums.TaskStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTaskStatusFilter<$PrismaModel>
+    _max?: NestedEnumTaskStatusFilter<$PrismaModel>
+  }
+
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
@@ -18279,17 +20404,6 @@ export namespace Prisma {
     _sum?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedIntNullableFilter<$PrismaModel>
     _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
-  export type NestedFloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
   export type NestedJsonFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -18318,98 +20432,64 @@ export namespace Prisma {
   export type ProductCreateWithoutUserInput = {
     id?: string
     name: string
-    description: string
+    slug: string
+    description?: string | null
     problemStatement: string
     targetAudience: string
     userGoals: string
     uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
+    isMvpGenerated?: boolean
+    isRoadmapGenerated?: boolean
+    currentStreak?: number
+    AllTimeBestStreak?: number
+    active?: boolean
+    techStack?: string | null
+    inspirationApps?: string | null
+    initialFeatures?: string | null
+    startDate?: Date | string
     deadline: Date | string
-    dailyCommitmentHrs: number
+    dailyCommitmentHrs?: number
+    mvpSummary?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutProductsInput
-    roadmap?: RoadmapCreateNestedOneWithoutProductInput
     features?: FeatureCreateNestedManyWithoutProductInput
-    buildLogs?: BuildLogCreateNestedManyWithoutProjectInput
-    dailyLogs?: DailyLogCreateNestedManyWithoutProjectInput
-    streaks?: StreakCreateNestedManyWithoutProductInput
+    buildLogs?: BuildLogCreateNestedManyWithoutProductInput
+    DailyStreak?: DailyStreakCreateNestedManyWithoutProductInput
+    aiLogs?: AiLogCreateNestedManyWithoutProductInput
   }
 
   export type ProductUncheckedCreateWithoutUserInput = {
     id?: string
     name: string
-    description: string
+    slug: string
+    description?: string | null
     problemStatement: string
     targetAudience: string
     userGoals: string
     uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
+    isMvpGenerated?: boolean
+    isRoadmapGenerated?: boolean
+    currentStreak?: number
+    AllTimeBestStreak?: number
+    active?: boolean
+    techStack?: string | null
+    inspirationApps?: string | null
+    initialFeatures?: string | null
+    startDate?: Date | string
     deadline: Date | string
-    dailyCommitmentHrs: number
-    userId: string
+    dailyCommitmentHrs?: number
+    mvpSummary?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    roadmap?: RoadmapUncheckedCreateNestedOneWithoutProductInput
     features?: FeatureUncheckedCreateNestedManyWithoutProductInput
-    buildLogs?: BuildLogUncheckedCreateNestedManyWithoutProjectInput
-    dailyLogs?: DailyLogUncheckedCreateNestedManyWithoutProjectInput
-    streaks?: StreakUncheckedCreateNestedManyWithoutProductInput
+    buildLogs?: BuildLogUncheckedCreateNestedManyWithoutProductInput
+    DailyStreak?: DailyStreakUncheckedCreateNestedManyWithoutProductInput
+    aiLogs?: AiLogUncheckedCreateNestedManyWithoutProductInput
   }
 
   export type ProductCreateOrConnectWithoutUserInput = {
     where: ProductWhereUniqueInput
     create: XOR<ProductCreateWithoutUserInput, ProductUncheckedCreateWithoutUserInput>
-  }
-
-  export type ProductCreateWithoutUserInput = {
-    id?: string
-    name: string
-    description: string
-    problemStatement: string
-    targetAudience: string
-    userGoals: string
-    uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
-    deadline: Date | string
-    dailyCommitmentHrs: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    roadmap?: RoadmapCreateNestedOneWithoutProductInput
-    features?: FeatureCreateNestedManyWithoutProductInput
-    buildLogs?: BuildLogCreateNestedManyWithoutProjectInput
-    dailyLogs?: DailyLogCreateNestedManyWithoutProjectInput
-    streaks?: StreakCreateNestedManyWithoutProductInput
-    User?: UserCreateNestedManyWithoutActiveProjectInput
-  }
-
-  export type ProductUncheckedCreateWithoutUserInput = {
-    id?: string
-    name: string
-    description: string
-    problemStatement: string
-    targetAudience: string
-    userGoals: string
-    uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
-    deadline: Date | string
-    dailyCommitmentHrs: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    roadmap?: RoadmapUncheckedCreateNestedOneWithoutProductInput
-    features?: FeatureUncheckedCreateNestedManyWithoutProductInput
-    buildLogs?: BuildLogUncheckedCreateNestedManyWithoutProjectInput
-    dailyLogs?: DailyLogUncheckedCreateNestedManyWithoutProjectInput
-    streaks?: StreakUncheckedCreateNestedManyWithoutProductInput
-    User?: UserUncheckedCreateNestedManyWithoutActiveProjectInput
   }
 
   export type ProductCreateManyUserInputEnvelope = {
@@ -18423,20 +20503,20 @@ export namespace Prisma {
     tweet?: string | null
     dayIndex?: number
     summary: string
-    sourceTasks: JsonNullValueInput | InputJsonValue
     generatedAt?: Date | string
-    project: ProductCreateNestedOneWithoutBuildLogsInput
+    product: ProductCreateNestedOneWithoutBuildLogsInput
+    DayTask?: DayTaskCreateNestedManyWithoutBuildLogInput
   }
 
   export type BuildLogUncheckedCreateWithoutUserInput = {
     id?: string
-    projectId: string
+    productId: string
     logDate: Date | string
     tweet?: string | null
     dayIndex?: number
     summary: string
-    sourceTasks: JsonNullValueInput | InputJsonValue
     generatedAt?: Date | string
+    DayTask?: DayTaskUncheckedCreateNestedManyWithoutBuildLogInput
   }
 
   export type BuildLogCreateOrConnectWithoutUserInput = {
@@ -18446,34 +20526,6 @@ export namespace Prisma {
 
   export type BuildLogCreateManyUserInputEnvelope = {
     data: BuildLogCreateManyUserInput | BuildLogCreateManyUserInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type DailyLogCreateWithoutUserInput = {
-    id?: string
-    date: Date | string
-    completedTasks: JsonNullValueInput | InputJsonValue
-    notes?: string | null
-    createdAt?: Date | string
-    project: ProductCreateNestedOneWithoutDailyLogsInput
-  }
-
-  export type DailyLogUncheckedCreateWithoutUserInput = {
-    id?: string
-    projectId: string
-    date: Date | string
-    completedTasks: JsonNullValueInput | InputJsonValue
-    notes?: string | null
-    createdAt?: Date | string
-  }
-
-  export type DailyLogCreateOrConnectWithoutUserInput = {
-    where: DailyLogWhereUniqueInput
-    create: XOR<DailyLogCreateWithoutUserInput, DailyLogUncheckedCreateWithoutUserInput>
-  }
-
-  export type DailyLogCreateManyUserInputEnvelope = {
-    data: DailyLogCreateManyUserInput | DailyLogCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -18498,91 +20550,113 @@ export namespace Prisma {
     create: XOR<TrialCreateWithoutUserInput, TrialUncheckedCreateWithoutUserInput>
   }
 
-  export type StreakCreateWithoutUserInput = {
+  export type DailyStreakCreateWithoutUserInput = {
     id?: string
-    currentStreak?: number
-    bestStreak?: number
-    lastActiveDate: Date | string
-    streakStart: Date | string
-    updatedAt?: Date | string
-    product: ProductCreateNestedOneWithoutStreaksInput
+    date: Date | string
+    hasBuildLog?: boolean
+    createdAt?: Date | string
+    product: ProductCreateNestedOneWithoutDailyStreakInput
   }
 
-  export type StreakUncheckedCreateWithoutUserInput = {
+  export type DailyStreakUncheckedCreateWithoutUserInput = {
     id?: string
     productId: string
-    currentStreak?: number
-    bestStreak?: number
-    lastActiveDate: Date | string
-    streakStart: Date | string
-    updatedAt?: Date | string
+    date: Date | string
+    hasBuildLog?: boolean
+    createdAt?: Date | string
   }
 
-  export type StreakCreateOrConnectWithoutUserInput = {
-    where: StreakWhereUniqueInput
-    create: XOR<StreakCreateWithoutUserInput, StreakUncheckedCreateWithoutUserInput>
+  export type DailyStreakCreateOrConnectWithoutUserInput = {
+    where: DailyStreakWhereUniqueInput
+    create: XOR<DailyStreakCreateWithoutUserInput, DailyStreakUncheckedCreateWithoutUserInput>
   }
 
-  export type StreakCreateManyUserInputEnvelope = {
-    data: StreakCreateManyUserInput | StreakCreateManyUserInput[]
+  export type DailyStreakCreateManyUserInputEnvelope = {
+    data: DailyStreakCreateManyUserInput | DailyStreakCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
-  export type ProductUpsertWithoutUserInput = {
-    update: XOR<ProductUpdateWithoutUserInput, ProductUncheckedUpdateWithoutUserInput>
-    create: XOR<ProductCreateWithoutUserInput, ProductUncheckedCreateWithoutUserInput>
-    where?: ProductWhereInput
+  export type AiLogCreateWithoutUserInput = {
+    id?: string
+    ai_model: string
+    type: string
+    input: JsonNullValueInput | InputJsonValue
+    output: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    product: ProductCreateNestedOneWithoutAiLogsInput
   }
 
-  export type ProductUpdateToOneWithWhereWithoutUserInput = {
-    where?: ProductWhereInput
-    data: XOR<ProductUpdateWithoutUserInput, ProductUncheckedUpdateWithoutUserInput>
+  export type AiLogUncheckedCreateWithoutUserInput = {
+    id?: string
+    productId: string
+    ai_model: string
+    type: string
+    input: JsonNullValueInput | InputJsonValue
+    output: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
   }
 
-  export type ProductUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    problemStatement?: StringFieldUpdateOperationsInput | string
-    targetAudience?: StringFieldUpdateOperationsInput | string
-    userGoals?: StringFieldUpdateOperationsInput | string
-    uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
-    deadline?: DateTimeFieldUpdateOperationsInput | Date | string
-    dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutProductsNestedInput
-    roadmap?: RoadmapUpdateOneWithoutProductNestedInput
-    features?: FeatureUpdateManyWithoutProductNestedInput
-    buildLogs?: BuildLogUpdateManyWithoutProjectNestedInput
-    dailyLogs?: DailyLogUpdateManyWithoutProjectNestedInput
-    streaks?: StreakUpdateManyWithoutProductNestedInput
+  export type AiLogCreateOrConnectWithoutUserInput = {
+    where: AiLogWhereUniqueInput
+    create: XOR<AiLogCreateWithoutUserInput, AiLogUncheckedCreateWithoutUserInput>
   }
 
-  export type ProductUncheckedUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    problemStatement?: StringFieldUpdateOperationsInput | string
-    targetAudience?: StringFieldUpdateOperationsInput | string
-    userGoals?: StringFieldUpdateOperationsInput | string
-    uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
-    deadline?: DateTimeFieldUpdateOperationsInput | Date | string
-    dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
-    userId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    roadmap?: RoadmapUncheckedUpdateOneWithoutProductNestedInput
-    features?: FeatureUncheckedUpdateManyWithoutProductNestedInput
-    buildLogs?: BuildLogUncheckedUpdateManyWithoutProjectNestedInput
-    dailyLogs?: DailyLogUncheckedUpdateManyWithoutProjectNestedInput
-    streaks?: StreakUncheckedUpdateManyWithoutProductNestedInput
+  export type AiLogCreateManyUserInputEnvelope = {
+    data: AiLogCreateManyUserInput | AiLogCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type TokenUsageCreateWithoutUserInput = {
+    id?: string
+    purpose: string
+    tokens: number
+    createdAt?: Date | string
+  }
+
+  export type TokenUsageUncheckedCreateWithoutUserInput = {
+    id?: string
+    purpose: string
+    tokens: number
+    createdAt?: Date | string
+  }
+
+  export type TokenUsageCreateOrConnectWithoutUserInput = {
+    where: TokenUsageWhereUniqueInput
+    create: XOR<TokenUsageCreateWithoutUserInput, TokenUsageUncheckedCreateWithoutUserInput>
+  }
+
+  export type TokenUsageCreateManyUserInputEnvelope = {
+    data: TokenUsageCreateManyUserInput | TokenUsageCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SettingsCreateWithoutUserInput = {
+    id?: string
+    dailyHours?: number
+    deadlineDays?: number
+    aiModel?: string
+    emailNudges?: boolean
+    isPublic?: boolean
+    slug?: string | null
+    bio?: string | null
+    twitter?: string | null
+  }
+
+  export type SettingsUncheckedCreateWithoutUserInput = {
+    id?: string
+    dailyHours?: number
+    deadlineDays?: number
+    aiModel?: string
+    emailNudges?: boolean
+    isPublic?: boolean
+    slug?: string | null
+    bio?: string | null
+    twitter?: string | null
+  }
+
+  export type SettingsCreateOrConnectWithoutUserInput = {
+    where: SettingsWhereUniqueInput
+    create: XOR<SettingsCreateWithoutUserInput, SettingsUncheckedCreateWithoutUserInput>
   }
 
   export type ProductUpsertWithWhereUniqueWithoutUserInput = {
@@ -18607,17 +20681,25 @@ export namespace Prisma {
     NOT?: ProductScalarWhereInput | ProductScalarWhereInput[]
     id?: StringFilter<"Product"> | string
     name?: StringFilter<"Product"> | string
-    description?: StringFilter<"Product"> | string
+    slug?: StringFilter<"Product"> | string
+    description?: StringNullableFilter<"Product"> | string | null
     problemStatement?: StringFilter<"Product"> | string
     targetAudience?: StringFilter<"Product"> | string
     userGoals?: StringFilter<"Product"> | string
     uniqueValueProp?: StringFilter<"Product"> | string
-    techStack?: StringFilter<"Product"> | string
-    inspirationApps?: StringFilter<"Product"> | string
-    initialFeatures?: StringFilter<"Product"> | string
+    isMvpGenerated?: BoolFilter<"Product"> | boolean
+    isRoadmapGenerated?: BoolFilter<"Product"> | boolean
+    currentStreak?: IntFilter<"Product"> | number
+    AllTimeBestStreak?: IntFilter<"Product"> | number
+    active?: BoolFilter<"Product"> | boolean
+    techStack?: StringNullableFilter<"Product"> | string | null
+    inspirationApps?: StringNullableFilter<"Product"> | string | null
+    initialFeatures?: StringNullableFilter<"Product"> | string | null
+    startDate?: DateTimeFilter<"Product"> | Date | string
     deadline?: DateTimeFilter<"Product"> | Date | string
     dailyCommitmentHrs?: FloatFilter<"Product"> | number
     userId?: StringFilter<"Product"> | string
+    mvpSummary?: StringNullableFilter<"Product"> | string | null
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
   }
@@ -18644,42 +20726,12 @@ export namespace Prisma {
     NOT?: BuildLogScalarWhereInput | BuildLogScalarWhereInput[]
     id?: StringFilter<"BuildLog"> | string
     userId?: StringFilter<"BuildLog"> | string
-    projectId?: StringFilter<"BuildLog"> | string
+    productId?: StringFilter<"BuildLog"> | string
     logDate?: DateTimeFilter<"BuildLog"> | Date | string
     tweet?: StringNullableFilter<"BuildLog"> | string | null
     dayIndex?: IntFilter<"BuildLog"> | number
     summary?: StringFilter<"BuildLog"> | string
-    sourceTasks?: JsonFilter<"BuildLog">
     generatedAt?: DateTimeFilter<"BuildLog"> | Date | string
-  }
-
-  export type DailyLogUpsertWithWhereUniqueWithoutUserInput = {
-    where: DailyLogWhereUniqueInput
-    update: XOR<DailyLogUpdateWithoutUserInput, DailyLogUncheckedUpdateWithoutUserInput>
-    create: XOR<DailyLogCreateWithoutUserInput, DailyLogUncheckedCreateWithoutUserInput>
-  }
-
-  export type DailyLogUpdateWithWhereUniqueWithoutUserInput = {
-    where: DailyLogWhereUniqueInput
-    data: XOR<DailyLogUpdateWithoutUserInput, DailyLogUncheckedUpdateWithoutUserInput>
-  }
-
-  export type DailyLogUpdateManyWithWhereWithoutUserInput = {
-    where: DailyLogScalarWhereInput
-    data: XOR<DailyLogUpdateManyMutationInput, DailyLogUncheckedUpdateManyWithoutUserInput>
-  }
-
-  export type DailyLogScalarWhereInput = {
-    AND?: DailyLogScalarWhereInput | DailyLogScalarWhereInput[]
-    OR?: DailyLogScalarWhereInput[]
-    NOT?: DailyLogScalarWhereInput | DailyLogScalarWhereInput[]
-    id?: StringFilter<"DailyLog"> | string
-    userId?: StringFilter<"DailyLog"> | string
-    projectId?: StringFilter<"DailyLog"> | string
-    date?: DateTimeFilter<"DailyLog"> | Date | string
-    completedTasks?: JsonFilter<"DailyLog">
-    notes?: StringNullableFilter<"DailyLog"> | string | null
-    createdAt?: DateTimeFilter<"DailyLog"> | Date | string
   }
 
   export type TrialUpsertWithoutUserInput = {
@@ -18709,34 +20761,124 @@ export namespace Prisma {
     expired?: BoolFieldUpdateOperationsInput | boolean
   }
 
-  export type StreakUpsertWithWhereUniqueWithoutUserInput = {
-    where: StreakWhereUniqueInput
-    update: XOR<StreakUpdateWithoutUserInput, StreakUncheckedUpdateWithoutUserInput>
-    create: XOR<StreakCreateWithoutUserInput, StreakUncheckedCreateWithoutUserInput>
+  export type DailyStreakUpsertWithWhereUniqueWithoutUserInput = {
+    where: DailyStreakWhereUniqueInput
+    update: XOR<DailyStreakUpdateWithoutUserInput, DailyStreakUncheckedUpdateWithoutUserInput>
+    create: XOR<DailyStreakCreateWithoutUserInput, DailyStreakUncheckedCreateWithoutUserInput>
   }
 
-  export type StreakUpdateWithWhereUniqueWithoutUserInput = {
-    where: StreakWhereUniqueInput
-    data: XOR<StreakUpdateWithoutUserInput, StreakUncheckedUpdateWithoutUserInput>
+  export type DailyStreakUpdateWithWhereUniqueWithoutUserInput = {
+    where: DailyStreakWhereUniqueInput
+    data: XOR<DailyStreakUpdateWithoutUserInput, DailyStreakUncheckedUpdateWithoutUserInput>
   }
 
-  export type StreakUpdateManyWithWhereWithoutUserInput = {
-    where: StreakScalarWhereInput
-    data: XOR<StreakUpdateManyMutationInput, StreakUncheckedUpdateManyWithoutUserInput>
+  export type DailyStreakUpdateManyWithWhereWithoutUserInput = {
+    where: DailyStreakScalarWhereInput
+    data: XOR<DailyStreakUpdateManyMutationInput, DailyStreakUncheckedUpdateManyWithoutUserInput>
   }
 
-  export type StreakScalarWhereInput = {
-    AND?: StreakScalarWhereInput | StreakScalarWhereInput[]
-    OR?: StreakScalarWhereInput[]
-    NOT?: StreakScalarWhereInput | StreakScalarWhereInput[]
-    id?: StringFilter<"Streak"> | string
-    userId?: StringFilter<"Streak"> | string
-    productId?: StringFilter<"Streak"> | string
-    currentStreak?: IntFilter<"Streak"> | number
-    bestStreak?: IntFilter<"Streak"> | number
-    lastActiveDate?: DateTimeFilter<"Streak"> | Date | string
-    streakStart?: DateTimeFilter<"Streak"> | Date | string
-    updatedAt?: DateTimeFilter<"Streak"> | Date | string
+  export type DailyStreakScalarWhereInput = {
+    AND?: DailyStreakScalarWhereInput | DailyStreakScalarWhereInput[]
+    OR?: DailyStreakScalarWhereInput[]
+    NOT?: DailyStreakScalarWhereInput | DailyStreakScalarWhereInput[]
+    id?: StringFilter<"DailyStreak"> | string
+    userId?: StringFilter<"DailyStreak"> | string
+    productId?: StringFilter<"DailyStreak"> | string
+    date?: DateTimeFilter<"DailyStreak"> | Date | string
+    hasBuildLog?: BoolFilter<"DailyStreak"> | boolean
+    createdAt?: DateTimeFilter<"DailyStreak"> | Date | string
+  }
+
+  export type AiLogUpsertWithWhereUniqueWithoutUserInput = {
+    where: AiLogWhereUniqueInput
+    update: XOR<AiLogUpdateWithoutUserInput, AiLogUncheckedUpdateWithoutUserInput>
+    create: XOR<AiLogCreateWithoutUserInput, AiLogUncheckedCreateWithoutUserInput>
+  }
+
+  export type AiLogUpdateWithWhereUniqueWithoutUserInput = {
+    where: AiLogWhereUniqueInput
+    data: XOR<AiLogUpdateWithoutUserInput, AiLogUncheckedUpdateWithoutUserInput>
+  }
+
+  export type AiLogUpdateManyWithWhereWithoutUserInput = {
+    where: AiLogScalarWhereInput
+    data: XOR<AiLogUpdateManyMutationInput, AiLogUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type AiLogScalarWhereInput = {
+    AND?: AiLogScalarWhereInput | AiLogScalarWhereInput[]
+    OR?: AiLogScalarWhereInput[]
+    NOT?: AiLogScalarWhereInput | AiLogScalarWhereInput[]
+    id?: StringFilter<"AiLog"> | string
+    userId?: StringFilter<"AiLog"> | string
+    productId?: StringFilter<"AiLog"> | string
+    ai_model?: StringFilter<"AiLog"> | string
+    type?: StringFilter<"AiLog"> | string
+    input?: JsonFilter<"AiLog">
+    output?: JsonFilter<"AiLog">
+    createdAt?: DateTimeFilter<"AiLog"> | Date | string
+  }
+
+  export type TokenUsageUpsertWithWhereUniqueWithoutUserInput = {
+    where: TokenUsageWhereUniqueInput
+    update: XOR<TokenUsageUpdateWithoutUserInput, TokenUsageUncheckedUpdateWithoutUserInput>
+    create: XOR<TokenUsageCreateWithoutUserInput, TokenUsageUncheckedCreateWithoutUserInput>
+  }
+
+  export type TokenUsageUpdateWithWhereUniqueWithoutUserInput = {
+    where: TokenUsageWhereUniqueInput
+    data: XOR<TokenUsageUpdateWithoutUserInput, TokenUsageUncheckedUpdateWithoutUserInput>
+  }
+
+  export type TokenUsageUpdateManyWithWhereWithoutUserInput = {
+    where: TokenUsageScalarWhereInput
+    data: XOR<TokenUsageUpdateManyMutationInput, TokenUsageUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type TokenUsageScalarWhereInput = {
+    AND?: TokenUsageScalarWhereInput | TokenUsageScalarWhereInput[]
+    OR?: TokenUsageScalarWhereInput[]
+    NOT?: TokenUsageScalarWhereInput | TokenUsageScalarWhereInput[]
+    id?: StringFilter<"TokenUsage"> | string
+    userId?: StringFilter<"TokenUsage"> | string
+    purpose?: StringFilter<"TokenUsage"> | string
+    tokens?: IntFilter<"TokenUsage"> | number
+    createdAt?: DateTimeFilter<"TokenUsage"> | Date | string
+  }
+
+  export type SettingsUpsertWithoutUserInput = {
+    update: XOR<SettingsUpdateWithoutUserInput, SettingsUncheckedUpdateWithoutUserInput>
+    create: XOR<SettingsCreateWithoutUserInput, SettingsUncheckedCreateWithoutUserInput>
+    where?: SettingsWhereInput
+  }
+
+  export type SettingsUpdateToOneWithWhereWithoutUserInput = {
+    where?: SettingsWhereInput
+    data: XOR<SettingsUpdateWithoutUserInput, SettingsUncheckedUpdateWithoutUserInput>
+  }
+
+  export type SettingsUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dailyHours?: FloatFieldUpdateOperationsInput | number
+    deadlineDays?: IntFieldUpdateOperationsInput | number
+    aiModel?: StringFieldUpdateOperationsInput | string
+    emailNudges?: BoolFieldUpdateOperationsInput | boolean
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    slug?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type SettingsUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dailyHours?: FloatFieldUpdateOperationsInput | number
+    deadlineDays?: IntFieldUpdateOperationsInput | number
+    aiModel?: StringFieldUpdateOperationsInput | string
+    emailNudges?: BoolFieldUpdateOperationsInput | boolean
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    slug?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserCreateWithoutTrialInput = {
@@ -18745,15 +20887,17 @@ export namespace Prisma {
     email: string
     name: string
     username?: string | null
+    onboardingCompleted?: boolean
     discovery?: string | null
     role?: string | null
     bestStreakOverall?: number
     createdAt?: Date | string
-    activeProject?: ProductCreateNestedOneWithoutUserInput
     products?: ProductCreateNestedManyWithoutUserInput
     buildLogs?: BuildLogCreateNestedManyWithoutUserInput
-    dailyLogs?: DailyLogCreateNestedManyWithoutUserInput
-    streaks?: StreakCreateNestedManyWithoutUserInput
+    DailyStreak?: DailyStreakCreateNestedManyWithoutUserInput
+    aiLogs?: AiLogCreateNestedManyWithoutUserInput
+    tokenUsages?: TokenUsageCreateNestedManyWithoutUserInput
+    settings?: SettingsCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutTrialInput = {
@@ -18762,15 +20906,17 @@ export namespace Prisma {
     email: string
     name: string
     username?: string | null
+    onboardingCompleted?: boolean
     discovery?: string | null
     role?: string | null
     bestStreakOverall?: number
-    activeProjectId?: string | null
     createdAt?: Date | string
     products?: ProductUncheckedCreateNestedManyWithoutUserInput
     buildLogs?: BuildLogUncheckedCreateNestedManyWithoutUserInput
-    dailyLogs?: DailyLogUncheckedCreateNestedManyWithoutUserInput
-    streaks?: StreakUncheckedCreateNestedManyWithoutUserInput
+    DailyStreak?: DailyStreakUncheckedCreateNestedManyWithoutUserInput
+    aiLogs?: AiLogUncheckedCreateNestedManyWithoutUserInput
+    tokenUsages?: TokenUsageUncheckedCreateNestedManyWithoutUserInput
+    settings?: SettingsUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutTrialInput = {
@@ -18795,15 +20941,17 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     username?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     discovery?: NullableStringFieldUpdateOperationsInput | string | null
     role?: NullableStringFieldUpdateOperationsInput | string | null
     bestStreakOverall?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activeProject?: ProductUpdateOneWithoutUserNestedInput
     products?: ProductUpdateManyWithoutUserNestedInput
     buildLogs?: BuildLogUpdateManyWithoutUserNestedInput
-    dailyLogs?: DailyLogUpdateManyWithoutUserNestedInput
-    streaks?: StreakUpdateManyWithoutUserNestedInput
+    DailyStreak?: DailyStreakUpdateManyWithoutUserNestedInput
+    aiLogs?: AiLogUpdateManyWithoutUserNestedInput
+    tokenUsages?: TokenUsageUpdateManyWithoutUserNestedInput
+    settings?: SettingsUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTrialInput = {
@@ -18812,15 +20960,17 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     username?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     discovery?: NullableStringFieldUpdateOperationsInput | string | null
     role?: NullableStringFieldUpdateOperationsInput | string | null
     bestStreakOverall?: IntFieldUpdateOperationsInput | number
-    activeProjectId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     products?: ProductUncheckedUpdateManyWithoutUserNestedInput
     buildLogs?: BuildLogUncheckedUpdateManyWithoutUserNestedInput
-    dailyLogs?: DailyLogUncheckedUpdateManyWithoutUserNestedInput
-    streaks?: StreakUncheckedUpdateManyWithoutUserNestedInput
+    DailyStreak?: DailyStreakUncheckedUpdateManyWithoutUserNestedInput
+    aiLogs?: AiLogUncheckedUpdateManyWithoutUserNestedInput
+    tokenUsages?: TokenUsageUncheckedUpdateManyWithoutUserNestedInput
+    settings?: SettingsUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateWithoutProductsInput = {
@@ -18829,15 +20979,17 @@ export namespace Prisma {
     email: string
     name: string
     username?: string | null
+    onboardingCompleted?: boolean
     discovery?: string | null
     role?: string | null
     bestStreakOverall?: number
     createdAt?: Date | string
-    activeProject?: ProductCreateNestedOneWithoutUserInput
     buildLogs?: BuildLogCreateNestedManyWithoutUserInput
-    dailyLogs?: DailyLogCreateNestedManyWithoutUserInput
     trial?: TrialCreateNestedOneWithoutUserInput
-    streaks?: StreakCreateNestedManyWithoutUserInput
+    DailyStreak?: DailyStreakCreateNestedManyWithoutUserInput
+    aiLogs?: AiLogCreateNestedManyWithoutUserInput
+    tokenUsages?: TokenUsageCreateNestedManyWithoutUserInput
+    settings?: SettingsCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutProductsInput = {
@@ -18846,37 +20998,22 @@ export namespace Prisma {
     email: string
     name: string
     username?: string | null
+    onboardingCompleted?: boolean
     discovery?: string | null
     role?: string | null
     bestStreakOverall?: number
-    activeProjectId?: string | null
     createdAt?: Date | string
     buildLogs?: BuildLogUncheckedCreateNestedManyWithoutUserInput
-    dailyLogs?: DailyLogUncheckedCreateNestedManyWithoutUserInput
     trial?: TrialUncheckedCreateNestedOneWithoutUserInput
-    streaks?: StreakUncheckedCreateNestedManyWithoutUserInput
+    DailyStreak?: DailyStreakUncheckedCreateNestedManyWithoutUserInput
+    aiLogs?: AiLogUncheckedCreateNestedManyWithoutUserInput
+    tokenUsages?: TokenUsageUncheckedCreateNestedManyWithoutUserInput
+    settings?: SettingsUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutProductsInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutProductsInput, UserUncheckedCreateWithoutProductsInput>
-  }
-
-  export type RoadmapCreateWithoutProductInput = {
-    id?: string
-    mvpSummary: string
-    createdAt?: Date | string
-  }
-
-  export type RoadmapUncheckedCreateWithoutProductInput = {
-    id?: string
-    mvpSummary: string
-    createdAt?: Date | string
-  }
-
-  export type RoadmapCreateOrConnectWithoutProductInput = {
-    where: RoadmapWhereUniqueInput
-    create: XOR<RoadmapCreateWithoutProductInput, RoadmapUncheckedCreateWithoutProductInput>
   }
 
   export type FeatureCreateWithoutProductInput = {
@@ -18905,137 +21042,91 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type BuildLogCreateWithoutProjectInput = {
+  export type BuildLogCreateWithoutProductInput = {
     id?: string
     logDate: Date | string
     tweet?: string | null
     dayIndex?: number
     summary: string
-    sourceTasks: JsonNullValueInput | InputJsonValue
     generatedAt?: Date | string
     user: UserCreateNestedOneWithoutBuildLogsInput
+    DayTask?: DayTaskCreateNestedManyWithoutBuildLogInput
   }
 
-  export type BuildLogUncheckedCreateWithoutProjectInput = {
+  export type BuildLogUncheckedCreateWithoutProductInput = {
     id?: string
     userId: string
     logDate: Date | string
     tweet?: string | null
     dayIndex?: number
     summary: string
-    sourceTasks: JsonNullValueInput | InputJsonValue
     generatedAt?: Date | string
+    DayTask?: DayTaskUncheckedCreateNestedManyWithoutBuildLogInput
   }
 
-  export type BuildLogCreateOrConnectWithoutProjectInput = {
+  export type BuildLogCreateOrConnectWithoutProductInput = {
     where: BuildLogWhereUniqueInput
-    create: XOR<BuildLogCreateWithoutProjectInput, BuildLogUncheckedCreateWithoutProjectInput>
+    create: XOR<BuildLogCreateWithoutProductInput, BuildLogUncheckedCreateWithoutProductInput>
   }
 
-  export type BuildLogCreateManyProjectInputEnvelope = {
-    data: BuildLogCreateManyProjectInput | BuildLogCreateManyProjectInput[]
+  export type BuildLogCreateManyProductInputEnvelope = {
+    data: BuildLogCreateManyProductInput | BuildLogCreateManyProductInput[]
     skipDuplicates?: boolean
   }
 
-  export type DailyLogCreateWithoutProjectInput = {
+  export type DailyStreakCreateWithoutProductInput = {
     id?: string
     date: Date | string
-    completedTasks: JsonNullValueInput | InputJsonValue
-    notes?: string | null
+    hasBuildLog?: boolean
     createdAt?: Date | string
-    user: UserCreateNestedOneWithoutDailyLogsInput
+    user: UserCreateNestedOneWithoutDailyStreakInput
   }
 
-  export type DailyLogUncheckedCreateWithoutProjectInput = {
+  export type DailyStreakUncheckedCreateWithoutProductInput = {
     id?: string
     userId: string
     date: Date | string
-    completedTasks: JsonNullValueInput | InputJsonValue
-    notes?: string | null
+    hasBuildLog?: boolean
     createdAt?: Date | string
   }
 
-  export type DailyLogCreateOrConnectWithoutProjectInput = {
-    where: DailyLogWhereUniqueInput
-    create: XOR<DailyLogCreateWithoutProjectInput, DailyLogUncheckedCreateWithoutProjectInput>
+  export type DailyStreakCreateOrConnectWithoutProductInput = {
+    where: DailyStreakWhereUniqueInput
+    create: XOR<DailyStreakCreateWithoutProductInput, DailyStreakUncheckedCreateWithoutProductInput>
   }
 
-  export type DailyLogCreateManyProjectInputEnvelope = {
-    data: DailyLogCreateManyProjectInput | DailyLogCreateManyProjectInput[]
+  export type DailyStreakCreateManyProductInputEnvelope = {
+    data: DailyStreakCreateManyProductInput | DailyStreakCreateManyProductInput[]
     skipDuplicates?: boolean
   }
 
-  export type StreakCreateWithoutProductInput = {
+  export type AiLogCreateWithoutProductInput = {
     id?: string
-    currentStreak?: number
-    bestStreak?: number
-    lastActiveDate: Date | string
-    streakStart: Date | string
-    updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutStreaksInput
+    ai_model: string
+    type: string
+    input: JsonNullValueInput | InputJsonValue
+    output: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutAiLogsInput
   }
 
-  export type StreakUncheckedCreateWithoutProductInput = {
+  export type AiLogUncheckedCreateWithoutProductInput = {
     id?: string
     userId: string
-    currentStreak?: number
-    bestStreak?: number
-    lastActiveDate: Date | string
-    streakStart: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type StreakCreateOrConnectWithoutProductInput = {
-    where: StreakWhereUniqueInput
-    create: XOR<StreakCreateWithoutProductInput, StreakUncheckedCreateWithoutProductInput>
-  }
-
-  export type StreakCreateManyProductInputEnvelope = {
-    data: StreakCreateManyProductInput | StreakCreateManyProductInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type UserCreateWithoutActiveProjectInput = {
-    id?: string
-    clerkId: string
-    email: string
-    name: string
-    username?: string | null
-    discovery?: string | null
-    role?: string | null
-    bestStreakOverall?: number
+    ai_model: string
+    type: string
+    input: JsonNullValueInput | InputJsonValue
+    output: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
-    products?: ProductCreateNestedManyWithoutUserInput
-    buildLogs?: BuildLogCreateNestedManyWithoutUserInput
-    dailyLogs?: DailyLogCreateNestedManyWithoutUserInput
-    trial?: TrialCreateNestedOneWithoutUserInput
-    streaks?: StreakCreateNestedManyWithoutUserInput
   }
 
-  export type UserUncheckedCreateWithoutActiveProjectInput = {
-    id?: string
-    clerkId: string
-    email: string
-    name: string
-    username?: string | null
-    discovery?: string | null
-    role?: string | null
-    bestStreakOverall?: number
-    createdAt?: Date | string
-    products?: ProductUncheckedCreateNestedManyWithoutUserInput
-    buildLogs?: BuildLogUncheckedCreateNestedManyWithoutUserInput
-    dailyLogs?: DailyLogUncheckedCreateNestedManyWithoutUserInput
-    trial?: TrialUncheckedCreateNestedOneWithoutUserInput
-    streaks?: StreakUncheckedCreateNestedManyWithoutUserInput
+  export type AiLogCreateOrConnectWithoutProductInput = {
+    where: AiLogWhereUniqueInput
+    create: XOR<AiLogCreateWithoutProductInput, AiLogUncheckedCreateWithoutProductInput>
   }
 
-  export type UserCreateOrConnectWithoutActiveProjectInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutActiveProjectInput, UserUncheckedCreateWithoutActiveProjectInput>
-  }
-
-  export type UserCreateManyActiveProjectInputEnvelope = {
-    data: UserCreateManyActiveProjectInput | UserCreateManyActiveProjectInput[]
+  export type AiLogCreateManyProductInputEnvelope = {
+    data: AiLogCreateManyProductInput | AiLogCreateManyProductInput[]
     skipDuplicates?: boolean
   }
 
@@ -19056,15 +21147,17 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     username?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     discovery?: NullableStringFieldUpdateOperationsInput | string | null
     role?: NullableStringFieldUpdateOperationsInput | string | null
     bestStreakOverall?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activeProject?: ProductUpdateOneWithoutUserNestedInput
     buildLogs?: BuildLogUpdateManyWithoutUserNestedInput
-    dailyLogs?: DailyLogUpdateManyWithoutUserNestedInput
     trial?: TrialUpdateOneWithoutUserNestedInput
-    streaks?: StreakUpdateManyWithoutUserNestedInput
+    DailyStreak?: DailyStreakUpdateManyWithoutUserNestedInput
+    aiLogs?: AiLogUpdateManyWithoutUserNestedInput
+    tokenUsages?: TokenUsageUpdateManyWithoutUserNestedInput
+    settings?: SettingsUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProductsInput = {
@@ -19073,38 +21166,17 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     username?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     discovery?: NullableStringFieldUpdateOperationsInput | string | null
     role?: NullableStringFieldUpdateOperationsInput | string | null
     bestStreakOverall?: IntFieldUpdateOperationsInput | number
-    activeProjectId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     buildLogs?: BuildLogUncheckedUpdateManyWithoutUserNestedInput
-    dailyLogs?: DailyLogUncheckedUpdateManyWithoutUserNestedInput
     trial?: TrialUncheckedUpdateOneWithoutUserNestedInput
-    streaks?: StreakUncheckedUpdateManyWithoutUserNestedInput
-  }
-
-  export type RoadmapUpsertWithoutProductInput = {
-    update: XOR<RoadmapUpdateWithoutProductInput, RoadmapUncheckedUpdateWithoutProductInput>
-    create: XOR<RoadmapCreateWithoutProductInput, RoadmapUncheckedCreateWithoutProductInput>
-    where?: RoadmapWhereInput
-  }
-
-  export type RoadmapUpdateToOneWithWhereWithoutProductInput = {
-    where?: RoadmapWhereInput
-    data: XOR<RoadmapUpdateWithoutProductInput, RoadmapUncheckedUpdateWithoutProductInput>
-  }
-
-  export type RoadmapUpdateWithoutProductInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    mvpSummary?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type RoadmapUncheckedUpdateWithoutProductInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    mvpSummary?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    DailyStreak?: DailyStreakUncheckedUpdateManyWithoutUserNestedInput
+    aiLogs?: AiLogUncheckedUpdateManyWithoutUserNestedInput
+    tokenUsages?: TokenUsageUncheckedUpdateManyWithoutUserNestedInput
+    settings?: SettingsUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type FeatureUpsertWithWhereUniqueWithoutProductInput = {
@@ -19134,238 +21206,110 @@ export namespace Prisma {
     productId?: StringFilter<"Feature"> | string
   }
 
-  export type BuildLogUpsertWithWhereUniqueWithoutProjectInput = {
+  export type BuildLogUpsertWithWhereUniqueWithoutProductInput = {
     where: BuildLogWhereUniqueInput
-    update: XOR<BuildLogUpdateWithoutProjectInput, BuildLogUncheckedUpdateWithoutProjectInput>
-    create: XOR<BuildLogCreateWithoutProjectInput, BuildLogUncheckedCreateWithoutProjectInput>
+    update: XOR<BuildLogUpdateWithoutProductInput, BuildLogUncheckedUpdateWithoutProductInput>
+    create: XOR<BuildLogCreateWithoutProductInput, BuildLogUncheckedCreateWithoutProductInput>
   }
 
-  export type BuildLogUpdateWithWhereUniqueWithoutProjectInput = {
+  export type BuildLogUpdateWithWhereUniqueWithoutProductInput = {
     where: BuildLogWhereUniqueInput
-    data: XOR<BuildLogUpdateWithoutProjectInput, BuildLogUncheckedUpdateWithoutProjectInput>
+    data: XOR<BuildLogUpdateWithoutProductInput, BuildLogUncheckedUpdateWithoutProductInput>
   }
 
-  export type BuildLogUpdateManyWithWhereWithoutProjectInput = {
+  export type BuildLogUpdateManyWithWhereWithoutProductInput = {
     where: BuildLogScalarWhereInput
-    data: XOR<BuildLogUpdateManyMutationInput, BuildLogUncheckedUpdateManyWithoutProjectInput>
+    data: XOR<BuildLogUpdateManyMutationInput, BuildLogUncheckedUpdateManyWithoutProductInput>
   }
 
-  export type DailyLogUpsertWithWhereUniqueWithoutProjectInput = {
-    where: DailyLogWhereUniqueInput
-    update: XOR<DailyLogUpdateWithoutProjectInput, DailyLogUncheckedUpdateWithoutProjectInput>
-    create: XOR<DailyLogCreateWithoutProjectInput, DailyLogUncheckedCreateWithoutProjectInput>
+  export type DailyStreakUpsertWithWhereUniqueWithoutProductInput = {
+    where: DailyStreakWhereUniqueInput
+    update: XOR<DailyStreakUpdateWithoutProductInput, DailyStreakUncheckedUpdateWithoutProductInput>
+    create: XOR<DailyStreakCreateWithoutProductInput, DailyStreakUncheckedCreateWithoutProductInput>
   }
 
-  export type DailyLogUpdateWithWhereUniqueWithoutProjectInput = {
-    where: DailyLogWhereUniqueInput
-    data: XOR<DailyLogUpdateWithoutProjectInput, DailyLogUncheckedUpdateWithoutProjectInput>
+  export type DailyStreakUpdateWithWhereUniqueWithoutProductInput = {
+    where: DailyStreakWhereUniqueInput
+    data: XOR<DailyStreakUpdateWithoutProductInput, DailyStreakUncheckedUpdateWithoutProductInput>
   }
 
-  export type DailyLogUpdateManyWithWhereWithoutProjectInput = {
-    where: DailyLogScalarWhereInput
-    data: XOR<DailyLogUpdateManyMutationInput, DailyLogUncheckedUpdateManyWithoutProjectInput>
+  export type DailyStreakUpdateManyWithWhereWithoutProductInput = {
+    where: DailyStreakScalarWhereInput
+    data: XOR<DailyStreakUpdateManyMutationInput, DailyStreakUncheckedUpdateManyWithoutProductInput>
   }
 
-  export type StreakUpsertWithWhereUniqueWithoutProductInput = {
-    where: StreakWhereUniqueInput
-    update: XOR<StreakUpdateWithoutProductInput, StreakUncheckedUpdateWithoutProductInput>
-    create: XOR<StreakCreateWithoutProductInput, StreakUncheckedCreateWithoutProductInput>
+  export type AiLogUpsertWithWhereUniqueWithoutProductInput = {
+    where: AiLogWhereUniqueInput
+    update: XOR<AiLogUpdateWithoutProductInput, AiLogUncheckedUpdateWithoutProductInput>
+    create: XOR<AiLogCreateWithoutProductInput, AiLogUncheckedCreateWithoutProductInput>
   }
 
-  export type StreakUpdateWithWhereUniqueWithoutProductInput = {
-    where: StreakWhereUniqueInput
-    data: XOR<StreakUpdateWithoutProductInput, StreakUncheckedUpdateWithoutProductInput>
+  export type AiLogUpdateWithWhereUniqueWithoutProductInput = {
+    where: AiLogWhereUniqueInput
+    data: XOR<AiLogUpdateWithoutProductInput, AiLogUncheckedUpdateWithoutProductInput>
   }
 
-  export type StreakUpdateManyWithWhereWithoutProductInput = {
-    where: StreakScalarWhereInput
-    data: XOR<StreakUpdateManyMutationInput, StreakUncheckedUpdateManyWithoutProductInput>
-  }
-
-  export type UserUpsertWithWhereUniqueWithoutActiveProjectInput = {
-    where: UserWhereUniqueInput
-    update: XOR<UserUpdateWithoutActiveProjectInput, UserUncheckedUpdateWithoutActiveProjectInput>
-    create: XOR<UserCreateWithoutActiveProjectInput, UserUncheckedCreateWithoutActiveProjectInput>
-  }
-
-  export type UserUpdateWithWhereUniqueWithoutActiveProjectInput = {
-    where: UserWhereUniqueInput
-    data: XOR<UserUpdateWithoutActiveProjectInput, UserUncheckedUpdateWithoutActiveProjectInput>
-  }
-
-  export type UserUpdateManyWithWhereWithoutActiveProjectInput = {
-    where: UserScalarWhereInput
-    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutActiveProjectInput>
-  }
-
-  export type UserScalarWhereInput = {
-    AND?: UserScalarWhereInput | UserScalarWhereInput[]
-    OR?: UserScalarWhereInput[]
-    NOT?: UserScalarWhereInput | UserScalarWhereInput[]
-    id?: StringFilter<"User"> | string
-    clerkId?: StringFilter<"User"> | string
-    email?: StringFilter<"User"> | string
-    name?: StringFilter<"User"> | string
-    username?: StringNullableFilter<"User"> | string | null
-    discovery?: StringNullableFilter<"User"> | string | null
-    role?: StringNullableFilter<"User"> | string | null
-    bestStreakOverall?: IntFilter<"User"> | number
-    activeProjectId?: StringNullableFilter<"User"> | string | null
-    createdAt?: DateTimeFilter<"User"> | Date | string
-  }
-
-  export type ProductCreateWithoutRoadmapInput = {
-    id?: string
-    name: string
-    description: string
-    problemStatement: string
-    targetAudience: string
-    userGoals: string
-    uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
-    deadline: Date | string
-    dailyCommitmentHrs: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutProductsInput
-    features?: FeatureCreateNestedManyWithoutProductInput
-    buildLogs?: BuildLogCreateNestedManyWithoutProjectInput
-    dailyLogs?: DailyLogCreateNestedManyWithoutProjectInput
-    streaks?: StreakCreateNestedManyWithoutProductInput
-    User?: UserCreateNestedManyWithoutActiveProjectInput
-  }
-
-  export type ProductUncheckedCreateWithoutRoadmapInput = {
-    id?: string
-    name: string
-    description: string
-    problemStatement: string
-    targetAudience: string
-    userGoals: string
-    uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
-    deadline: Date | string
-    dailyCommitmentHrs: number
-    userId: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    features?: FeatureUncheckedCreateNestedManyWithoutProductInput
-    buildLogs?: BuildLogUncheckedCreateNestedManyWithoutProjectInput
-    dailyLogs?: DailyLogUncheckedCreateNestedManyWithoutProjectInput
-    streaks?: StreakUncheckedCreateNestedManyWithoutProductInput
-    User?: UserUncheckedCreateNestedManyWithoutActiveProjectInput
-  }
-
-  export type ProductCreateOrConnectWithoutRoadmapInput = {
-    where: ProductWhereUniqueInput
-    create: XOR<ProductCreateWithoutRoadmapInput, ProductUncheckedCreateWithoutRoadmapInput>
-  }
-
-  export type ProductUpsertWithoutRoadmapInput = {
-    update: XOR<ProductUpdateWithoutRoadmapInput, ProductUncheckedUpdateWithoutRoadmapInput>
-    create: XOR<ProductCreateWithoutRoadmapInput, ProductUncheckedCreateWithoutRoadmapInput>
-    where?: ProductWhereInput
-  }
-
-  export type ProductUpdateToOneWithWhereWithoutRoadmapInput = {
-    where?: ProductWhereInput
-    data: XOR<ProductUpdateWithoutRoadmapInput, ProductUncheckedUpdateWithoutRoadmapInput>
-  }
-
-  export type ProductUpdateWithoutRoadmapInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    problemStatement?: StringFieldUpdateOperationsInput | string
-    targetAudience?: StringFieldUpdateOperationsInput | string
-    userGoals?: StringFieldUpdateOperationsInput | string
-    uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
-    deadline?: DateTimeFieldUpdateOperationsInput | Date | string
-    dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutProductsNestedInput
-    features?: FeatureUpdateManyWithoutProductNestedInput
-    buildLogs?: BuildLogUpdateManyWithoutProjectNestedInput
-    dailyLogs?: DailyLogUpdateManyWithoutProjectNestedInput
-    streaks?: StreakUpdateManyWithoutProductNestedInput
-    User?: UserUpdateManyWithoutActiveProjectNestedInput
-  }
-
-  export type ProductUncheckedUpdateWithoutRoadmapInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    problemStatement?: StringFieldUpdateOperationsInput | string
-    targetAudience?: StringFieldUpdateOperationsInput | string
-    userGoals?: StringFieldUpdateOperationsInput | string
-    uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
-    deadline?: DateTimeFieldUpdateOperationsInput | Date | string
-    dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
-    userId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    features?: FeatureUncheckedUpdateManyWithoutProductNestedInput
-    buildLogs?: BuildLogUncheckedUpdateManyWithoutProjectNestedInput
-    dailyLogs?: DailyLogUncheckedUpdateManyWithoutProjectNestedInput
-    streaks?: StreakUncheckedUpdateManyWithoutProductNestedInput
-    User?: UserUncheckedUpdateManyWithoutActiveProjectNestedInput
+  export type AiLogUpdateManyWithWhereWithoutProductInput = {
+    where: AiLogScalarWhereInput
+    data: XOR<AiLogUpdateManyMutationInput, AiLogUncheckedUpdateManyWithoutProductInput>
   }
 
   export type ProductCreateWithoutFeaturesInput = {
     id?: string
     name: string
-    description: string
+    slug: string
+    description?: string | null
     problemStatement: string
     targetAudience: string
     userGoals: string
     uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
+    isMvpGenerated?: boolean
+    isRoadmapGenerated?: boolean
+    currentStreak?: number
+    AllTimeBestStreak?: number
+    active?: boolean
+    techStack?: string | null
+    inspirationApps?: string | null
+    initialFeatures?: string | null
+    startDate?: Date | string
     deadline: Date | string
-    dailyCommitmentHrs: number
+    dailyCommitmentHrs?: number
+    mvpSummary?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProductsInput
-    roadmap?: RoadmapCreateNestedOneWithoutProductInput
-    buildLogs?: BuildLogCreateNestedManyWithoutProjectInput
-    dailyLogs?: DailyLogCreateNestedManyWithoutProjectInput
-    streaks?: StreakCreateNestedManyWithoutProductInput
-    User?: UserCreateNestedManyWithoutActiveProjectInput
+    buildLogs?: BuildLogCreateNestedManyWithoutProductInput
+    DailyStreak?: DailyStreakCreateNestedManyWithoutProductInput
+    aiLogs?: AiLogCreateNestedManyWithoutProductInput
   }
 
   export type ProductUncheckedCreateWithoutFeaturesInput = {
     id?: string
     name: string
-    description: string
+    slug: string
+    description?: string | null
     problemStatement: string
     targetAudience: string
     userGoals: string
     uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
+    isMvpGenerated?: boolean
+    isRoadmapGenerated?: boolean
+    currentStreak?: number
+    AllTimeBestStreak?: number
+    active?: boolean
+    techStack?: string | null
+    inspirationApps?: string | null
+    initialFeatures?: string | null
+    startDate?: Date | string
     deadline: Date | string
-    dailyCommitmentHrs: number
+    dailyCommitmentHrs?: number
     userId: string
+    mvpSummary?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    roadmap?: RoadmapUncheckedCreateNestedOneWithoutProductInput
-    buildLogs?: BuildLogUncheckedCreateNestedManyWithoutProjectInput
-    dailyLogs?: DailyLogUncheckedCreateNestedManyWithoutProjectInput
-    streaks?: StreakUncheckedCreateNestedManyWithoutProductInput
-    User?: UserUncheckedCreateNestedManyWithoutActiveProjectInput
+    buildLogs?: BuildLogUncheckedCreateNestedManyWithoutProductInput
+    DailyStreak?: DailyStreakUncheckedCreateNestedManyWithoutProductInput
+    aiLogs?: AiLogUncheckedCreateNestedManyWithoutProductInput
   }
 
   export type ProductCreateOrConnectWithoutFeaturesInput = {
@@ -19376,6 +21320,8 @@ export namespace Prisma {
   export type TaskCreateWithoutFeatureInput = {
     id?: string
     title: string
+    estimatedHours?: number | null
+    status?: $Enums.TaskStatus
     dayNumber?: number | null
     completed?: boolean
     dayTask?: DayTaskCreateNestedOneWithoutTaskInput
@@ -19384,6 +21330,8 @@ export namespace Prisma {
   export type TaskUncheckedCreateWithoutFeatureInput = {
     id?: string
     title: string
+    estimatedHours?: number | null
+    status?: $Enums.TaskStatus
     dayNumber?: number | null
     completed?: boolean
     dayTask?: DayTaskUncheckedCreateNestedOneWithoutTaskInput
@@ -19413,47 +21361,59 @@ export namespace Prisma {
   export type ProductUpdateWithoutFeaturesInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     problemStatement?: StringFieldUpdateOperationsInput | string
     targetAudience?: StringFieldUpdateOperationsInput | string
     userGoals?: StringFieldUpdateOperationsInput | string
     uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
+    isMvpGenerated?: BoolFieldUpdateOperationsInput | boolean
+    isRoadmapGenerated?: BoolFieldUpdateOperationsInput | boolean
+    currentStreak?: IntFieldUpdateOperationsInput | number
+    AllTimeBestStreak?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    techStack?: NullableStringFieldUpdateOperationsInput | string | null
+    inspirationApps?: NullableStringFieldUpdateOperationsInput | string | null
+    initialFeatures?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     deadline?: DateTimeFieldUpdateOperationsInput | Date | string
     dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
+    mvpSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProductsNestedInput
-    roadmap?: RoadmapUpdateOneWithoutProductNestedInput
-    buildLogs?: BuildLogUpdateManyWithoutProjectNestedInput
-    dailyLogs?: DailyLogUpdateManyWithoutProjectNestedInput
-    streaks?: StreakUpdateManyWithoutProductNestedInput
-    User?: UserUpdateManyWithoutActiveProjectNestedInput
+    buildLogs?: BuildLogUpdateManyWithoutProductNestedInput
+    DailyStreak?: DailyStreakUpdateManyWithoutProductNestedInput
+    aiLogs?: AiLogUpdateManyWithoutProductNestedInput
   }
 
   export type ProductUncheckedUpdateWithoutFeaturesInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     problemStatement?: StringFieldUpdateOperationsInput | string
     targetAudience?: StringFieldUpdateOperationsInput | string
     userGoals?: StringFieldUpdateOperationsInput | string
     uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
+    isMvpGenerated?: BoolFieldUpdateOperationsInput | boolean
+    isRoadmapGenerated?: BoolFieldUpdateOperationsInput | boolean
+    currentStreak?: IntFieldUpdateOperationsInput | number
+    AllTimeBestStreak?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    techStack?: NullableStringFieldUpdateOperationsInput | string | null
+    inspirationApps?: NullableStringFieldUpdateOperationsInput | string | null
+    initialFeatures?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     deadline?: DateTimeFieldUpdateOperationsInput | Date | string
     dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
     userId?: StringFieldUpdateOperationsInput | string
+    mvpSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    roadmap?: RoadmapUncheckedUpdateOneWithoutProductNestedInput
-    buildLogs?: BuildLogUncheckedUpdateManyWithoutProjectNestedInput
-    dailyLogs?: DailyLogUncheckedUpdateManyWithoutProjectNestedInput
-    streaks?: StreakUncheckedUpdateManyWithoutProductNestedInput
-    User?: UserUncheckedUpdateManyWithoutActiveProjectNestedInput
+    buildLogs?: BuildLogUncheckedUpdateManyWithoutProductNestedInput
+    DailyStreak?: DailyStreakUncheckedUpdateManyWithoutProductNestedInput
+    aiLogs?: AiLogUncheckedUpdateManyWithoutProductNestedInput
   }
 
   export type TaskUpsertWithWhereUniqueWithoutFeatureInput = {
@@ -19478,6 +21438,8 @@ export namespace Prisma {
     NOT?: TaskScalarWhereInput | TaskScalarWhereInput[]
     id?: StringFilter<"Task"> | string
     title?: StringFilter<"Task"> | string
+    estimatedHours?: FloatNullableFilter<"Task"> | number | null
+    status?: EnumTaskStatusFilter<"Task"> | $Enums.TaskStatus
     dayNumber?: IntNullableFilter<"Task"> | number | null
     completed?: BoolFilter<"Task"> | boolean
     featureId?: StringFilter<"Task"> | string
@@ -19508,18 +21470,26 @@ export namespace Prisma {
     id?: string
     dayIndex: number
     dueDate: Date | string
+    completedAt?: Date | string | null
     category: string
     description: string
     status?: string
+    milestoneGoal?: string | null
+    shipCheck?: string | null
+    buildLog?: BuildLogCreateNestedOneWithoutDayTaskInput
   }
 
   export type DayTaskUncheckedCreateWithoutTaskInput = {
     id?: string
     dayIndex: number
     dueDate: Date | string
+    completedAt?: Date | string | null
     category: string
     description: string
     status?: string
+    milestoneGoal?: string | null
+    shipCheck?: string | null
+    buildLogId?: string | null
   }
 
   export type DayTaskCreateOrConnectWithoutTaskInput = {
@@ -19569,23 +21539,33 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     dayIndex?: IntFieldUpdateOperationsInput | number
     dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     category?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    milestoneGoal?: NullableStringFieldUpdateOperationsInput | string | null
+    shipCheck?: NullableStringFieldUpdateOperationsInput | string | null
+    buildLog?: BuildLogUpdateOneWithoutDayTaskNestedInput
   }
 
   export type DayTaskUncheckedUpdateWithoutTaskInput = {
     id?: StringFieldUpdateOperationsInput | string
     dayIndex?: IntFieldUpdateOperationsInput | number
     dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     category?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    milestoneGoal?: NullableStringFieldUpdateOperationsInput | string | null
+    shipCheck?: NullableStringFieldUpdateOperationsInput | string | null
+    buildLogId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TaskCreateWithoutDayTaskInput = {
     id?: string
     title: string
+    estimatedHours?: number | null
+    status?: $Enums.TaskStatus
     dayNumber?: number | null
     completed?: boolean
     feature: FeatureCreateNestedOneWithoutTasksInput
@@ -19594,6 +21574,8 @@ export namespace Prisma {
   export type TaskUncheckedCreateWithoutDayTaskInput = {
     id?: string
     title: string
+    estimatedHours?: number | null
+    status?: $Enums.TaskStatus
     dayNumber?: number | null
     completed?: boolean
     featureId: string
@@ -19602,6 +21584,33 @@ export namespace Prisma {
   export type TaskCreateOrConnectWithoutDayTaskInput = {
     where: TaskWhereUniqueInput
     create: XOR<TaskCreateWithoutDayTaskInput, TaskUncheckedCreateWithoutDayTaskInput>
+  }
+
+  export type BuildLogCreateWithoutDayTaskInput = {
+    id?: string
+    logDate: Date | string
+    tweet?: string | null
+    dayIndex?: number
+    summary: string
+    generatedAt?: Date | string
+    user: UserCreateNestedOneWithoutBuildLogsInput
+    product: ProductCreateNestedOneWithoutBuildLogsInput
+  }
+
+  export type BuildLogUncheckedCreateWithoutDayTaskInput = {
+    id?: string
+    userId: string
+    productId: string
+    logDate: Date | string
+    tweet?: string | null
+    dayIndex?: number
+    summary: string
+    generatedAt?: Date | string
+  }
+
+  export type BuildLogCreateOrConnectWithoutDayTaskInput = {
+    where: BuildLogWhereUniqueInput
+    create: XOR<BuildLogCreateWithoutDayTaskInput, BuildLogUncheckedCreateWithoutDayTaskInput>
   }
 
   export type TaskUpsertWithoutDayTaskInput = {
@@ -19618,6 +21627,8 @@ export namespace Prisma {
   export type TaskUpdateWithoutDayTaskInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    estimatedHours?: NullableFloatFieldUpdateOperationsInput | number | null
+    status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     dayNumber?: NullableIntFieldUpdateOperationsInput | number | null
     completed?: BoolFieldUpdateOperationsInput | boolean
     feature?: FeatureUpdateOneRequiredWithoutTasksNestedInput
@@ -19626,201 +21637,44 @@ export namespace Prisma {
   export type TaskUncheckedUpdateWithoutDayTaskInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    estimatedHours?: NullableFloatFieldUpdateOperationsInput | number | null
+    status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     dayNumber?: NullableIntFieldUpdateOperationsInput | number | null
     completed?: BoolFieldUpdateOperationsInput | boolean
     featureId?: StringFieldUpdateOperationsInput | string
   }
 
-  export type UserCreateWithoutDailyLogsInput = {
-    id?: string
-    clerkId: string
-    email: string
-    name: string
-    username?: string | null
-    discovery?: string | null
-    role?: string | null
-    bestStreakOverall?: number
-    createdAt?: Date | string
-    activeProject?: ProductCreateNestedOneWithoutUserInput
-    products?: ProductCreateNestedManyWithoutUserInput
-    buildLogs?: BuildLogCreateNestedManyWithoutUserInput
-    trial?: TrialCreateNestedOneWithoutUserInput
-    streaks?: StreakCreateNestedManyWithoutUserInput
+  export type BuildLogUpsertWithoutDayTaskInput = {
+    update: XOR<BuildLogUpdateWithoutDayTaskInput, BuildLogUncheckedUpdateWithoutDayTaskInput>
+    create: XOR<BuildLogCreateWithoutDayTaskInput, BuildLogUncheckedCreateWithoutDayTaskInput>
+    where?: BuildLogWhereInput
   }
 
-  export type UserUncheckedCreateWithoutDailyLogsInput = {
-    id?: string
-    clerkId: string
-    email: string
-    name: string
-    username?: string | null
-    discovery?: string | null
-    role?: string | null
-    bestStreakOverall?: number
-    activeProjectId?: string | null
-    createdAt?: Date | string
-    products?: ProductUncheckedCreateNestedManyWithoutUserInput
-    buildLogs?: BuildLogUncheckedCreateNestedManyWithoutUserInput
-    trial?: TrialUncheckedCreateNestedOneWithoutUserInput
-    streaks?: StreakUncheckedCreateNestedManyWithoutUserInput
+  export type BuildLogUpdateToOneWithWhereWithoutDayTaskInput = {
+    where?: BuildLogWhereInput
+    data: XOR<BuildLogUpdateWithoutDayTaskInput, BuildLogUncheckedUpdateWithoutDayTaskInput>
   }
 
-  export type UserCreateOrConnectWithoutDailyLogsInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutDailyLogsInput, UserUncheckedCreateWithoutDailyLogsInput>
-  }
-
-  export type ProductCreateWithoutDailyLogsInput = {
-    id?: string
-    name: string
-    description: string
-    problemStatement: string
-    targetAudience: string
-    userGoals: string
-    uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
-    deadline: Date | string
-    dailyCommitmentHrs: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutProductsInput
-    roadmap?: RoadmapCreateNestedOneWithoutProductInput
-    features?: FeatureCreateNestedManyWithoutProductInput
-    buildLogs?: BuildLogCreateNestedManyWithoutProjectInput
-    streaks?: StreakCreateNestedManyWithoutProductInput
-    User?: UserCreateNestedManyWithoutActiveProjectInput
-  }
-
-  export type ProductUncheckedCreateWithoutDailyLogsInput = {
-    id?: string
-    name: string
-    description: string
-    problemStatement: string
-    targetAudience: string
-    userGoals: string
-    uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
-    deadline: Date | string
-    dailyCommitmentHrs: number
-    userId: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    roadmap?: RoadmapUncheckedCreateNestedOneWithoutProductInput
-    features?: FeatureUncheckedCreateNestedManyWithoutProductInput
-    buildLogs?: BuildLogUncheckedCreateNestedManyWithoutProjectInput
-    streaks?: StreakUncheckedCreateNestedManyWithoutProductInput
-    User?: UserUncheckedCreateNestedManyWithoutActiveProjectInput
-  }
-
-  export type ProductCreateOrConnectWithoutDailyLogsInput = {
-    where: ProductWhereUniqueInput
-    create: XOR<ProductCreateWithoutDailyLogsInput, ProductUncheckedCreateWithoutDailyLogsInput>
-  }
-
-  export type UserUpsertWithoutDailyLogsInput = {
-    update: XOR<UserUpdateWithoutDailyLogsInput, UserUncheckedUpdateWithoutDailyLogsInput>
-    create: XOR<UserCreateWithoutDailyLogsInput, UserUncheckedCreateWithoutDailyLogsInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutDailyLogsInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutDailyLogsInput, UserUncheckedUpdateWithoutDailyLogsInput>
-  }
-
-  export type UserUpdateWithoutDailyLogsInput = {
+  export type BuildLogUpdateWithoutDayTaskInput = {
     id?: StringFieldUpdateOperationsInput | string
-    clerkId?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    username?: NullableStringFieldUpdateOperationsInput | string | null
-    discovery?: NullableStringFieldUpdateOperationsInput | string | null
-    role?: NullableStringFieldUpdateOperationsInput | string | null
-    bestStreakOverall?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activeProject?: ProductUpdateOneWithoutUserNestedInput
-    products?: ProductUpdateManyWithoutUserNestedInput
-    buildLogs?: BuildLogUpdateManyWithoutUserNestedInput
-    trial?: TrialUpdateOneWithoutUserNestedInput
-    streaks?: StreakUpdateManyWithoutUserNestedInput
+    logDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    tweet?: NullableStringFieldUpdateOperationsInput | string | null
+    dayIndex?: IntFieldUpdateOperationsInput | number
+    summary?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutBuildLogsNestedInput
+    product?: ProductUpdateOneRequiredWithoutBuildLogsNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutDailyLogsInput = {
+  export type BuildLogUncheckedUpdateWithoutDayTaskInput = {
     id?: StringFieldUpdateOperationsInput | string
-    clerkId?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    username?: NullableStringFieldUpdateOperationsInput | string | null
-    discovery?: NullableStringFieldUpdateOperationsInput | string | null
-    role?: NullableStringFieldUpdateOperationsInput | string | null
-    bestStreakOverall?: IntFieldUpdateOperationsInput | number
-    activeProjectId?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    products?: ProductUncheckedUpdateManyWithoutUserNestedInput
-    buildLogs?: BuildLogUncheckedUpdateManyWithoutUserNestedInput
-    trial?: TrialUncheckedUpdateOneWithoutUserNestedInput
-    streaks?: StreakUncheckedUpdateManyWithoutUserNestedInput
-  }
-
-  export type ProductUpsertWithoutDailyLogsInput = {
-    update: XOR<ProductUpdateWithoutDailyLogsInput, ProductUncheckedUpdateWithoutDailyLogsInput>
-    create: XOR<ProductCreateWithoutDailyLogsInput, ProductUncheckedCreateWithoutDailyLogsInput>
-    where?: ProductWhereInput
-  }
-
-  export type ProductUpdateToOneWithWhereWithoutDailyLogsInput = {
-    where?: ProductWhereInput
-    data: XOR<ProductUpdateWithoutDailyLogsInput, ProductUncheckedUpdateWithoutDailyLogsInput>
-  }
-
-  export type ProductUpdateWithoutDailyLogsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    problemStatement?: StringFieldUpdateOperationsInput | string
-    targetAudience?: StringFieldUpdateOperationsInput | string
-    userGoals?: StringFieldUpdateOperationsInput | string
-    uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
-    deadline?: DateTimeFieldUpdateOperationsInput | Date | string
-    dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutProductsNestedInput
-    roadmap?: RoadmapUpdateOneWithoutProductNestedInput
-    features?: FeatureUpdateManyWithoutProductNestedInput
-    buildLogs?: BuildLogUpdateManyWithoutProjectNestedInput
-    streaks?: StreakUpdateManyWithoutProductNestedInput
-    User?: UserUpdateManyWithoutActiveProjectNestedInput
-  }
-
-  export type ProductUncheckedUpdateWithoutDailyLogsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    problemStatement?: StringFieldUpdateOperationsInput | string
-    targetAudience?: StringFieldUpdateOperationsInput | string
-    userGoals?: StringFieldUpdateOperationsInput | string
-    uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
-    deadline?: DateTimeFieldUpdateOperationsInput | Date | string
-    dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
     userId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    roadmap?: RoadmapUncheckedUpdateOneWithoutProductNestedInput
-    features?: FeatureUncheckedUpdateManyWithoutProductNestedInput
-    buildLogs?: BuildLogUncheckedUpdateManyWithoutProjectNestedInput
-    streaks?: StreakUncheckedUpdateManyWithoutProductNestedInput
-    User?: UserUncheckedUpdateManyWithoutActiveProjectNestedInput
+    productId?: StringFieldUpdateOperationsInput | string
+    logDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    tweet?: NullableStringFieldUpdateOperationsInput | string | null
+    dayIndex?: IntFieldUpdateOperationsInput | number
+    summary?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type UserCreateWithoutBuildLogsInput = {
@@ -19829,15 +21683,17 @@ export namespace Prisma {
     email: string
     name: string
     username?: string | null
+    onboardingCompleted?: boolean
     discovery?: string | null
     role?: string | null
     bestStreakOverall?: number
     createdAt?: Date | string
-    activeProject?: ProductCreateNestedOneWithoutUserInput
     products?: ProductCreateNestedManyWithoutUserInput
-    dailyLogs?: DailyLogCreateNestedManyWithoutUserInput
     trial?: TrialCreateNestedOneWithoutUserInput
-    streaks?: StreakCreateNestedManyWithoutUserInput
+    DailyStreak?: DailyStreakCreateNestedManyWithoutUserInput
+    aiLogs?: AiLogCreateNestedManyWithoutUserInput
+    tokenUsages?: TokenUsageCreateNestedManyWithoutUserInput
+    settings?: SettingsCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutBuildLogsInput = {
@@ -19846,15 +21702,17 @@ export namespace Prisma {
     email: string
     name: string
     username?: string | null
+    onboardingCompleted?: boolean
     discovery?: string | null
     role?: string | null
     bestStreakOverall?: number
-    activeProjectId?: string | null
     createdAt?: Date | string
     products?: ProductUncheckedCreateNestedManyWithoutUserInput
-    dailyLogs?: DailyLogUncheckedCreateNestedManyWithoutUserInput
     trial?: TrialUncheckedCreateNestedOneWithoutUserInput
-    streaks?: StreakUncheckedCreateNestedManyWithoutUserInput
+    DailyStreak?: DailyStreakUncheckedCreateNestedManyWithoutUserInput
+    aiLogs?: AiLogUncheckedCreateNestedManyWithoutUserInput
+    tokenUsages?: TokenUsageUncheckedCreateNestedManyWithoutUserInput
+    settings?: SettingsUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutBuildLogsInput = {
@@ -19865,52 +21723,100 @@ export namespace Prisma {
   export type ProductCreateWithoutBuildLogsInput = {
     id?: string
     name: string
-    description: string
+    slug: string
+    description?: string | null
     problemStatement: string
     targetAudience: string
     userGoals: string
     uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
+    isMvpGenerated?: boolean
+    isRoadmapGenerated?: boolean
+    currentStreak?: number
+    AllTimeBestStreak?: number
+    active?: boolean
+    techStack?: string | null
+    inspirationApps?: string | null
+    initialFeatures?: string | null
+    startDate?: Date | string
     deadline: Date | string
-    dailyCommitmentHrs: number
+    dailyCommitmentHrs?: number
+    mvpSummary?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProductsInput
-    roadmap?: RoadmapCreateNestedOneWithoutProductInput
     features?: FeatureCreateNestedManyWithoutProductInput
-    dailyLogs?: DailyLogCreateNestedManyWithoutProjectInput
-    streaks?: StreakCreateNestedManyWithoutProductInput
-    User?: UserCreateNestedManyWithoutActiveProjectInput
+    DailyStreak?: DailyStreakCreateNestedManyWithoutProductInput
+    aiLogs?: AiLogCreateNestedManyWithoutProductInput
   }
 
   export type ProductUncheckedCreateWithoutBuildLogsInput = {
     id?: string
     name: string
-    description: string
+    slug: string
+    description?: string | null
     problemStatement: string
     targetAudience: string
     userGoals: string
     uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
+    isMvpGenerated?: boolean
+    isRoadmapGenerated?: boolean
+    currentStreak?: number
+    AllTimeBestStreak?: number
+    active?: boolean
+    techStack?: string | null
+    inspirationApps?: string | null
+    initialFeatures?: string | null
+    startDate?: Date | string
     deadline: Date | string
-    dailyCommitmentHrs: number
+    dailyCommitmentHrs?: number
     userId: string
+    mvpSummary?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    roadmap?: RoadmapUncheckedCreateNestedOneWithoutProductInput
     features?: FeatureUncheckedCreateNestedManyWithoutProductInput
-    dailyLogs?: DailyLogUncheckedCreateNestedManyWithoutProjectInput
-    streaks?: StreakUncheckedCreateNestedManyWithoutProductInput
-    User?: UserUncheckedCreateNestedManyWithoutActiveProjectInput
+    DailyStreak?: DailyStreakUncheckedCreateNestedManyWithoutProductInput
+    aiLogs?: AiLogUncheckedCreateNestedManyWithoutProductInput
   }
 
   export type ProductCreateOrConnectWithoutBuildLogsInput = {
     where: ProductWhereUniqueInput
     create: XOR<ProductCreateWithoutBuildLogsInput, ProductUncheckedCreateWithoutBuildLogsInput>
+  }
+
+  export type DayTaskCreateWithoutBuildLogInput = {
+    id?: string
+    dayIndex: number
+    dueDate: Date | string
+    completedAt?: Date | string | null
+    category: string
+    description: string
+    status?: string
+    milestoneGoal?: string | null
+    shipCheck?: string | null
+    task: TaskCreateNestedOneWithoutDayTaskInput
+  }
+
+  export type DayTaskUncheckedCreateWithoutBuildLogInput = {
+    id?: string
+    taskId: string
+    dayIndex: number
+    dueDate: Date | string
+    completedAt?: Date | string | null
+    category: string
+    description: string
+    status?: string
+    milestoneGoal?: string | null
+    shipCheck?: string | null
+  }
+
+  export type DayTaskCreateOrConnectWithoutBuildLogInput = {
+    where: DayTaskWhereUniqueInput
+    create: XOR<DayTaskCreateWithoutBuildLogInput, DayTaskUncheckedCreateWithoutBuildLogInput>
+  }
+
+  export type DayTaskCreateManyBuildLogInputEnvelope = {
+    data: DayTaskCreateManyBuildLogInput | DayTaskCreateManyBuildLogInput[]
+    skipDuplicates?: boolean
   }
 
   export type UserUpsertWithoutBuildLogsInput = {
@@ -19930,15 +21836,17 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     username?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     discovery?: NullableStringFieldUpdateOperationsInput | string | null
     role?: NullableStringFieldUpdateOperationsInput | string | null
     bestStreakOverall?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activeProject?: ProductUpdateOneWithoutUserNestedInput
     products?: ProductUpdateManyWithoutUserNestedInput
-    dailyLogs?: DailyLogUpdateManyWithoutUserNestedInput
     trial?: TrialUpdateOneWithoutUserNestedInput
-    streaks?: StreakUpdateManyWithoutUserNestedInput
+    DailyStreak?: DailyStreakUpdateManyWithoutUserNestedInput
+    aiLogs?: AiLogUpdateManyWithoutUserNestedInput
+    tokenUsages?: TokenUsageUpdateManyWithoutUserNestedInput
+    settings?: SettingsUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBuildLogsInput = {
@@ -19947,15 +21855,17 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     username?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     discovery?: NullableStringFieldUpdateOperationsInput | string | null
     role?: NullableStringFieldUpdateOperationsInput | string | null
     bestStreakOverall?: IntFieldUpdateOperationsInput | number
-    activeProjectId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     products?: ProductUncheckedUpdateManyWithoutUserNestedInput
-    dailyLogs?: DailyLogUncheckedUpdateManyWithoutUserNestedInput
     trial?: TrialUncheckedUpdateOneWithoutUserNestedInput
-    streaks?: StreakUncheckedUpdateManyWithoutUserNestedInput
+    DailyStreak?: DailyStreakUncheckedUpdateManyWithoutUserNestedInput
+    aiLogs?: AiLogUncheckedUpdateManyWithoutUserNestedInput
+    tokenUsages?: TokenUsageUncheckedUpdateManyWithoutUserNestedInput
+    settings?: SettingsUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type ProductUpsertWithoutBuildLogsInput = {
@@ -19972,347 +21882,865 @@ export namespace Prisma {
   export type ProductUpdateWithoutBuildLogsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     problemStatement?: StringFieldUpdateOperationsInput | string
     targetAudience?: StringFieldUpdateOperationsInput | string
     userGoals?: StringFieldUpdateOperationsInput | string
     uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
+    isMvpGenerated?: BoolFieldUpdateOperationsInput | boolean
+    isRoadmapGenerated?: BoolFieldUpdateOperationsInput | boolean
+    currentStreak?: IntFieldUpdateOperationsInput | number
+    AllTimeBestStreak?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    techStack?: NullableStringFieldUpdateOperationsInput | string | null
+    inspirationApps?: NullableStringFieldUpdateOperationsInput | string | null
+    initialFeatures?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     deadline?: DateTimeFieldUpdateOperationsInput | Date | string
     dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
+    mvpSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProductsNestedInput
-    roadmap?: RoadmapUpdateOneWithoutProductNestedInput
     features?: FeatureUpdateManyWithoutProductNestedInput
-    dailyLogs?: DailyLogUpdateManyWithoutProjectNestedInput
-    streaks?: StreakUpdateManyWithoutProductNestedInput
-    User?: UserUpdateManyWithoutActiveProjectNestedInput
+    DailyStreak?: DailyStreakUpdateManyWithoutProductNestedInput
+    aiLogs?: AiLogUpdateManyWithoutProductNestedInput
   }
 
   export type ProductUncheckedUpdateWithoutBuildLogsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     problemStatement?: StringFieldUpdateOperationsInput | string
     targetAudience?: StringFieldUpdateOperationsInput | string
     userGoals?: StringFieldUpdateOperationsInput | string
     uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
+    isMvpGenerated?: BoolFieldUpdateOperationsInput | boolean
+    isRoadmapGenerated?: BoolFieldUpdateOperationsInput | boolean
+    currentStreak?: IntFieldUpdateOperationsInput | number
+    AllTimeBestStreak?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    techStack?: NullableStringFieldUpdateOperationsInput | string | null
+    inspirationApps?: NullableStringFieldUpdateOperationsInput | string | null
+    initialFeatures?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     deadline?: DateTimeFieldUpdateOperationsInput | Date | string
     dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
     userId?: StringFieldUpdateOperationsInput | string
+    mvpSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    roadmap?: RoadmapUncheckedUpdateOneWithoutProductNestedInput
     features?: FeatureUncheckedUpdateManyWithoutProductNestedInput
-    dailyLogs?: DailyLogUncheckedUpdateManyWithoutProjectNestedInput
-    streaks?: StreakUncheckedUpdateManyWithoutProductNestedInput
-    User?: UserUncheckedUpdateManyWithoutActiveProjectNestedInput
+    DailyStreak?: DailyStreakUncheckedUpdateManyWithoutProductNestedInput
+    aiLogs?: AiLogUncheckedUpdateManyWithoutProductNestedInput
   }
 
-  export type UserCreateWithoutStreaksInput = {
+  export type DayTaskUpsertWithWhereUniqueWithoutBuildLogInput = {
+    where: DayTaskWhereUniqueInput
+    update: XOR<DayTaskUpdateWithoutBuildLogInput, DayTaskUncheckedUpdateWithoutBuildLogInput>
+    create: XOR<DayTaskCreateWithoutBuildLogInput, DayTaskUncheckedCreateWithoutBuildLogInput>
+  }
+
+  export type DayTaskUpdateWithWhereUniqueWithoutBuildLogInput = {
+    where: DayTaskWhereUniqueInput
+    data: XOR<DayTaskUpdateWithoutBuildLogInput, DayTaskUncheckedUpdateWithoutBuildLogInput>
+  }
+
+  export type DayTaskUpdateManyWithWhereWithoutBuildLogInput = {
+    where: DayTaskScalarWhereInput
+    data: XOR<DayTaskUpdateManyMutationInput, DayTaskUncheckedUpdateManyWithoutBuildLogInput>
+  }
+
+  export type DayTaskScalarWhereInput = {
+    AND?: DayTaskScalarWhereInput | DayTaskScalarWhereInput[]
+    OR?: DayTaskScalarWhereInput[]
+    NOT?: DayTaskScalarWhereInput | DayTaskScalarWhereInput[]
+    id?: StringFilter<"DayTask"> | string
+    taskId?: StringFilter<"DayTask"> | string
+    dayIndex?: IntFilter<"DayTask"> | number
+    dueDate?: DateTimeFilter<"DayTask"> | Date | string
+    completedAt?: DateTimeNullableFilter<"DayTask"> | Date | string | null
+    category?: StringFilter<"DayTask"> | string
+    description?: StringFilter<"DayTask"> | string
+    status?: StringFilter<"DayTask"> | string
+    milestoneGoal?: StringNullableFilter<"DayTask"> | string | null
+    shipCheck?: StringNullableFilter<"DayTask"> | string | null
+    buildLogId?: StringNullableFilter<"DayTask"> | string | null
+  }
+
+  export type UserCreateWithoutDailyStreakInput = {
     id?: string
     clerkId: string
     email: string
     name: string
     username?: string | null
+    onboardingCompleted?: boolean
     discovery?: string | null
     role?: string | null
     bestStreakOverall?: number
     createdAt?: Date | string
-    activeProject?: ProductCreateNestedOneWithoutUserInput
     products?: ProductCreateNestedManyWithoutUserInput
     buildLogs?: BuildLogCreateNestedManyWithoutUserInput
-    dailyLogs?: DailyLogCreateNestedManyWithoutUserInput
     trial?: TrialCreateNestedOneWithoutUserInput
+    aiLogs?: AiLogCreateNestedManyWithoutUserInput
+    tokenUsages?: TokenUsageCreateNestedManyWithoutUserInput
+    settings?: SettingsCreateNestedOneWithoutUserInput
   }
 
-  export type UserUncheckedCreateWithoutStreaksInput = {
+  export type UserUncheckedCreateWithoutDailyStreakInput = {
     id?: string
     clerkId: string
     email: string
     name: string
     username?: string | null
+    onboardingCompleted?: boolean
     discovery?: string | null
     role?: string | null
     bestStreakOverall?: number
-    activeProjectId?: string | null
     createdAt?: Date | string
     products?: ProductUncheckedCreateNestedManyWithoutUserInput
     buildLogs?: BuildLogUncheckedCreateNestedManyWithoutUserInput
-    dailyLogs?: DailyLogUncheckedCreateNestedManyWithoutUserInput
     trial?: TrialUncheckedCreateNestedOneWithoutUserInput
+    aiLogs?: AiLogUncheckedCreateNestedManyWithoutUserInput
+    tokenUsages?: TokenUsageUncheckedCreateNestedManyWithoutUserInput
+    settings?: SettingsUncheckedCreateNestedOneWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutStreaksInput = {
+  export type UserCreateOrConnectWithoutDailyStreakInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutStreaksInput, UserUncheckedCreateWithoutStreaksInput>
+    create: XOR<UserCreateWithoutDailyStreakInput, UserUncheckedCreateWithoutDailyStreakInput>
   }
 
-  export type ProductCreateWithoutStreaksInput = {
+  export type ProductCreateWithoutDailyStreakInput = {
     id?: string
     name: string
-    description: string
+    slug: string
+    description?: string | null
     problemStatement: string
     targetAudience: string
     userGoals: string
     uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
+    isMvpGenerated?: boolean
+    isRoadmapGenerated?: boolean
+    currentStreak?: number
+    AllTimeBestStreak?: number
+    active?: boolean
+    techStack?: string | null
+    inspirationApps?: string | null
+    initialFeatures?: string | null
+    startDate?: Date | string
     deadline: Date | string
-    dailyCommitmentHrs: number
+    dailyCommitmentHrs?: number
+    mvpSummary?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProductsInput
-    roadmap?: RoadmapCreateNestedOneWithoutProductInput
     features?: FeatureCreateNestedManyWithoutProductInput
-    buildLogs?: BuildLogCreateNestedManyWithoutProjectInput
-    dailyLogs?: DailyLogCreateNestedManyWithoutProjectInput
-    User?: UserCreateNestedManyWithoutActiveProjectInput
+    buildLogs?: BuildLogCreateNestedManyWithoutProductInput
+    aiLogs?: AiLogCreateNestedManyWithoutProductInput
   }
 
-  export type ProductUncheckedCreateWithoutStreaksInput = {
+  export type ProductUncheckedCreateWithoutDailyStreakInput = {
     id?: string
     name: string
-    description: string
+    slug: string
+    description?: string | null
     problemStatement: string
     targetAudience: string
     userGoals: string
     uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
+    isMvpGenerated?: boolean
+    isRoadmapGenerated?: boolean
+    currentStreak?: number
+    AllTimeBestStreak?: number
+    active?: boolean
+    techStack?: string | null
+    inspirationApps?: string | null
+    initialFeatures?: string | null
+    startDate?: Date | string
     deadline: Date | string
-    dailyCommitmentHrs: number
+    dailyCommitmentHrs?: number
     userId: string
+    mvpSummary?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    roadmap?: RoadmapUncheckedCreateNestedOneWithoutProductInput
     features?: FeatureUncheckedCreateNestedManyWithoutProductInput
-    buildLogs?: BuildLogUncheckedCreateNestedManyWithoutProjectInput
-    dailyLogs?: DailyLogUncheckedCreateNestedManyWithoutProjectInput
-    User?: UserUncheckedCreateNestedManyWithoutActiveProjectInput
+    buildLogs?: BuildLogUncheckedCreateNestedManyWithoutProductInput
+    aiLogs?: AiLogUncheckedCreateNestedManyWithoutProductInput
   }
 
-  export type ProductCreateOrConnectWithoutStreaksInput = {
+  export type ProductCreateOrConnectWithoutDailyStreakInput = {
     where: ProductWhereUniqueInput
-    create: XOR<ProductCreateWithoutStreaksInput, ProductUncheckedCreateWithoutStreaksInput>
+    create: XOR<ProductCreateWithoutDailyStreakInput, ProductUncheckedCreateWithoutDailyStreakInput>
   }
 
-  export type UserUpsertWithoutStreaksInput = {
-    update: XOR<UserUpdateWithoutStreaksInput, UserUncheckedUpdateWithoutStreaksInput>
-    create: XOR<UserCreateWithoutStreaksInput, UserUncheckedCreateWithoutStreaksInput>
+  export type UserUpsertWithoutDailyStreakInput = {
+    update: XOR<UserUpdateWithoutDailyStreakInput, UserUncheckedUpdateWithoutDailyStreakInput>
+    create: XOR<UserCreateWithoutDailyStreakInput, UserUncheckedCreateWithoutDailyStreakInput>
     where?: UserWhereInput
   }
 
-  export type UserUpdateToOneWithWhereWithoutStreaksInput = {
+  export type UserUpdateToOneWithWhereWithoutDailyStreakInput = {
     where?: UserWhereInput
-    data: XOR<UserUpdateWithoutStreaksInput, UserUncheckedUpdateWithoutStreaksInput>
+    data: XOR<UserUpdateWithoutDailyStreakInput, UserUncheckedUpdateWithoutDailyStreakInput>
   }
 
-  export type UserUpdateWithoutStreaksInput = {
+  export type UserUpdateWithoutDailyStreakInput = {
     id?: StringFieldUpdateOperationsInput | string
     clerkId?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     username?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     discovery?: NullableStringFieldUpdateOperationsInput | string | null
     role?: NullableStringFieldUpdateOperationsInput | string | null
     bestStreakOverall?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activeProject?: ProductUpdateOneWithoutUserNestedInput
     products?: ProductUpdateManyWithoutUserNestedInput
     buildLogs?: BuildLogUpdateManyWithoutUserNestedInput
-    dailyLogs?: DailyLogUpdateManyWithoutUserNestedInput
     trial?: TrialUpdateOneWithoutUserNestedInput
+    aiLogs?: AiLogUpdateManyWithoutUserNestedInput
+    tokenUsages?: TokenUsageUpdateManyWithoutUserNestedInput
+    settings?: SettingsUpdateOneWithoutUserNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutStreaksInput = {
+  export type UserUncheckedUpdateWithoutDailyStreakInput = {
     id?: StringFieldUpdateOperationsInput | string
     clerkId?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     username?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     discovery?: NullableStringFieldUpdateOperationsInput | string | null
     role?: NullableStringFieldUpdateOperationsInput | string | null
     bestStreakOverall?: IntFieldUpdateOperationsInput | number
-    activeProjectId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     products?: ProductUncheckedUpdateManyWithoutUserNestedInput
     buildLogs?: BuildLogUncheckedUpdateManyWithoutUserNestedInput
-    dailyLogs?: DailyLogUncheckedUpdateManyWithoutUserNestedInput
     trial?: TrialUncheckedUpdateOneWithoutUserNestedInput
+    aiLogs?: AiLogUncheckedUpdateManyWithoutUserNestedInput
+    tokenUsages?: TokenUsageUncheckedUpdateManyWithoutUserNestedInput
+    settings?: SettingsUncheckedUpdateOneWithoutUserNestedInput
   }
 
-  export type ProductUpsertWithoutStreaksInput = {
-    update: XOR<ProductUpdateWithoutStreaksInput, ProductUncheckedUpdateWithoutStreaksInput>
-    create: XOR<ProductCreateWithoutStreaksInput, ProductUncheckedCreateWithoutStreaksInput>
+  export type ProductUpsertWithoutDailyStreakInput = {
+    update: XOR<ProductUpdateWithoutDailyStreakInput, ProductUncheckedUpdateWithoutDailyStreakInput>
+    create: XOR<ProductCreateWithoutDailyStreakInput, ProductUncheckedCreateWithoutDailyStreakInput>
     where?: ProductWhereInput
   }
 
-  export type ProductUpdateToOneWithWhereWithoutStreaksInput = {
+  export type ProductUpdateToOneWithWhereWithoutDailyStreakInput = {
     where?: ProductWhereInput
-    data: XOR<ProductUpdateWithoutStreaksInput, ProductUncheckedUpdateWithoutStreaksInput>
+    data: XOR<ProductUpdateWithoutDailyStreakInput, ProductUncheckedUpdateWithoutDailyStreakInput>
   }
 
-  export type ProductUpdateWithoutStreaksInput = {
+  export type ProductUpdateWithoutDailyStreakInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     problemStatement?: StringFieldUpdateOperationsInput | string
     targetAudience?: StringFieldUpdateOperationsInput | string
     userGoals?: StringFieldUpdateOperationsInput | string
     uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
+    isMvpGenerated?: BoolFieldUpdateOperationsInput | boolean
+    isRoadmapGenerated?: BoolFieldUpdateOperationsInput | boolean
+    currentStreak?: IntFieldUpdateOperationsInput | number
+    AllTimeBestStreak?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    techStack?: NullableStringFieldUpdateOperationsInput | string | null
+    inspirationApps?: NullableStringFieldUpdateOperationsInput | string | null
+    initialFeatures?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     deadline?: DateTimeFieldUpdateOperationsInput | Date | string
     dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
+    mvpSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProductsNestedInput
-    roadmap?: RoadmapUpdateOneWithoutProductNestedInput
     features?: FeatureUpdateManyWithoutProductNestedInput
-    buildLogs?: BuildLogUpdateManyWithoutProjectNestedInput
-    dailyLogs?: DailyLogUpdateManyWithoutProjectNestedInput
-    User?: UserUpdateManyWithoutActiveProjectNestedInput
+    buildLogs?: BuildLogUpdateManyWithoutProductNestedInput
+    aiLogs?: AiLogUpdateManyWithoutProductNestedInput
   }
 
-  export type ProductUncheckedUpdateWithoutStreaksInput = {
+  export type ProductUncheckedUpdateWithoutDailyStreakInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     problemStatement?: StringFieldUpdateOperationsInput | string
     targetAudience?: StringFieldUpdateOperationsInput | string
     userGoals?: StringFieldUpdateOperationsInput | string
     uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
+    isMvpGenerated?: BoolFieldUpdateOperationsInput | boolean
+    isRoadmapGenerated?: BoolFieldUpdateOperationsInput | boolean
+    currentStreak?: IntFieldUpdateOperationsInput | number
+    AllTimeBestStreak?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    techStack?: NullableStringFieldUpdateOperationsInput | string | null
+    inspirationApps?: NullableStringFieldUpdateOperationsInput | string | null
+    initialFeatures?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     deadline?: DateTimeFieldUpdateOperationsInput | Date | string
     dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
     userId?: StringFieldUpdateOperationsInput | string
+    mvpSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    roadmap?: RoadmapUncheckedUpdateOneWithoutProductNestedInput
     features?: FeatureUncheckedUpdateManyWithoutProductNestedInput
-    buildLogs?: BuildLogUncheckedUpdateManyWithoutProjectNestedInput
-    dailyLogs?: DailyLogUncheckedUpdateManyWithoutProjectNestedInput
-    User?: UserUncheckedUpdateManyWithoutActiveProjectNestedInput
+    buildLogs?: BuildLogUncheckedUpdateManyWithoutProductNestedInput
+    aiLogs?: AiLogUncheckedUpdateManyWithoutProductNestedInput
+  }
+
+  export type UserCreateWithoutAiLogsInput = {
+    id?: string
+    clerkId: string
+    email: string
+    name: string
+    username?: string | null
+    onboardingCompleted?: boolean
+    discovery?: string | null
+    role?: string | null
+    bestStreakOverall?: number
+    createdAt?: Date | string
+    products?: ProductCreateNestedManyWithoutUserInput
+    buildLogs?: BuildLogCreateNestedManyWithoutUserInput
+    trial?: TrialCreateNestedOneWithoutUserInput
+    DailyStreak?: DailyStreakCreateNestedManyWithoutUserInput
+    tokenUsages?: TokenUsageCreateNestedManyWithoutUserInput
+    settings?: SettingsCreateNestedOneWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutAiLogsInput = {
+    id?: string
+    clerkId: string
+    email: string
+    name: string
+    username?: string | null
+    onboardingCompleted?: boolean
+    discovery?: string | null
+    role?: string | null
+    bestStreakOverall?: number
+    createdAt?: Date | string
+    products?: ProductUncheckedCreateNestedManyWithoutUserInput
+    buildLogs?: BuildLogUncheckedCreateNestedManyWithoutUserInput
+    trial?: TrialUncheckedCreateNestedOneWithoutUserInput
+    DailyStreak?: DailyStreakUncheckedCreateNestedManyWithoutUserInput
+    tokenUsages?: TokenUsageUncheckedCreateNestedManyWithoutUserInput
+    settings?: SettingsUncheckedCreateNestedOneWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutAiLogsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutAiLogsInput, UserUncheckedCreateWithoutAiLogsInput>
+  }
+
+  export type ProductCreateWithoutAiLogsInput = {
+    id?: string
+    name: string
+    slug: string
+    description?: string | null
+    problemStatement: string
+    targetAudience: string
+    userGoals: string
+    uniqueValueProp: string
+    isMvpGenerated?: boolean
+    isRoadmapGenerated?: boolean
+    currentStreak?: number
+    AllTimeBestStreak?: number
+    active?: boolean
+    techStack?: string | null
+    inspirationApps?: string | null
+    initialFeatures?: string | null
+    startDate?: Date | string
+    deadline: Date | string
+    dailyCommitmentHrs?: number
+    mvpSummary?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutProductsInput
+    features?: FeatureCreateNestedManyWithoutProductInput
+    buildLogs?: BuildLogCreateNestedManyWithoutProductInput
+    DailyStreak?: DailyStreakCreateNestedManyWithoutProductInput
+  }
+
+  export type ProductUncheckedCreateWithoutAiLogsInput = {
+    id?: string
+    name: string
+    slug: string
+    description?: string | null
+    problemStatement: string
+    targetAudience: string
+    userGoals: string
+    uniqueValueProp: string
+    isMvpGenerated?: boolean
+    isRoadmapGenerated?: boolean
+    currentStreak?: number
+    AllTimeBestStreak?: number
+    active?: boolean
+    techStack?: string | null
+    inspirationApps?: string | null
+    initialFeatures?: string | null
+    startDate?: Date | string
+    deadline: Date | string
+    dailyCommitmentHrs?: number
+    userId: string
+    mvpSummary?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    features?: FeatureUncheckedCreateNestedManyWithoutProductInput
+    buildLogs?: BuildLogUncheckedCreateNestedManyWithoutProductInput
+    DailyStreak?: DailyStreakUncheckedCreateNestedManyWithoutProductInput
+  }
+
+  export type ProductCreateOrConnectWithoutAiLogsInput = {
+    where: ProductWhereUniqueInput
+    create: XOR<ProductCreateWithoutAiLogsInput, ProductUncheckedCreateWithoutAiLogsInput>
+  }
+
+  export type UserUpsertWithoutAiLogsInput = {
+    update: XOR<UserUpdateWithoutAiLogsInput, UserUncheckedUpdateWithoutAiLogsInput>
+    create: XOR<UserCreateWithoutAiLogsInput, UserUncheckedCreateWithoutAiLogsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutAiLogsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutAiLogsInput, UserUncheckedUpdateWithoutAiLogsInput>
+  }
+
+  export type UserUpdateWithoutAiLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clerkId?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
+    discovery?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    bestStreakOverall?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    products?: ProductUpdateManyWithoutUserNestedInput
+    buildLogs?: BuildLogUpdateManyWithoutUserNestedInput
+    trial?: TrialUpdateOneWithoutUserNestedInput
+    DailyStreak?: DailyStreakUpdateManyWithoutUserNestedInput
+    tokenUsages?: TokenUsageUpdateManyWithoutUserNestedInput
+    settings?: SettingsUpdateOneWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutAiLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clerkId?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
+    discovery?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    bestStreakOverall?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    products?: ProductUncheckedUpdateManyWithoutUserNestedInput
+    buildLogs?: BuildLogUncheckedUpdateManyWithoutUserNestedInput
+    trial?: TrialUncheckedUpdateOneWithoutUserNestedInput
+    DailyStreak?: DailyStreakUncheckedUpdateManyWithoutUserNestedInput
+    tokenUsages?: TokenUsageUncheckedUpdateManyWithoutUserNestedInput
+    settings?: SettingsUncheckedUpdateOneWithoutUserNestedInput
+  }
+
+  export type ProductUpsertWithoutAiLogsInput = {
+    update: XOR<ProductUpdateWithoutAiLogsInput, ProductUncheckedUpdateWithoutAiLogsInput>
+    create: XOR<ProductCreateWithoutAiLogsInput, ProductUncheckedCreateWithoutAiLogsInput>
+    where?: ProductWhereInput
+  }
+
+  export type ProductUpdateToOneWithWhereWithoutAiLogsInput = {
+    where?: ProductWhereInput
+    data: XOR<ProductUpdateWithoutAiLogsInput, ProductUncheckedUpdateWithoutAiLogsInput>
+  }
+
+  export type ProductUpdateWithoutAiLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    problemStatement?: StringFieldUpdateOperationsInput | string
+    targetAudience?: StringFieldUpdateOperationsInput | string
+    userGoals?: StringFieldUpdateOperationsInput | string
+    uniqueValueProp?: StringFieldUpdateOperationsInput | string
+    isMvpGenerated?: BoolFieldUpdateOperationsInput | boolean
+    isRoadmapGenerated?: BoolFieldUpdateOperationsInput | boolean
+    currentStreak?: IntFieldUpdateOperationsInput | number
+    AllTimeBestStreak?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    techStack?: NullableStringFieldUpdateOperationsInput | string | null
+    inspirationApps?: NullableStringFieldUpdateOperationsInput | string | null
+    initialFeatures?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    deadline?: DateTimeFieldUpdateOperationsInput | Date | string
+    dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
+    mvpSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutProductsNestedInput
+    features?: FeatureUpdateManyWithoutProductNestedInput
+    buildLogs?: BuildLogUpdateManyWithoutProductNestedInput
+    DailyStreak?: DailyStreakUpdateManyWithoutProductNestedInput
+  }
+
+  export type ProductUncheckedUpdateWithoutAiLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    problemStatement?: StringFieldUpdateOperationsInput | string
+    targetAudience?: StringFieldUpdateOperationsInput | string
+    userGoals?: StringFieldUpdateOperationsInput | string
+    uniqueValueProp?: StringFieldUpdateOperationsInput | string
+    isMvpGenerated?: BoolFieldUpdateOperationsInput | boolean
+    isRoadmapGenerated?: BoolFieldUpdateOperationsInput | boolean
+    currentStreak?: IntFieldUpdateOperationsInput | number
+    AllTimeBestStreak?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    techStack?: NullableStringFieldUpdateOperationsInput | string | null
+    inspirationApps?: NullableStringFieldUpdateOperationsInput | string | null
+    initialFeatures?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    deadline?: DateTimeFieldUpdateOperationsInput | Date | string
+    dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
+    userId?: StringFieldUpdateOperationsInput | string
+    mvpSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    features?: FeatureUncheckedUpdateManyWithoutProductNestedInput
+    buildLogs?: BuildLogUncheckedUpdateManyWithoutProductNestedInput
+    DailyStreak?: DailyStreakUncheckedUpdateManyWithoutProductNestedInput
+  }
+
+  export type UserCreateWithoutTokenUsagesInput = {
+    id?: string
+    clerkId: string
+    email: string
+    name: string
+    username?: string | null
+    onboardingCompleted?: boolean
+    discovery?: string | null
+    role?: string | null
+    bestStreakOverall?: number
+    createdAt?: Date | string
+    products?: ProductCreateNestedManyWithoutUserInput
+    buildLogs?: BuildLogCreateNestedManyWithoutUserInput
+    trial?: TrialCreateNestedOneWithoutUserInput
+    DailyStreak?: DailyStreakCreateNestedManyWithoutUserInput
+    aiLogs?: AiLogCreateNestedManyWithoutUserInput
+    settings?: SettingsCreateNestedOneWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutTokenUsagesInput = {
+    id?: string
+    clerkId: string
+    email: string
+    name: string
+    username?: string | null
+    onboardingCompleted?: boolean
+    discovery?: string | null
+    role?: string | null
+    bestStreakOverall?: number
+    createdAt?: Date | string
+    products?: ProductUncheckedCreateNestedManyWithoutUserInput
+    buildLogs?: BuildLogUncheckedCreateNestedManyWithoutUserInput
+    trial?: TrialUncheckedCreateNestedOneWithoutUserInput
+    DailyStreak?: DailyStreakUncheckedCreateNestedManyWithoutUserInput
+    aiLogs?: AiLogUncheckedCreateNestedManyWithoutUserInput
+    settings?: SettingsUncheckedCreateNestedOneWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutTokenUsagesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutTokenUsagesInput, UserUncheckedCreateWithoutTokenUsagesInput>
+  }
+
+  export type UserUpsertWithoutTokenUsagesInput = {
+    update: XOR<UserUpdateWithoutTokenUsagesInput, UserUncheckedUpdateWithoutTokenUsagesInput>
+    create: XOR<UserCreateWithoutTokenUsagesInput, UserUncheckedCreateWithoutTokenUsagesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutTokenUsagesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutTokenUsagesInput, UserUncheckedUpdateWithoutTokenUsagesInput>
+  }
+
+  export type UserUpdateWithoutTokenUsagesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clerkId?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
+    discovery?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    bestStreakOverall?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    products?: ProductUpdateManyWithoutUserNestedInput
+    buildLogs?: BuildLogUpdateManyWithoutUserNestedInput
+    trial?: TrialUpdateOneWithoutUserNestedInput
+    DailyStreak?: DailyStreakUpdateManyWithoutUserNestedInput
+    aiLogs?: AiLogUpdateManyWithoutUserNestedInput
+    settings?: SettingsUpdateOneWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutTokenUsagesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clerkId?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
+    discovery?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    bestStreakOverall?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    products?: ProductUncheckedUpdateManyWithoutUserNestedInput
+    buildLogs?: BuildLogUncheckedUpdateManyWithoutUserNestedInput
+    trial?: TrialUncheckedUpdateOneWithoutUserNestedInput
+    DailyStreak?: DailyStreakUncheckedUpdateManyWithoutUserNestedInput
+    aiLogs?: AiLogUncheckedUpdateManyWithoutUserNestedInput
+    settings?: SettingsUncheckedUpdateOneWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutSettingsInput = {
+    id?: string
+    clerkId: string
+    email: string
+    name: string
+    username?: string | null
+    onboardingCompleted?: boolean
+    discovery?: string | null
+    role?: string | null
+    bestStreakOverall?: number
+    createdAt?: Date | string
+    products?: ProductCreateNestedManyWithoutUserInput
+    buildLogs?: BuildLogCreateNestedManyWithoutUserInput
+    trial?: TrialCreateNestedOneWithoutUserInput
+    DailyStreak?: DailyStreakCreateNestedManyWithoutUserInput
+    aiLogs?: AiLogCreateNestedManyWithoutUserInput
+    tokenUsages?: TokenUsageCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutSettingsInput = {
+    id?: string
+    clerkId: string
+    email: string
+    name: string
+    username?: string | null
+    onboardingCompleted?: boolean
+    discovery?: string | null
+    role?: string | null
+    bestStreakOverall?: number
+    createdAt?: Date | string
+    products?: ProductUncheckedCreateNestedManyWithoutUserInput
+    buildLogs?: BuildLogUncheckedCreateNestedManyWithoutUserInput
+    trial?: TrialUncheckedCreateNestedOneWithoutUserInput
+    DailyStreak?: DailyStreakUncheckedCreateNestedManyWithoutUserInput
+    aiLogs?: AiLogUncheckedCreateNestedManyWithoutUserInput
+    tokenUsages?: TokenUsageUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutSettingsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSettingsInput, UserUncheckedCreateWithoutSettingsInput>
+  }
+
+  export type UserUpsertWithoutSettingsInput = {
+    update: XOR<UserUpdateWithoutSettingsInput, UserUncheckedUpdateWithoutSettingsInput>
+    create: XOR<UserCreateWithoutSettingsInput, UserUncheckedCreateWithoutSettingsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSettingsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSettingsInput, UserUncheckedUpdateWithoutSettingsInput>
+  }
+
+  export type UserUpdateWithoutSettingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clerkId?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
+    discovery?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    bestStreakOverall?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    products?: ProductUpdateManyWithoutUserNestedInput
+    buildLogs?: BuildLogUpdateManyWithoutUserNestedInput
+    trial?: TrialUpdateOneWithoutUserNestedInput
+    DailyStreak?: DailyStreakUpdateManyWithoutUserNestedInput
+    aiLogs?: AiLogUpdateManyWithoutUserNestedInput
+    tokenUsages?: TokenUsageUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSettingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clerkId?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
+    discovery?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    bestStreakOverall?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    products?: ProductUncheckedUpdateManyWithoutUserNestedInput
+    buildLogs?: BuildLogUncheckedUpdateManyWithoutUserNestedInput
+    trial?: TrialUncheckedUpdateOneWithoutUserNestedInput
+    DailyStreak?: DailyStreakUncheckedUpdateManyWithoutUserNestedInput
+    aiLogs?: AiLogUncheckedUpdateManyWithoutUserNestedInput
+    tokenUsages?: TokenUsageUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ProductCreateManyUserInput = {
     id?: string
     name: string
-    description: string
+    slug: string
+    description?: string | null
     problemStatement: string
     targetAudience: string
     userGoals: string
     uniqueValueProp: string
-    techStack: string
-    inspirationApps: string
-    initialFeatures: string
+    isMvpGenerated?: boolean
+    isRoadmapGenerated?: boolean
+    currentStreak?: number
+    AllTimeBestStreak?: number
+    active?: boolean
+    techStack?: string | null
+    inspirationApps?: string | null
+    initialFeatures?: string | null
+    startDate?: Date | string
     deadline: Date | string
-    dailyCommitmentHrs: number
+    dailyCommitmentHrs?: number
+    mvpSummary?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type BuildLogCreateManyUserInput = {
     id?: string
-    projectId: string
+    productId: string
     logDate: Date | string
     tweet?: string | null
     dayIndex?: number
     summary: string
-    sourceTasks: JsonNullValueInput | InputJsonValue
     generatedAt?: Date | string
   }
 
-  export type DailyLogCreateManyUserInput = {
+  export type DailyStreakCreateManyUserInput = {
     id?: string
-    projectId: string
+    productId: string
     date: Date | string
-    completedTasks: JsonNullValueInput | InputJsonValue
-    notes?: string | null
+    hasBuildLog?: boolean
     createdAt?: Date | string
   }
 
-  export type StreakCreateManyUserInput = {
+  export type AiLogCreateManyUserInput = {
     id?: string
     productId: string
-    currentStreak?: number
-    bestStreak?: number
-    lastActiveDate: Date | string
-    streakStart: Date | string
-    updatedAt?: Date | string
+    ai_model: string
+    type: string
+    input: JsonNullValueInput | InputJsonValue
+    output: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type TokenUsageCreateManyUserInput = {
+    id?: string
+    purpose: string
+    tokens: number
+    createdAt?: Date | string
   }
 
   export type ProductUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     problemStatement?: StringFieldUpdateOperationsInput | string
     targetAudience?: StringFieldUpdateOperationsInput | string
     userGoals?: StringFieldUpdateOperationsInput | string
     uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
+    isMvpGenerated?: BoolFieldUpdateOperationsInput | boolean
+    isRoadmapGenerated?: BoolFieldUpdateOperationsInput | boolean
+    currentStreak?: IntFieldUpdateOperationsInput | number
+    AllTimeBestStreak?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    techStack?: NullableStringFieldUpdateOperationsInput | string | null
+    inspirationApps?: NullableStringFieldUpdateOperationsInput | string | null
+    initialFeatures?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     deadline?: DateTimeFieldUpdateOperationsInput | Date | string
     dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
+    mvpSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    roadmap?: RoadmapUpdateOneWithoutProductNestedInput
     features?: FeatureUpdateManyWithoutProductNestedInput
-    buildLogs?: BuildLogUpdateManyWithoutProjectNestedInput
-    dailyLogs?: DailyLogUpdateManyWithoutProjectNestedInput
-    streaks?: StreakUpdateManyWithoutProductNestedInput
-    User?: UserUpdateManyWithoutActiveProjectNestedInput
+    buildLogs?: BuildLogUpdateManyWithoutProductNestedInput
+    DailyStreak?: DailyStreakUpdateManyWithoutProductNestedInput
+    aiLogs?: AiLogUpdateManyWithoutProductNestedInput
   }
 
   export type ProductUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     problemStatement?: StringFieldUpdateOperationsInput | string
     targetAudience?: StringFieldUpdateOperationsInput | string
     userGoals?: StringFieldUpdateOperationsInput | string
     uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
+    isMvpGenerated?: BoolFieldUpdateOperationsInput | boolean
+    isRoadmapGenerated?: BoolFieldUpdateOperationsInput | boolean
+    currentStreak?: IntFieldUpdateOperationsInput | number
+    AllTimeBestStreak?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    techStack?: NullableStringFieldUpdateOperationsInput | string | null
+    inspirationApps?: NullableStringFieldUpdateOperationsInput | string | null
+    initialFeatures?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     deadline?: DateTimeFieldUpdateOperationsInput | Date | string
     dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
+    mvpSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    roadmap?: RoadmapUncheckedUpdateOneWithoutProductNestedInput
     features?: FeatureUncheckedUpdateManyWithoutProductNestedInput
-    buildLogs?: BuildLogUncheckedUpdateManyWithoutProjectNestedInput
-    dailyLogs?: DailyLogUncheckedUpdateManyWithoutProjectNestedInput
-    streaks?: StreakUncheckedUpdateManyWithoutProductNestedInput
-    User?: UserUncheckedUpdateManyWithoutActiveProjectNestedInput
+    buildLogs?: BuildLogUncheckedUpdateManyWithoutProductNestedInput
+    DailyStreak?: DailyStreakUncheckedUpdateManyWithoutProductNestedInput
+    aiLogs?: AiLogUncheckedUpdateManyWithoutProductNestedInput
   }
 
   export type ProductUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     problemStatement?: StringFieldUpdateOperationsInput | string
     targetAudience?: StringFieldUpdateOperationsInput | string
     userGoals?: StringFieldUpdateOperationsInput | string
     uniqueValueProp?: StringFieldUpdateOperationsInput | string
-    techStack?: StringFieldUpdateOperationsInput | string
-    inspirationApps?: StringFieldUpdateOperationsInput | string
-    initialFeatures?: StringFieldUpdateOperationsInput | string
+    isMvpGenerated?: BoolFieldUpdateOperationsInput | boolean
+    isRoadmapGenerated?: BoolFieldUpdateOperationsInput | boolean
+    currentStreak?: IntFieldUpdateOperationsInput | number
+    AllTimeBestStreak?: IntFieldUpdateOperationsInput | number
+    active?: BoolFieldUpdateOperationsInput | boolean
+    techStack?: NullableStringFieldUpdateOperationsInput | string | null
+    inspirationApps?: NullableStringFieldUpdateOperationsInput | string | null
+    initialFeatures?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     deadline?: DateTimeFieldUpdateOperationsInput | Date | string
     dailyCommitmentHrs?: FloatFieldUpdateOperationsInput | number
+    mvpSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -20323,88 +22751,105 @@ export namespace Prisma {
     tweet?: NullableStringFieldUpdateOperationsInput | string | null
     dayIndex?: IntFieldUpdateOperationsInput | number
     summary?: StringFieldUpdateOperationsInput | string
-    sourceTasks?: JsonNullValueInput | InputJsonValue
     generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    project?: ProductUpdateOneRequiredWithoutBuildLogsNestedInput
+    product?: ProductUpdateOneRequiredWithoutBuildLogsNestedInput
+    DayTask?: DayTaskUpdateManyWithoutBuildLogNestedInput
   }
 
   export type BuildLogUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    projectId?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
     logDate?: DateTimeFieldUpdateOperationsInput | Date | string
     tweet?: NullableStringFieldUpdateOperationsInput | string | null
     dayIndex?: IntFieldUpdateOperationsInput | number
     summary?: StringFieldUpdateOperationsInput | string
-    sourceTasks?: JsonNullValueInput | InputJsonValue
     generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    DayTask?: DayTaskUncheckedUpdateManyWithoutBuildLogNestedInput
   }
 
   export type BuildLogUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    projectId?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
     logDate?: DateTimeFieldUpdateOperationsInput | Date | string
     tweet?: NullableStringFieldUpdateOperationsInput | string | null
     dayIndex?: IntFieldUpdateOperationsInput | number
     summary?: StringFieldUpdateOperationsInput | string
-    sourceTasks?: JsonNullValueInput | InputJsonValue
     generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type DailyLogUpdateWithoutUserInput = {
+  export type DailyStreakUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
-    completedTasks?: JsonNullValueInput | InputJsonValue
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    hasBuildLog?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    project?: ProductUpdateOneRequiredWithoutDailyLogsNestedInput
+    product?: ProductUpdateOneRequiredWithoutDailyStreakNestedInput
   }
 
-  export type DailyLogUncheckedUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    projectId?: StringFieldUpdateOperationsInput | string
-    date?: DateTimeFieldUpdateOperationsInput | Date | string
-    completedTasks?: JsonNullValueInput | InputJsonValue
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type DailyLogUncheckedUpdateManyWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    projectId?: StringFieldUpdateOperationsInput | string
-    date?: DateTimeFieldUpdateOperationsInput | Date | string
-    completedTasks?: JsonNullValueInput | InputJsonValue
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type StreakUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    currentStreak?: IntFieldUpdateOperationsInput | number
-    bestStreak?: IntFieldUpdateOperationsInput | number
-    lastActiveDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    streakStart?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    product?: ProductUpdateOneRequiredWithoutStreaksNestedInput
-  }
-
-  export type StreakUncheckedUpdateWithoutUserInput = {
+  export type DailyStreakUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     productId?: StringFieldUpdateOperationsInput | string
-    currentStreak?: IntFieldUpdateOperationsInput | number
-    bestStreak?: IntFieldUpdateOperationsInput | number
-    lastActiveDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    streakStart?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    hasBuildLog?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StreakUncheckedUpdateManyWithoutUserInput = {
+  export type DailyStreakUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     productId?: StringFieldUpdateOperationsInput | string
-    currentStreak?: IntFieldUpdateOperationsInput | number
-    bestStreak?: IntFieldUpdateOperationsInput | number
-    lastActiveDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    streakStart?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    hasBuildLog?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AiLogUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ai_model?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    input?: JsonNullValueInput | InputJsonValue
+    output?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    product?: ProductUpdateOneRequiredWithoutAiLogsNestedInput
+  }
+
+  export type AiLogUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    ai_model?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    input?: JsonNullValueInput | InputJsonValue
+    output?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AiLogUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    ai_model?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    input?: JsonNullValueInput | InputJsonValue
+    output?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TokenUsageUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    purpose?: StringFieldUpdateOperationsInput | string
+    tokens?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TokenUsageUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    purpose?: StringFieldUpdateOperationsInput | string
+    tokens?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TokenUsageUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    purpose?: StringFieldUpdateOperationsInput | string
+    tokens?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type FeatureCreateManyProductInput = {
@@ -20414,45 +22859,31 @@ export namespace Prisma {
     rank: number
   }
 
-  export type BuildLogCreateManyProjectInput = {
+  export type BuildLogCreateManyProductInput = {
     id?: string
     userId: string
     logDate: Date | string
     tweet?: string | null
     dayIndex?: number
     summary: string
-    sourceTasks: JsonNullValueInput | InputJsonValue
     generatedAt?: Date | string
   }
 
-  export type DailyLogCreateManyProjectInput = {
+  export type DailyStreakCreateManyProductInput = {
     id?: string
     userId: string
     date: Date | string
-    completedTasks: JsonNullValueInput | InputJsonValue
-    notes?: string | null
+    hasBuildLog?: boolean
     createdAt?: Date | string
   }
 
-  export type StreakCreateManyProductInput = {
+  export type AiLogCreateManyProductInput = {
     id?: string
     userId: string
-    currentStreak?: number
-    bestStreak?: number
-    lastActiveDate: Date | string
-    streakStart: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type UserCreateManyActiveProjectInput = {
-    id?: string
-    clerkId: string
-    email: string
-    name: string
-    username?: string | null
-    discovery?: string | null
-    role?: string | null
-    bestStreakOverall?: number
+    ai_model: string
+    type: string
+    input: JsonNullValueInput | InputJsonValue
+    output: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
   }
 
@@ -20479,145 +22910,97 @@ export namespace Prisma {
     rank?: IntFieldUpdateOperationsInput | number
   }
 
-  export type BuildLogUpdateWithoutProjectInput = {
+  export type BuildLogUpdateWithoutProductInput = {
     id?: StringFieldUpdateOperationsInput | string
     logDate?: DateTimeFieldUpdateOperationsInput | Date | string
     tweet?: NullableStringFieldUpdateOperationsInput | string | null
     dayIndex?: IntFieldUpdateOperationsInput | number
     summary?: StringFieldUpdateOperationsInput | string
-    sourceTasks?: JsonNullValueInput | InputJsonValue
     generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutBuildLogsNestedInput
+    DayTask?: DayTaskUpdateManyWithoutBuildLogNestedInput
   }
 
-  export type BuildLogUncheckedUpdateWithoutProjectInput = {
+  export type BuildLogUncheckedUpdateWithoutProductInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     logDate?: DateTimeFieldUpdateOperationsInput | Date | string
     tweet?: NullableStringFieldUpdateOperationsInput | string | null
     dayIndex?: IntFieldUpdateOperationsInput | number
     summary?: StringFieldUpdateOperationsInput | string
-    sourceTasks?: JsonNullValueInput | InputJsonValue
     generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    DayTask?: DayTaskUncheckedUpdateManyWithoutBuildLogNestedInput
   }
 
-  export type BuildLogUncheckedUpdateManyWithoutProjectInput = {
+  export type BuildLogUncheckedUpdateManyWithoutProductInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     logDate?: DateTimeFieldUpdateOperationsInput | Date | string
     tweet?: NullableStringFieldUpdateOperationsInput | string | null
     dayIndex?: IntFieldUpdateOperationsInput | number
     summary?: StringFieldUpdateOperationsInput | string
-    sourceTasks?: JsonNullValueInput | InputJsonValue
     generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type DailyLogUpdateWithoutProjectInput = {
+  export type DailyStreakUpdateWithoutProductInput = {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
-    completedTasks?: JsonNullValueInput | InputJsonValue
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    hasBuildLog?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutDailyLogsNestedInput
+    user?: UserUpdateOneRequiredWithoutDailyStreakNestedInput
   }
 
-  export type DailyLogUncheckedUpdateWithoutProjectInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    date?: DateTimeFieldUpdateOperationsInput | Date | string
-    completedTasks?: JsonNullValueInput | InputJsonValue
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type DailyLogUncheckedUpdateManyWithoutProjectInput = {
+  export type DailyStreakUncheckedUpdateWithoutProductInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
-    completedTasks?: JsonNullValueInput | InputJsonValue
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    hasBuildLog?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StreakUpdateWithoutProductInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    currentStreak?: IntFieldUpdateOperationsInput | number
-    bestStreak?: IntFieldUpdateOperationsInput | number
-    lastActiveDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    streakStart?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutStreaksNestedInput
-  }
-
-  export type StreakUncheckedUpdateWithoutProductInput = {
+  export type DailyStreakUncheckedUpdateManyWithoutProductInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    currentStreak?: IntFieldUpdateOperationsInput | number
-    bestStreak?: IntFieldUpdateOperationsInput | number
-    lastActiveDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    streakStart?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    hasBuildLog?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StreakUncheckedUpdateManyWithoutProductInput = {
+  export type AiLogUpdateWithoutProductInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ai_model?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    input?: JsonNullValueInput | InputJsonValue
+    output?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutAiLogsNestedInput
+  }
+
+  export type AiLogUncheckedUpdateWithoutProductInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    currentStreak?: IntFieldUpdateOperationsInput | number
-    bestStreak?: IntFieldUpdateOperationsInput | number
-    lastActiveDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    streakStart?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type UserUpdateWithoutActiveProjectInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    clerkId?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    username?: NullableStringFieldUpdateOperationsInput | string | null
-    discovery?: NullableStringFieldUpdateOperationsInput | string | null
-    role?: NullableStringFieldUpdateOperationsInput | string | null
-    bestStreakOverall?: IntFieldUpdateOperationsInput | number
+    ai_model?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    input?: JsonNullValueInput | InputJsonValue
+    output?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    products?: ProductUpdateManyWithoutUserNestedInput
-    buildLogs?: BuildLogUpdateManyWithoutUserNestedInput
-    dailyLogs?: DailyLogUpdateManyWithoutUserNestedInput
-    trial?: TrialUpdateOneWithoutUserNestedInput
-    streaks?: StreakUpdateManyWithoutUserNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutActiveProjectInput = {
+  export type AiLogUncheckedUpdateManyWithoutProductInput = {
     id?: StringFieldUpdateOperationsInput | string
-    clerkId?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    username?: NullableStringFieldUpdateOperationsInput | string | null
-    discovery?: NullableStringFieldUpdateOperationsInput | string | null
-    role?: NullableStringFieldUpdateOperationsInput | string | null
-    bestStreakOverall?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    products?: ProductUncheckedUpdateManyWithoutUserNestedInput
-    buildLogs?: BuildLogUncheckedUpdateManyWithoutUserNestedInput
-    dailyLogs?: DailyLogUncheckedUpdateManyWithoutUserNestedInput
-    trial?: TrialUncheckedUpdateOneWithoutUserNestedInput
-    streaks?: StreakUncheckedUpdateManyWithoutUserNestedInput
-  }
-
-  export type UserUncheckedUpdateManyWithoutActiveProjectInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    clerkId?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    username?: NullableStringFieldUpdateOperationsInput | string | null
-    discovery?: NullableStringFieldUpdateOperationsInput | string | null
-    role?: NullableStringFieldUpdateOperationsInput | string | null
-    bestStreakOverall?: IntFieldUpdateOperationsInput | number
+    userId?: StringFieldUpdateOperationsInput | string
+    ai_model?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    input?: JsonNullValueInput | InputJsonValue
+    output?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type TaskCreateManyFeatureInput = {
     id?: string
     title: string
+    estimatedHours?: number | null
+    status?: $Enums.TaskStatus
     dayNumber?: number | null
     completed?: boolean
   }
@@ -20625,6 +23008,8 @@ export namespace Prisma {
   export type TaskUpdateWithoutFeatureInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    estimatedHours?: NullableFloatFieldUpdateOperationsInput | number | null
+    status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     dayNumber?: NullableIntFieldUpdateOperationsInput | number | null
     completed?: BoolFieldUpdateOperationsInput | boolean
     dayTask?: DayTaskUpdateOneWithoutTaskNestedInput
@@ -20633,6 +23018,8 @@ export namespace Prisma {
   export type TaskUncheckedUpdateWithoutFeatureInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    estimatedHours?: NullableFloatFieldUpdateOperationsInput | number | null
+    status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     dayNumber?: NullableIntFieldUpdateOperationsInput | number | null
     completed?: BoolFieldUpdateOperationsInput | boolean
     dayTask?: DayTaskUncheckedUpdateOneWithoutTaskNestedInput
@@ -20641,8 +23028,62 @@ export namespace Prisma {
   export type TaskUncheckedUpdateManyWithoutFeatureInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    estimatedHours?: NullableFloatFieldUpdateOperationsInput | number | null
+    status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     dayNumber?: NullableIntFieldUpdateOperationsInput | number | null
     completed?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type DayTaskCreateManyBuildLogInput = {
+    id?: string
+    taskId: string
+    dayIndex: number
+    dueDate: Date | string
+    completedAt?: Date | string | null
+    category: string
+    description: string
+    status?: string
+    milestoneGoal?: string | null
+    shipCheck?: string | null
+  }
+
+  export type DayTaskUpdateWithoutBuildLogInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dayIndex?: IntFieldUpdateOperationsInput | number
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    category?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    milestoneGoal?: NullableStringFieldUpdateOperationsInput | string | null
+    shipCheck?: NullableStringFieldUpdateOperationsInput | string | null
+    task?: TaskUpdateOneRequiredWithoutDayTaskNestedInput
+  }
+
+  export type DayTaskUncheckedUpdateWithoutBuildLogInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    taskId?: StringFieldUpdateOperationsInput | string
+    dayIndex?: IntFieldUpdateOperationsInput | number
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    category?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    milestoneGoal?: NullableStringFieldUpdateOperationsInput | string | null
+    shipCheck?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type DayTaskUncheckedUpdateManyWithoutBuildLogInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    taskId?: StringFieldUpdateOperationsInput | string
+    dayIndex?: IntFieldUpdateOperationsInput | number
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    category?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    milestoneGoal?: NullableStringFieldUpdateOperationsInput | string | null
+    shipCheck?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
 

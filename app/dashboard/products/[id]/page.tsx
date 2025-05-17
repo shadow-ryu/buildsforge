@@ -1,18 +1,20 @@
+// Product Detail Page – Upgraded UI with Modern Design + Dark Purple Theme
+
 "use client";
+
 import React from "react";
+import Link from "next/link";
+import axios from "axios";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Product, Feature, Task } from "@/generated/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+
 import { CheckCircle } from "lucide-react";
-
-import { useEffect, useState } from "react";
-import { EditProductDetails } from "@/components/products/product-details-edit";
-import { EditFeatureModal } from "@/components/products/product-feature-task-edit";
-import { useRouter } from "next/navigation";
-
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -20,303 +22,159 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { LoadingScreen } from "@/components/loading-screen";
+import { EditProductDetails } from "@/components/products/product-details-edit";
 
-type Task = { id?: string; title: string };
-type Feature = {
-  id?: string;
-  name: string;
-  description: string;
+interface ProductFeatures extends Feature {
   tasks: Task[];
-};
-type Product = {
-  id: string;
-  name: string;
-  description: string;
-  problemStatement: string;
-  targetAudience: string;
-  userGoals: string;
-  uniqueValueProp?: string;
-  techStack: string;
-  inspirationApps?: string;
-  initialFeatures?: string;
-  deadline: string;
-  dailyCommitmentHrs: number;
-  features: Feature[];
-};
-async function generateRoadmap(productId: string, startDate: string) {
-  const res = await fetch(`/api/products/${productId}/roadmap/schedule`, {
-    method: "POST",
-    body: JSON.stringify({ productId, startDate }),
-    headers: {
-      "Content-Type": "application/json",
+}
+
+interface ProductDetail extends Product {
+  features: ProductFeatures[];
+}
+
+export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = React.use(params);
+  const queryClient = useQueryClient();
+  const [newDeadline, setNewDeadline] = React.useState<string | null>(null);
+  const [newStartDate, setNewStartDate] = React.useState<string | null>(null);
+  const [newDailyCommitmentHrs, setNewDailyCommitmentHrs] = React.useState<number | null>(null);
+
+  const { data, isLoading, error } = useQuery<ProductDetail, Error>({
+    queryKey: ["product", id],
+    queryFn: async () => {
+      const res = await axios.get(`/api/products/${id}`);
+      if (!res.data.success) throw new Error(res.data.error || "Failed to fetch product");
+      return res.data.product;
     },
   });
 
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Failed to generate roadmap");
+  const mvpMutation = useMutation({
+    mutationFn: async (productId: string) => {
+      const res = await axios.post(`/api/products/generate/mvp`, { productId });
+      if (!res.data.success) throw new Error(res.data.error);
+      return res.data;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["product", id] }),
+  });
 
-  return data;
-}
+  const roadmapMutation = useMutation({
+    mutationFn: async ({ productId, startDate, deadline, dailyCommitmentHrs }: { productId: string; startDate: string; deadline: string; dailyCommitmentHrs: number }) => {
+      const res = await axios.post(`/api/products/generate/roadmap`, {
+        productId,
+        startDate,
+        deadline,
+        dailyCommitmentHrs,
+      });
+      if (!res.data.success) throw new Error(res.data.error);
+      return res.data;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["product", id] }),
+  });
 
-export default function ProductDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = React.use(params);
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [newDeadline, setNewDeadline] = useState<string | null>(null);
-  const [newDailyCommitmentHrs, setNewDailyCommitmentHrs] = useState<
-    number | null
-  >(null);
-  const router = useRouter();
+  if (isLoading) return <LoadingScreen isLoading={true} message="Loading product..." header="" />;
+  if (error || !data) return <div className="text-center text-red-400 py-10">{error?.message || "Product not found."}</div>;
 
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-    fetch(`/api/products/${id}`)
-      .then(async (res) => {
-        const data = await res.json();
-        if (!data.success)
-          throw new Error(data.error || "Failed to fetch product");
-        setProduct(data.product);
-        setNewDeadline(data.product.deadline);
-        setNewDailyCommitmentHrs(data.product.dailyCommitmentHrs);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [id]);
+  const product = data;
+  const goals = typeof product.userGoals === "string" ? product.userGoals.split(",").map(g => g.trim()) : [];
+  const tech = typeof product.techStack === "string" ? product.techStack.split(",").map(t => t.trim()) : [];
 
-  if (loading) {
-    return (
-      <div className="max-w-4xl mx-auto py-12 px-2 md:px-0 text-center text-[#A1A1AA]">
-        Loading product...
-      </div>
-    );
-  }
-  if (error || !product) {
-    return (
-      <div className="max-w-4xl mx-auto py-12 px-2 md:px-0 text-center text-red-400">
-        {error || "Product not found."}
-      </div>
-    );
-  }
-
-  // Adapt backend fields to UI fields
-  const features =
-    product.features?.map((f) => ({
-      title: f.name,
-      id: f.id,
-      description: f.description,
-      tasks: f.tasks,
-    })) || [];
-
-  const goalsArray = Array.isArray(product.userGoals)
-    ? product.userGoals
-    : typeof product.userGoals === "string"
-    ? product.userGoals
-        .split(",")
-        .map((g: string) => g.trim())
-        .filter(Boolean)
-    : [];
-
-  const techStackArray = Array.isArray(product.techStack)
-    ? product.techStack
-    : typeof product.techStack === "string"
-    ? product.techStack
-        .split(",")
-        .map((t: string) => t.trim())
-        .filter(Boolean)
-    : [];
-
-  const handleSubmit = async () => {
-    try {
-      await generateRoadmap(id, newDeadline || "");
-      router.push(`/dashboard/products/${id}/roadmap`);
-    } catch (err) {
-      console.error("Error generating roadmap:", err);
-    }
+  const handleRoadmapSubmit = () => {
+    if (!newDeadline || !newStartDate) return;
+    roadmapMutation.mutate({ productId: id, startDate: newStartDate, deadline: newDeadline, dailyCommitmentHrs: newDailyCommitmentHrs || 2 });
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-12 px-2 md:px-0">
-      {/* Product Overview */}
-      <div className="mb-8">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-1">
-          <h1 className="text-3xl md:text-4xl font-bold text-[#F4F4F5] tracking-tight flex items-center gap-2">
-            {product.name}
-          </h1>
-          <div className="flex flex-row gap-2 mt-2 md:mt-0">
-            {/* <Button
-              variant="secondary"
-              className="bg-[#23262F] border border-[#2563eb] text-[#2563eb] hover:bg-[#2563eb]/10 font-semibold px-4 py-2 rounded-md"
-              onClick={() => router.push(`/dashboard/products/${id}/roadmap`)}
-            >
-              View Roadmap
-            </Button>
-            <Button
-              variant="secondary"
-              className="bg-[#23262F] border border-[#FBBF24] text-[#FBBF24] hover:bg-[#FBBF24]/10 font-semibold px-4 py-2 rounded-md"
-              onClick={() => alert("Build Logs (coming soon)")}
-            >
-              Build Logs
-            </Button> */}
-          </div>
-        </div>
-        <p className="text-lg text-[#A1A1AA] mb-2">{product.description}</p>
+    <div className="max-w-5xl mx-auto px-6 py-10 text-white bg-[#0f0f11]">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
+        <h1 className="text-4xl font-bold text-white tracking-tight">{product.name}</h1>
+        <EditProductDetails product={product} onSave={() => queryClient.invalidateQueries({ queryKey: ["product", id] })} />
       </div>
-      {/* Project Info */}
-      <Card className="mb-8 rounded-2xl shadow-sm bg-[#23262F] border-0">
-        <CardHeader className="pb-2 flex flex-row items-center justify-between">
+
+      <p className="text-gray-400 text-lg mb-6">{product.description}</p>
+
+      <Card className="bg-[#181A20] border border-purple-800/40 rounded-2xl mb-10">
+        <CardHeader><CardTitle className="text-xl text-white">📌 Project Overview</CardTitle></CardHeader>
+        <CardContent className="grid md:grid-cols-2 gap-6 text-sm">
           <div>
-            <CardTitle className="text-lg text-[#F4F4F5]">
-              Project Info
-            </CardTitle>
-          </div>
-          <EditProductDetails
-            product={product}
-            onSave={(data) => console.log("Saved data:", data)}
-          />
-        </CardHeader>
-        <CardContent className="pt-0 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <div className="mb-2">
-              <span className="font-semibold text-[#F4F4F5]">Problem</span>
-              <p className="text-[#A1A1AA] text-sm mt-1">
-                {product.problemStatement}
-              </p>
+            <p className="text-gray-400 mb-2"><span className="font-semibold text-white">Problem:</span> {product.problemStatement}</p>
+            <p className="text-gray-400 mb-4"><span className="font-semibold text-white">Audience:</span> {product.targetAudience}</p>
+            <div>
+              <span className="font-semibold text-white">Goals</span>
+              <ul className="mt-1 space-y-1 text-[#A1F59F]">
+                {goals.map((goal, i) => <li key={i} className="flex items-center gap-2"><CheckCircle size={16} className="text-[#A1F59F]" /> {goal}</li>)}
+              </ul>
             </div>
-            <div className="mb-2">
-              <span className="font-semibold text-[#F4F4F5]">Goals</span>
-              <ul className="mt-1 space-y-1">
-                {goalsArray.map((goal: string) => (
-                  <li
-                    key={goal}
-                    className="flex items-center gap-2 text-[#A1F59F] text-sm"
-                  >
-                    <CheckCircle size={16} className="text-[#A1F59F]" /> {goal}
+          </div>
+          <div>
+            <span className="font-semibold text-white">Tech Stack</span>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {tech.map((t, i) => <Badge key={i} variant="outline" className="border-purple-800 text-white">{t}</Badge>)}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {!product.isMvpGenerated && (
+        <Button className="bg-purple-600 hover:bg-purple-700 text-white mb-6" onClick={() => mvpMutation.mutate(id)} disabled={mvpMutation.isPending}>
+          {mvpMutation.isPending ? "Generating MVP..." : "Generate MVP"}
+        </Button>
+      )}
+
+      {product.isMvpGenerated && (
+        <Card className="bg-[#181A20] border border-purple-800/40 rounded-2xl mb-10">
+          <CardHeader><CardTitle className="text-xl">🚀 MVP Details</CardTitle></CardHeader>
+          <CardContent className="space-y-6">
+            <p className="text-gray-400"><span className="font-semibold text-white">Summary:</span> {product.mvpSummary}</p>
+            <div>
+              <h3 className="text-white font-semibold text-lg mb-2">Features</h3>
+              <ul className="space-y-4">
+                {product.features.map((feature) => (
+                  <li key={feature.id} className="bg-[#1a1a1d] border border-purple-900 p-4 rounded-xl">
+                    <h4 className="text-purple-300 font-medium mb-1">{feature.name}</h4>
+                    <p className="text-sm text-gray-400 mb-2">{feature.description}</p>
+                    <ul className="list-disc list-inside text-sm text-gray-300 space-y-1">
+                      {(feature as ProductFeatures).tasks.map(task => <li key={task.id}>{task.title}</li>)}
+                    </ul>
                   </li>
                 ))}
               </ul>
             </div>
-            <div>
-              <span className="font-semibold text-[#F4F4F5]">Tech Stack</span>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {techStackArray.map((tech: string) => (
-                  <span
-                    key={tech}
-                    className="bg-[#181A20] px-3 py-1 rounded-full text-xs text-[#F4F4F5] border border-[#23262F]"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div>
-            <span className="font-semibold text-[#F4F4F5]">Audience</span>
-            <p className="text-[#A1A1AA] text-sm mb-4 mt-1">
-              {product.targetAudience}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-      {/* MVP Features */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-[#F4F4F5] mb-4">MVP Features</h2>
-        <div className="space-y-6">
-          {features.map((feature, idx) => (
-            <Card
-              key={feature.title}
-              className="rounded-2xl shadow-sm bg-[#181A20] border-0"
-            >
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-lg text-[#FBBF24] flex items-center gap-2">
-                  {idx + 1}. {feature.title}
-                </CardTitle>
-                {/* @ts-expect-error unknown type */}
-                <EditFeatureModal feature={feature} productId={id} />
-              </CardHeader>
-              <CardContent className="pt-0 pb-4">
-                <p className="text-[#A1A1AA] mb-2 text-sm">
-                  {feature.description}
-                </p>
-                <ul className="space-y-2">
-                  {feature.tasks.map((task) => (
-                    <li
-                      key={task.id}
-                      className="flex items-center gap-2 text-[#A1F59F] text-sm"
-                    >
-                      <CheckCircle size={16} className="text-[#A1F59F]" />{" "}
-                      {task.title}
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {!product.isRoadmapGenerated && product.isMvpGenerated && (
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button className="bg-blue-600 text-white">Continue to Roadmap Setup</Button>
+          </DialogTrigger>
+          <DialogContent className="bg-[#181A20] border border-purple-700 text-white">
+            <DialogHeader>
+              <DialogTitle>🚧 Plan Your Launch Timeline</DialogTitle>
+              <DialogDescription>Set your start date, deadline, and how many hours per day you can commit.</DialogDescription>
+            </DialogHeader>
+            <form className="space-y-4">
+              <Input type="date" value={newStartDate || ""} onChange={(e) => setNewStartDate(e.target.value)} placeholder="Start Date" />
+              <Input type="date" value={newDeadline || ""} onChange={(e) => setNewDeadline(e.target.value)} placeholder="Deadline" />
+              <Input type="number" min="1" value={newDailyCommitmentHrs || ""} onChange={(e) => setNewDailyCommitmentHrs(Number(e.target.value))} placeholder="Daily Focus Hours (e.g. 2)" />
+              <DialogFooter>
+                <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700" onClick={(e) => { e.preventDefault(); handleRoadmapSubmit(); }} disabled={roadmapMutation.isPending}>
+                  {roadmapMutation.isPending ? "Generating..." : "Generate Roadmap"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {product.isRoadmapGenerated && (
+        <div className="mt-8">
+          <Link href={`/dashboard/products/${id}/roadmap`}>
+            <Button className="bg-purple-700 text-white hover:bg-purple-800">View Roadmap</Button>
+          </Link>
         </div>
-      </div>
-      <Dialog>
-        <DialogTrigger>Continue to Roadmap Setup</DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Plan Your Launch Timeline</DialogTitle>
-            <DialogDescription>
-              Pick your launch date and daily commitment. We’ll craft your
-              step-by-step build roadmap.
-            </DialogDescription>
-            <DialogContent>
-              <form className="space-y-4 mt-4">
-                <div>
-                  <label className="block text-sm text-[#A1A1AA] mb-1">
-                    Launch deadline
-                  </label>
-                  <Input
-                    type="date"
-                    value={newDeadline || ""}
-                    onChange={(e) => setNewDeadline(e.target.value)}
-                    className="w-full bg-[#23262F] border border-[#3F3F46] text-white px-3 py-2 rounded-lg outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm text-[#A1A1AA] mb-1">
-                    Daily focus hours
-                  </label>
-                  <Input
-                    type="number"
-                    min="1"
-                    value={newDailyCommitmentHrs || ""}
-                    onChange={(e) =>
-                      setNewDailyCommitmentHrs(Number(e.target.value))
-                    }
-                    className="w-full bg-[#23262F] border border-[#3F3F46] text-white px-3 py-2 rounded-lg outline-none"
-                    placeholder="e.g. 2"
-                  />
-                </div>
-
-                <DialogFooter>
-                  <DialogClose>Close</DialogClose>
-                  <Button
-                    type="submit"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleSubmit();
-                    }}
-                    className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 w-full"
-                  >
-                    🚀 Generate Roadmap
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
-      aƒ
+      )}
     </div>
   );
 }

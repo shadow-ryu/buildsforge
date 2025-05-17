@@ -21,8 +21,6 @@ export async function POST(req: NextRequest) {
     const existingUser = await prisma.earlyAccess.findFirst({
       where: {
         email: sanitizedEmail,
-        invited: true,
-        tier: "BETA",
       },
     });
 
@@ -35,6 +33,8 @@ export async function POST(req: NextRequest) {
     await prisma.earlyAccess.create({
       data: {
         email: sanitizedEmail,
+        tier: "BASE",
+        invited: true,
       },
     });
 
@@ -43,18 +43,38 @@ export async function POST(req: NextRequest) {
     await resend.emails.send({
       from: "BuildsForge <noreply@buildsforge.com>",
       to: sanitizedEmail,
-      subject: "Thanks for waiting!",
+      subject: "You're in — welcome to BuildsForge!",
       html: `
-          <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
-            <p>Hi ${"there"},</p>
-            <p>Thank you for waiting. We truly appreciate your patience and support as we build great things at <strong>BuildsForge</strong>.</p>
-            <p>🚀 Keep building,<br/>The BuildsForge Team</p>
-            <hr style="margin-top: 30px;"/>
-            <small>This email was sent by BuildsForge. If you have questions, contact us at support@buildsforge.com.</small>
-          </div>
-        `,
-      text: `Hi ${"there"},\n\nThank you for waiting. We appreciate your patience.\n\n- The BuildsForge Team`,
+        <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333; line-height: 1.6;">
+          <p>Hey ${"there"},</p>
+    
+          <p>You're officially on the waitlist for <strong>BuildsForge</strong> — the AI-powered build partner for solo founders 🚀</p>
+    
+          <p>While you're waiting, come join our <strong>Discord community</strong> where early builders like you are sharing feedback, ideas, and momentum:</p>
+    
+          <p>
+            👉 <a href="https://discord.gg/Fvn63fRfE7" target="_blank" style="color: #5865F2; font-weight: bold;">Join the BuildsForge Discord</a>
+          </p>
+    
+          <p>Thanks again for believing in the mission. We’ll reach out as soon as your beta access is ready.</p>
+    
+          <p>Keep building,<br/>– The BuildsForge Team</p>
+    
+          <hr style="margin-top: 30px;"/>
+          <small style="color: #777;">This email was sent by BuildsForge. Questions? Reach us at <a href="mailto:support@buildsforge.com">support@buildsforge.com</a></small>
+        </div>
+      `,
+      text: `Hey there,
+    
+    You're on the wait list for BuildsForge — thanks for joining us!
+    
+    Join the community on Discord: https://discord.gg/Fvn63fRfE7
+    
+    We’ll contact you when your beta access is ready.
+    
+    – The BuildsForge Team`,
     });
+
     return NextResponse.json({
       success: true,
       message: "you have joined waiting list",

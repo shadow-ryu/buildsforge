@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       where: { email },
     });
 
-    const newUser = await prisma.user.create({
+    await prisma.user.create({
       data: {
         clerkId: user.id,
         email,
@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
         discovery,
         role,
         username,
+        onboardingCompleted: true,
       },
     });
 
@@ -59,14 +60,14 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      await prisma.trial.create({
-        data: {
-          userId: newUser.id,
-          plan: "BETA",
-          startDate: new Date(),
-          endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days later
-        },
-      });
+      // await prisma.trial.create({
+      //   data: {
+      //     userId: newUser.id,
+      //     plan: "BETA",
+      //     startDate: new Date(),
+      //     endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days later
+      //   },
+      // });
     }
 
     // Update Clerk public metadata

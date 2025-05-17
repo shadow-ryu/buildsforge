@@ -1,33 +1,42 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, ArrowLeft, Flame, RefreshCcw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { CheckCircle, ArrowLeft, Flame } from "lucide-react";
+import { Button, buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
-function RoadmapDisplay({
-  days,
-  onTaskComplete,
-  id,
-  onShowBuildLog,
-}: {
-  days: {
-    dayIndex: number;
-    dueDate: string;
-    tasks: {
-      id: string;
-      title: string;
-      status: string;
-      description: string;
-      category: string;
-      completed?: boolean;
-    }[];
-  }[];
-  onTaskComplete: (dayIdx: number, taskId: string) => void;
+import { LoadingScreen } from "@/components/loading-screen";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import BuildLogForm from "@/components/build-log-form";
+import { cn } from "@/lib/utils";
+interface Task {
+  id: string;
+  title: string;
+  status: string;
+  description: string;
+  category: string;
+  completed?: boolean;
+  dayIndex?: number;
+  dayIdx?: number;
+  dueDate?: string;
+}
+
+interface Day {
+  dayIndex: number;
+  dueDate: string;
+  tasks: Task[];
+}
+
+interface RoadmapDisplayProps {
+  days: Day[];
+  onTaskComplete: (taskId: string) => void;
   id: string;
   onShowBuildLog: (dayIndex: number) => void;
-}) {
+}
+
+function RoadmapDisplay({ days, onTaskComplete, id }: RoadmapDisplayProps) {
   const totalCompleted = days.reduce(
     (acc, day) => acc + day.tasks.filter((task) => task.completed).length,
     0
@@ -35,161 +44,178 @@ function RoadmapDisplay({
 
   const today = new Date().toDateString();
   const todaysTasks = days
-    .flatMap((day, dayIdx) =>
-      day.tasks.map((task) => ({ ...task, dayIndex: day.dayIndex, dayIdx }))
+    .flatMap((day) =>
+      day.tasks.map((task) => ({
+        ...task,
+        dayIndex: day.dayIndex,
+        dueDate: day.dueDate,
+      }))
     )
-    .filter((task) => {
-      const taskDate = days.find((d) => d.dayIndex === task.dayIndex)?.dueDate;
-      return new Date(taskDate || today).toDateString() === today;
-    });
+    .filter((task) => new Date(task.dueDate).toDateString() === today);
 
   const restOfRoadmap = days.filter(
     (day) => new Date(day.dueDate).toDateString() !== today
   );
 
   return (
-    <div className="mx-auto py-8 px-4 md:px-6">
-      <div className="flex items-center justify-between text-center mb-6">
-        <div className="flex items-center gap-2">
+    <div className="mx-auto py-10  sm:p-6  w-full bg-[#0f0f11]">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
           <Link href={`/dashboard/products/${id}`}>
-            <Button variant="ghost" className="rounded-full">
+            <Button
+              variant="ghost"
+              className="text-white hover:text-purple-400"
+            >
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
-          <h2 className="text-3xl font-bold text-[#F4F4F5]">Project Roadmap</h2>
+          <h2 className="text-2xl font-bold text-white">Your Roadmap</h2>
         </div>
-        <div className="flex items-center gap-2 text-sm text-[#FBBF24] font-medium">
-          <Flame className="w-4 h-4" />
-          <span>{totalCompleted} Tasks Completed</span>
+        <div className="flex items-center gap-2 text-sm">
+          <Badge className="flex items-center gap-2 text-sm">
+            <Flame className="w-4 h-4 text-purple-800" />
+            <p className="text-white">
+              <span className="text-purple-400">{totalCompleted}</span>{" "}
+            </p>
+          </Badge>
+          <Dialog >
+            <DialogTrigger>
+              <div
+                className={cn(
+                  buttonVariants({ variant: "default" }),
+                  "text-white hover:text-purple-400 bg-purple-600 hover:bg-purple-700"
+                )}
+              >
+                Generate Build Log
+              </div>
+            </DialogTrigger>
+            <DialogContent className="bg-[#181A20] border border-purple-800/40 rounded-2xl">
+              <DialogHeader>
+                <DialogTitle className="text-xl text-white">Generate Build Log</DialogTitle>
+              </DialogHeader>
+              <BuildLogForm projectId={id} />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
-      {/* Today’s Tasks Section */}
       {todaysTasks.length > 0 && (
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold text-[#A1F59F] mb-4">
+        <section className="mb-12">
+          <h3 className="text-xl font-semibold text-white mb-4">
             Today&apos;s Focus
           </h3>
-          <ul className="space-y-4">
-            {todaysTasks.map((task, idx) => (
-              <li
-                key={idx}
-                className="p-3 rounded-xl bg-[#1C1C1F] border border-[#2D2F36] hover:border-[#A1F59F] transition"
+          <div className="space-y-4">
+            {todaysTasks.map((task) => (
+              <div
+                key={task.id}
+                className="p-4 rounded-xl bg-[#181A20] border border-[#2A2D36] hover:border-purple-600 transition"
               >
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
+                <div className="flex justify-between items-start gap-4">
+                  <div className="flex items-start gap-3">
                     <CheckCircle
-                      size={18}
+                      size={20}
                       className={
-                        task.completed ? "text-[#A1F59F]" : "text-gray-500"
+                        task.completed ? "text-purple-500" : "text-gray-500"
                       }
                     />
                     <div>
-                      <p className="text-sm font-medium text-[#F4F4F5]">
+                      <p className="text-white font-medium text-sm">
                         {task.title}
                       </p>
-                      <p className="text-xs text-[#A1A1AA] mt-1">
+                      <p className="text-gray-400 text-xs mt-1">
                         {task.description}
                       </p>
+                      <Badge className="mt-2 bg-purple-900 text-purple-300 border border-purple-700 text-xs">
+                        {task.category}
+                      </Badge>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge className="text-xs bg-[#23262F] text-[#A1A1AA] border border-[#333]">
-                      {task.category}
-                    </Badge>
+                  <Button
+                    size="sm"
+                    className="text-xs font-semibold bg-purple-600 hover:bg-purple-700"
+                    disabled={task.completed}
+                    onClick={() => onTaskComplete(task.id)}
+                  >
+                    {task.completed ? "Done" : "Mark Done"}
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        {restOfRoadmap.map((day) => (
+          <div
+            key={day.dayIndex}
+            className="rounded-2xl border border-purple-900 bg-gradient-to-br from-[#1f1f22] to-[#151516] p-5"
+          >
+            <div className="flex justify-between items-center mb-3">
+              <h4 className="text-white font-semibold">
+                Day {day.dayIndex} – {new Date(day.dueDate).toDateString()}
+              </h4>
+              <Badge
+                variant="outline"
+                className="text-purple-300 border-purple-700 text-xs"
+              >
+                {day.tasks.some((t) => t.completed)
+                  ? "In Progress"
+                  : "Upcoming"}
+              </Badge>
+            </div>
+            <div className="space-y-4">
+              {day.tasks.map((task) => (
+                <div
+                  key={task.id}
+                  className="p-4 bg-[#181A20] rounded-xl border border-[#2D2F36] hover:border-purple-600 transition"
+                >
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="flex gap-3">
+                      <CheckCircle
+                        size={20}
+                        className={
+                          task.completed ? "text-purple-500" : "text-gray-500"
+                        }
+                      />
+                      <div>
+                        <p className="text-sm font-medium text-white">
+                          {task.title}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {task.description}
+                        </p>
+                        <Badge className="mt-2 bg-purple-900 text-purple-300 border border-purple-700 text-xs">
+                          {task.category}
+                        </Badge>
+                      </div>
+                    </div>
                     <Button
                       size="sm"
-                      className="text-xs font-semibold px-3 py-1 bg-[#A1F59F] text-[#181A20] hover:bg-[#8be58c]"
+                      className="text-xs font-semibold bg-purple-600 hover:bg-purple-700"
                       disabled={task.completed}
-                      onClick={() => {
-                        console.log(task.id);
-                        onTaskComplete(task.dayIdx, task.id);
-                      }}
+                      onClick={() => onTaskComplete(task.id)}
                     >
                       {task.completed ? "Done" : "Mark Done"}
                     </Button>
                   </div>
                 </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Rest of Roadmap */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {restOfRoadmap.map((day, dayIdx) => (
-          <div
-            key={day.dayIndex}
-            className="bg-gradient-to-br from-[#1F1F22] to-[#121316] p-4 rounded-2xl border border-[#2A2D36] shadow-sm hover:shadow-md transition duration-300"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-semibold text-[#F4F4F5]">
-                Day {day.dayIndex} – {new Date(day.dueDate).toDateString()}
-              </h3>
-              <Badge
-                variant="outline"
-                className="text-xs text-[#A1F59F] border-[#A1F59F]"
-              >
-                {day.tasks.some((task) => task.completed)
-                  ? "In Progress"
-                  : "Upcoming"}
-              </Badge>
-            </div>
-            <ul className="space-y-4">
-              {day.tasks.map((task, idx) => (
-                <li
-                  key={idx}
-                  className="p-3 rounded-xl bg-[#1C1C1F] border border-[#2D2F36] hover:border-[#A1F59F] transition"
-                >
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle
-                        size={18}
-                        className={
-                          task.completed ? "text-[#A1F59F]" : "text-gray-500"
-                        }
-                      />
-                      <div>
-                        <p className="text-sm font-medium text-[#F4F4F5]">
-                          {task.title}
-                        </p>
-                        <p className="text-xs text-[#A1A1AA] mt-1">
-                          {task.description}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge className="text-xs bg-[#23262F] text-[#A1A1AA] border border-[#333]">
-                        {task.category}
-                      </Badge>
-                      <Button
-                        size="sm"
-                        className="text-xs font-semibold px-3 py-1 bg-[#A1F59F] text-[#181A20] hover:bg-[#8be58c]"
-                        disabled={task.completed}
-                        onClick={() => onTaskComplete(dayIdx, task.id)}
-                      >
-                        {task.completed ? "Done" : "Mark Done"}
-                      </Button>
-                    </div>
-                  </div>
-                </li>
               ))}
-            </ul>
-            <div className="flex justify-between items-center mt-4">
-              <Button
+            </div>
+            <div className="flex justify-between items-center mt-5">
+              {/* <Button
                 variant="ghost"
-                className="text-xs  flex items-center gap-1"
+                className="text-xs text-purple-300 hover:text-purple-400"
                 onClick={() => onShowBuildLog(day.dayIndex)}
               >
                 Generate Build Log
               </Button>
               <Button
-                variant="ghost"
-                className="text-xs  flex items-center gap-1"
+                variant="outline"
+                className="text-xs text-white border-purple-700 hover:border-purple-500"
               >
-                <RefreshCcw size={14} /> Revise Roadmap
-              </Button>
+                <RefreshCcw size={14} className="mr-1" /> Revise Roadmap
+              </Button> */}
             </div>
           </div>
         ))}
@@ -203,98 +229,73 @@ export default function ProductDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  // TODO: Replace this with real user ID from auth/session
   const { id } = React.use(params);
-  const [days, setDays] = useState<
-    {
-      dayIndex: number;
-      dueDate: string;
-      tasks: {
-        id: string;
-        title: string;
-        status: string;
-        description: string;
-        category: string;
-        completed?: boolean;
-      }[];
-    }[]
-  >([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
   // Build Log Modal State
-  const [buildLog, setBuildLog] = useState<{
+  const [buildLog, setBuildLog] = React.useState<{
     summary: string;
     tweet: string;
   } | null>(null);
-  const [buildLogLoading, setBuildLogLoading] = useState(false);
-  const [buildLogError, setBuildLogError] = useState<string | null>(null);
+  const [buildLogLoading, setBuildLogLoading] = React.useState(false);
+  const [buildLogError, setBuildLogError] = React.useState<string | null>(null);
 
-  useEffect(() => {
-    fetch(`/api/products/${id}/daily_task`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) setDays(data.days);
-      })
-      .finally(() => setLoading(false));
-  }, [id]);
+  // Fetch tasks with React Query
+  const { data: days = [], isLoading } = useQuery<Day[]>({
+    queryKey: ["roadmap", id],
+    queryFn: async () => {
+      const res = await axios.get(`/api/products/${id}/daily_task`);
+      if (!res.data.success)
+        throw new Error(res.data.error || "Failed to fetch roadmap");
+      return res.data.days;
+    },
+  });
 
-  if (loading) return <div>Loading tasks...</div>;
-
-  // Local handler for marking a task as complete (UI only)
-  async function onTaskComplete(dayIdx: number, taskIdx: number) {
-    console.log(dayIdx, taskIdx, "onTaskComplete", id);
-    // Get the task object using dayIdx and taskIdx from your state/data structure
-    const task = days[dayIdx].tasks[taskIdx];
-    // if (!task || task.completed) return;
-
-    // Replace these with actual values from your app's context/state // e.g. from session or props
-    const projectId = id; // e.g. from route or props
-
-    try {
-      const res = await fetch(`/api/products/${projectId}/task`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          projectId,
-          completedTasks: [task.id], // single task completion
-          notes: "", // or any notes you want to send
-        }),
+  // Task completion mutation
+  const completeMutation = useMutation({
+    mutationFn: async (taskId: string) => {
+      const res = await axios.post(`/api/products/${id}/daily_task/mark_complete`, {
+        dayTaskId: taskId,
+        productId: id,
       });
+      if (!res.data.success)
+        throw new Error(res.data.error || "Failed to complete task");
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["roadmap", id] });
+    },
+    onError: (error) => {
+      console.error("Error completing task:", error);
+      alert("Failed to complete task: " + error);
+    },
+  });
 
-      const data = await res.json();
-      if (data.success) {
-        // Update your local state/UI to mark the task as completed
-        setDays((prevDays) => {
-          const newDays = [...prevDays];
-          newDays[dayIdx].tasks[taskIdx].completed = true;
-          return newDays;
-        });
-      } else {
-        alert("Failed to complete task: " + data.error);
-      }
-    } catch (err) {
-      alert("Error completing task: " + err);
-    }
-  }
+  if (isLoading)
+    return (
+      <LoadingScreen isLoading={true} message="Loading roadmap..." header="" />
+    );
+
+  // Handler for task completion using React Query mutation
+  const handleTaskComplete = (taskId: string) => {
+    completeMutation.mutate(taskId);
+  };
 
   return (
     <div className="">
       <RoadmapDisplay
         id={id}
-        userId={id}
         days={days}
-        // @ts-expect-error unknown type
-        onTaskComplete={onTaskComplete}
+        onTaskComplete={handleTaskComplete}
         onShowBuildLog={async (dayIndex: number) => {
           setBuildLogLoading(true);
           setBuildLogError(null);
           try {
-            const res = await fetch(`/api/products/${id}/build-log`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ dayIndex, projectId: id }),
+            const res = await axios.post(`/api/products/${id}/build-log`, {
+              dayIndex,
+              productId: id,
             });
-            const data = await res.json();
+            const data = res.data;
             if (data.success) {
               setBuildLog({
                 summary: data.buildLog.summary,

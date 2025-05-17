@@ -126,10 +126,10 @@ exports.Prisma.UserScalarFieldEnum = {
   email: 'email',
   name: 'name',
   username: 'username',
+  onboardingCompleted: 'onboardingCompleted',
   discovery: 'discovery',
   role: 'role',
   bestStreakOverall: 'bestStreakOverall',
-  activeProjectId: 'activeProjectId',
   createdAt: 'createdAt'
 };
 
@@ -156,26 +156,27 @@ exports.Prisma.TrialScalarFieldEnum = {
 exports.Prisma.ProductScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  slug: 'slug',
   description: 'description',
   problemStatement: 'problemStatement',
   targetAudience: 'targetAudience',
   userGoals: 'userGoals',
   uniqueValueProp: 'uniqueValueProp',
+  isMvpGenerated: 'isMvpGenerated',
+  isRoadmapGenerated: 'isRoadmapGenerated',
+  currentStreak: 'currentStreak',
+  AllTimeBestStreak: 'AllTimeBestStreak',
+  active: 'active',
   techStack: 'techStack',
   inspirationApps: 'inspirationApps',
   initialFeatures: 'initialFeatures',
+  startDate: 'startDate',
   deadline: 'deadline',
   dailyCommitmentHrs: 'dailyCommitmentHrs',
   userId: 'userId',
+  mvpSummary: 'mvpSummary',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
-};
-
-exports.Prisma.RoadmapScalarFieldEnum = {
-  id: 'id',
-  mvpSummary: 'mvpSummary',
-  productId: 'productId',
-  createdAt: 'createdAt'
 };
 
 exports.Prisma.FeatureScalarFieldEnum = {
@@ -189,6 +190,8 @@ exports.Prisma.FeatureScalarFieldEnum = {
 exports.Prisma.TaskScalarFieldEnum = {
   id: 'id',
   title: 'title',
+  estimatedHours: 'estimatedHours',
+  status: 'status',
   dayNumber: 'dayNumber',
   completed: 'completed',
   featureId: 'featureId'
@@ -199,42 +202,65 @@ exports.Prisma.DayTaskScalarFieldEnum = {
   taskId: 'taskId',
   dayIndex: 'dayIndex',
   dueDate: 'dueDate',
+  completedAt: 'completedAt',
   category: 'category',
   description: 'description',
-  status: 'status'
-};
-
-exports.Prisma.DailyLogScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  projectId: 'projectId',
-  date: 'date',
-  completedTasks: 'completedTasks',
-  notes: 'notes',
-  createdAt: 'createdAt'
+  status: 'status',
+  milestoneGoal: 'milestoneGoal',
+  shipCheck: 'shipCheck',
+  buildLogId: 'buildLogId'
 };
 
 exports.Prisma.BuildLogScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  projectId: 'projectId',
+  productId: 'productId',
   logDate: 'logDate',
   tweet: 'tweet',
   dayIndex: 'dayIndex',
   summary: 'summary',
-  sourceTasks: 'sourceTasks',
   generatedAt: 'generatedAt'
 };
 
-exports.Prisma.StreakScalarFieldEnum = {
+exports.Prisma.DailyStreakScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   productId: 'productId',
-  currentStreak: 'currentStreak',
-  bestStreak: 'bestStreak',
-  lastActiveDate: 'lastActiveDate',
-  streakStart: 'streakStart',
-  updatedAt: 'updatedAt'
+  date: 'date',
+  hasBuildLog: 'hasBuildLog',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.AiLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  productId: 'productId',
+  ai_model: 'ai_model',
+  type: 'type',
+  input: 'input',
+  output: 'output',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.TokenUsageScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  purpose: 'purpose',
+  tokens: 'tokens',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.SettingsScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  dailyHours: 'dailyHours',
+  deadlineDays: 'deadlineDays',
+  aiModel: 'aiModel',
+  emailNudges: 'emailNudges',
+  isPublic: 'isPublic',
+  slug: 'slug',
+  bio: 'bio',
+  twitter: 'twitter'
 };
 
 exports.Prisma.SortOrder = {
@@ -269,18 +295,27 @@ exports.AccessTier = exports.$Enums.AccessTier = {
   PRO: 'PRO'
 };
 
+exports.TaskStatus = exports.$Enums.TaskStatus = {
+  backlog: 'backlog',
+  in_progress: 'in_progress',
+  done: 'done',
+  skipped: 'skipped',
+  blocked: 'blocked'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   EarlyAccess: 'EarlyAccess',
   Trial: 'Trial',
   Product: 'Product',
-  Roadmap: 'Roadmap',
   Feature: 'Feature',
   Task: 'Task',
   DayTask: 'DayTask',
-  DailyLog: 'DailyLog',
   BuildLog: 'BuildLog',
-  Streak: 'Streak'
+  DailyStreak: 'DailyStreak',
+  AiLog: 'AiLog',
+  TokenUsage: 'TokenUsage',
+  Settings: 'Settings'
 };
 
 /**

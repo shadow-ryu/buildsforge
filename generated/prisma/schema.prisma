@@ -16,25 +16,35 @@ enum AccessTier {
   PRO
 }
 
+enum TaskStatus {
+  backlog
+  in_progress
+  done
+  skipped
+  blocked
+}
+
 model User {
-  id       String  @id @default(cuid())
-  clerkId  String  @unique
-  email    String  @unique
-  name     String
-  username String? @unique
+  id                  String   @id @default(cuid())
+  clerkId             String   @unique
+  email               String   @unique
+  name                String
+  username            String?  @unique
+  onboardingCompleted Boolean  @default(false)
+  discovery           String?  @default("none")
+  role                String?  @default("founder")
+  bestStreakOverall   Int      @default(0)
+  createdAt           DateTime @default(now())
 
-  discovery         String?  @default("none")
-  role              String?  @default("founder")
-  bestStreakOverall Int      @default(0)
-  activeProjectId   String?
-  activeProject     Product? @relation("ActiveProject", fields: [activeProjectId], references: [id])
-  createdAt         DateTime @default(now())
+  // Relations
+  products    Product[]
+  buildLogs   BuildLog[]
+  trial       Trial?
+  DailyStreak DailyStreak[]
+  aiLogs      AiLog[]
+  tokenUsages TokenUsage[]
 
-  products  Product[]
-  buildLogs BuildLog[]
-  dailyLogs DailyLog[]
-  trial     Trial?
-  streaks   Streak[]
+  settings Settings?
 }
 
 model EarlyAccess {
@@ -59,38 +69,36 @@ model Trial {
 }
 
 model Product {
-  id   String @id @default(cuid())
-  name String
-
-  description        String
+  id                 String   @id @default(cuid())
+  name               String
+  slug               String   @unique
+  description        String?
   problemStatement   String
   targetAudience     String
   userGoals          String
   uniqueValueProp    String
-  techStack          String
-  inspirationApps    String
-  initialFeatures    String
+  isMvpGenerated     Boolean  @default(false)
+  isRoadmapGenerated Boolean  @default(false)
+  currentStreak      Int      @default(0)
+  AllTimeBestStreak  Int      @default(0)
+  active             Boolean  @default(false)
+  techStack          String?
+  inspirationApps    String?
+  initialFeatures    String?
+  startDate          DateTime @default(now())
   deadline           DateTime
-  dailyCommitmentHrs Float
+  dailyCommitmentHrs Float    @default(2.0)
   userId             String
-  user               User       @relation(fields: [userId], references: [id])
-  roadmap            Roadmap?
-  features           Feature[]
-  buildLogs          BuildLog[]
-  dailyLogs          DailyLog[]
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
-  streaks            Streak[]
+  user               User     @relation(fields: [userId], references: [id])
+  mvpSummary         String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
-  User User[] @relation("ActiveProject")
-}
-
-model Roadmap {
-  id         String   @id @default(cuid())
-  mvpSummary String
-  productId  String   @unique
-  product    Product  @relation(fields: [productId], references: [id])
-  createdAt  DateTime @default(now())
+  // Relations
+  features    Feature[]
+  buildLogs   BuildLog[]
+  DailyStreak DailyStreak[]
+  aiLogs      AiLog[]
 }
 
 model Feature {
@@ -104,63 +112,92 @@ model Feature {
 }
 
 model Task {
-  id        String   @id @default(cuid())
-  title     String
-  dayNumber Int?
-  completed Boolean  @default(false)
-  featureId String
-  feature   Feature  @relation(fields: [featureId], references: [id])
-  dayTask   DayTask?
+  id             String     @id @default(cuid())
+  title          String
+  estimatedHours Float? // Used for roadmap time planning
+  status         TaskStatus @default(backlog)
+  dayNumber      Int?
+  completed      Boolean    @default(false)
+  featureId      String
+  feature        Feature    @relation(fields: [featureId], references: [id])
+  dayTask        DayTask?
 }
 
 model DayTask {
-  id          String   @id @default(cuid())
-  taskId      String   @unique
-  task        Task     @relation(fields: [taskId], references: [id])
-  dayIndex    Int
-  dueDate     DateTime
-  category    String
-  description String
-  status      String   @default("backlog")
-}
-
-model DailyLog {
-  id             String   @id @default(cuid())
-  userId         String
-  user           User     @relation(fields: [userId], references: [id])
-  projectId      String
-  project        Product  @relation(fields: [projectId], references: [id])
-  date           DateTime
-  completedTasks Json
-  notes          String?
-  createdAt      DateTime @default(now())
+  id            String    @id @default(cuid())
+  taskId        String    @unique
+  task          Task      @relation(fields: [taskId], references: [id])
+  dayIndex      Int
+  dueDate       DateTime
+  completedAt   DateTime?
+  category      String
+  description   String
+  status        String    @default("backlog")
+  milestoneGoal String? // What this day is aiming to unlock
+  shipCheck     String? // What outcome proves real progress
+  buildLogId    String?
+  buildLog      BuildLog? @relation(fields: [buildLogId], references: [id])
 }
 
 model BuildLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  productId String // renamed from projectId to match Product model
+  product   Product  @relation(fields: [productId], references: [id])
+  logDate   DateTime
+  tweet     String?
+  dayIndex  Int      @default(1)
+  summary   String
+
+  generatedAt DateTime  @default(now())
+  DayTask     DayTask[]
+}
+
+model DailyStreak {
   id          String   @id @default(cuid())
   userId      String
   user        User     @relation(fields: [userId], references: [id])
-  projectId   String
-  project     Product  @relation(fields: [projectId], references: [id])
-  logDate     DateTime
-  tweet       String?
-  dayIndex    Int      @default(1)
-  summary     String
-  sourceTasks Json
-  generatedAt DateTime @default(now())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  date        DateTime @unique
+  hasBuildLog Boolean  @default(false)
+  createdAt   DateTime @default(now())
 }
 
-model Streak {
-  id             String   @id @default(cuid())
-  userId         String
-  user           User     @relation(fields: [userId], references: [id])
-  productId      String
-  product        Product  @relation(fields: [productId], references: [id])
-  currentStreak  Int      @default(0)
-  bestStreak     Int      @default(0)
-  lastActiveDate DateTime
-  streakStart    DateTime
-  updatedAt      DateTime @updatedAt
+model AiLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  ai_model  String
+  type      String // e.g. "mvp_generation", "roadmap", "build_log"
+  input     Json // Full GPT input
+  output    Json // GPT output stored for debugging/auditing
+  createdAt DateTime @default(now())
+}
 
-  @@unique([userId, productId])
+model TokenUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  purpose   String // e.g. "generate_mvp", "rebuild_log"
+  tokens    Int
+  createdAt DateTime @default(now())
+}
+
+model Settings {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  dailyHours   Float   @default(2.0)
+  deadlineDays Int     @default(14)
+  aiModel      String  @default("gpt-4")
+  emailNudges  Boolean @default(true)
+  isPublic     Boolean @default(false)
+  slug         String? @unique
+  bio          String? @default("")
+  twitter      String? @default("")
 }
