@@ -17,7 +17,7 @@ export function LoadingSpinner({
   return (
     <div
       className={cn(
-        "flex items-center justify-center",
+        "flex items-center justify-center h-full w-full",
         variant === "default" ? "text-[#F5F5DC]" : "text-primary/70",
         className
       )}
@@ -62,7 +62,7 @@ export function LoadingScreen({
 
   return (
     <div
-      className={className + " w-full h-full flex items-center justify-center"}
+      className={className + " w-full h-full flex items-center justify-center my-15"}
     >
       <div className="w-full h-full max-w-md px-6 flex flex-col items-center">
         <div

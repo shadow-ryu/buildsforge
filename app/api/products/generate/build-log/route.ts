@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { generateBuildLogPrompt } from "@/lib/ai_helpers/generate-prompts";
 import { auth } from "@clerk/nextjs/server";
 import { generateWithChatGPT } from "@/lib/ai_helpers/chatgptMvpGenerator";
 import { generateBuildLogPromptUpgraded } from "@/lib/ai_helpers/solo-prompt";

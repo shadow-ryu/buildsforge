@@ -75,7 +75,7 @@ function ManualMvpForm({ productId }: { productId: string }) {
   };
 
   const mutation = useMutation({
-    mutationFn: async (payload: any) => {
+    mutationFn: async (payload: { summary: string; features: object[] }) => {
       const res = await axios.post(`/api/products/${productId}/manual/mvp`, {
         productId,
         mvp_summary: payload.summary,
@@ -91,7 +91,7 @@ function ManualMvpForm({ productId }: { productId: string }) {
       setFeatures([{ name: "", description: "", tasks: [""], expanded: true }]);
       queryClient.invalidateQueries();
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error(err?.message || "Something went wrong");
     },
   });
@@ -226,11 +226,7 @@ function ManualMvpForm({ productId }: { productId: string }) {
             </div>
           ))}
 
-          <Button
-            onClick={addFeature}
-            variant="secondary"
-            className="w-full"
-          >
+          <Button onClick={addFeature} variant="secondary" className="w-full">
             + Add Another Feature
           </Button>
 

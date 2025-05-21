@@ -4,13 +4,37 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, ArrowLeft, Flame } from "lucide-react";
+import { CheckCircle, ArrowLeft, Flame, Trash } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 import { LoadingScreen } from "@/components/loading-screen";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import BuildLogForm from "@/components/build-log-form";
 import { cn } from "@/lib/utils";
+import ReorderRoadmap from "@/components/roadmaps/redo-roadmap";
+import { toast } from "sonner";
+
+// Backend DayTask type (minimal, for type conversion)
+type DayTask = {
+  id: string;
+  status: string;
+  taskId: string;
+  dayIndex: number;
+  dueDate: Date;
+  completedAt: Date | null;
+  category: string;
+  description: string;
+  milestoneGoal: string | null;
+  shipCheck: string | null;
+  buildLogId: string | null;
+  // Optionally, you can add frontend fields here if needed
+};
 interface Task {
   id: string;
   title: string;
@@ -34,15 +58,47 @@ interface RoadmapDisplayProps {
   onTaskComplete: (taskId: string) => void;
   id: string;
   onShowBuildLog: (dayIndex: number) => void;
+  handleRevise: () => void;
 }
+export function useDeleteTask(productId: string) {
+  const queryClient = useQueryClient();
 
-function RoadmapDisplay({ days, onTaskComplete, id }: RoadmapDisplayProps) {
+  return useMutation({
+    mutationFn: async (taskId: string) => {
+      const res = await axios.delete("/api/products/delete-task", {
+        data: {
+          productId,
+          taskId,
+        },
+      });
+      if (!res.data.success) {
+        throw new Error(res.data.error || "Delete failed");
+      }
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["roadmap", productId] });
+    },
+    onError: (error) => {
+      console.error("Delete failed", error);
+      alert("Failed to delete task");
+    },
+  });
+}
+function RoadmapDisplay({
+  days,
+  onTaskComplete,
+  id,
+  handleRevise,
+}: RoadmapDisplayProps) {
   const totalCompleted = days.reduce(
     (acc, day) => acc + day.tasks.filter((task) => task.completed).length,
     0
   );
 
-  const today = new Date().toDateString();
+  const today = new Date();
+  const todayStr = today.toDateString();
+
   const todaysTasks = days
     .flatMap((day) =>
       day.tasks.map((task) => ({
@@ -51,14 +107,44 @@ function RoadmapDisplay({ days, onTaskComplete, id }: RoadmapDisplayProps) {
         dueDate: day.dueDate,
       }))
     )
-    .filter((task) => new Date(task.dueDate).toDateString() === today);
+    .filter((task) => new Date(task.dueDate).toDateString() === todayStr);
 
   const restOfRoadmap = days.filter(
-    (day) => new Date(day.dueDate).toDateString() !== today
+    (day) => new Date(day.dueDate).toDateString() !== todayStr
   );
 
+  const deleteTask = useDeleteTask(id);
+
+  const getDayStatus = (day: Day, index: number): string => {
+    const dayDate = new Date(day.dueDate);
+    const allCompleted = day.tasks.every((t: Task) => t.completed);
+    const anyCompleted = day.tasks.some((t: Task) => t.completed);
+
+    if (dayDate.toDateString() === todayStr) {
+      return anyCompleted && !allCompleted
+        ? "In Progress"
+        : allCompleted
+        ? "Completed"
+        : "In Progress";
+    }
+
+    if (dayDate < today) {
+      return allCompleted ? "Completed" : "Missed Backlog";
+    }
+
+    const nextDay = days[index - 1]?.dueDate
+      ? new Date(days[index - 1].dueDate)
+      : null;
+
+    if (nextDay && nextDay > today && !allCompleted) {
+      return "Upcoming Backlog";
+    }
+
+    return allCompleted ? "Completed" : "Upcoming";
+  };
+
   return (
-    <div className="mx-auto py-10  sm:p-6  w-full bg-[#0f0f11]">
+    <div className="mx-auto py-10 sm:p-6 w-full bg-[#0f0f11]">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
           <Link href={`/dashboard/products/${id}`}>
@@ -71,32 +157,42 @@ function RoadmapDisplay({ days, onTaskComplete, id }: RoadmapDisplayProps) {
           </Link>
           <h2 className="text-2xl font-bold text-white">Your Roadmap</h2>
         </div>
-        <div className="flex items-center gap-2 text-sm">
-          <Badge className="flex items-center gap-2 text-sm">
-            <Flame className="w-4 h-4 text-purple-800" />
-            <p className="text-white">
-              <span className="text-purple-400">{totalCompleted}</span>{" "}
-            </p>
-          </Badge>
-          <Dialog >
-            <DialogTrigger>
-              <div
-                className={cn(
-                  buttonVariants({ variant: "default" }),
-                  "text-white hover:text-purple-400 bg-purple-600 hover:bg-purple-700"
-                )}
-              >
+      </div>
+      <div className="flex items-center gap-2 text-sm justify-end w-full">
+        <Badge className="flex items-center gap-2 text-sm">
+          <Flame className="w-4 h-4 text-purple-800" />
+          <p className="text-white">
+            <span className="text-purple-400">{totalCompleted}</span>
+          </p>
+        </Badge>
+        <Dialog>
+          <DialogTrigger>
+            <div
+              className={cn(
+                buttonVariants({ variant: "default" }),
+                "text-white hover:text-purple-400 bg-purple-600 hover:bg-purple-700"
+              )}
+            >
+              Generate Build Log
+            </div>
+          </DialogTrigger>
+          <DialogContent className="bg-[#181A20] border border-purple-800/40 rounded-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-xl text-white">
                 Generate Build Log
-              </div>
-            </DialogTrigger>
-            <DialogContent className="bg-[#181A20] border border-purple-800/40 rounded-2xl">
-              <DialogHeader>
-                <DialogTitle className="text-xl text-white">Generate Build Log</DialogTitle>
-              </DialogHeader>
-              <BuildLogForm projectId={id} />
-            </DialogContent>
-          </Dialog>
-        </div>
+              </DialogTitle>
+            </DialogHeader>
+            <BuildLogForm projectId={id} />
+          </DialogContent>
+        </Dialog>
+
+        <Button
+          variant="outline"
+          className="text-xs text-purple-400 hover:text-purple-700 border-purple-700 hover:border-purple-500"
+          onClick={handleRevise}
+        >
+          Revise Roadmap
+        </Button>
       </div>
 
       {todaysTasks.length > 0 && (
@@ -130,14 +226,25 @@ function RoadmapDisplay({ days, onTaskComplete, id }: RoadmapDisplayProps) {
                       </Badge>
                     </div>
                   </div>
-                  <Button
-                    size="sm"
-                    className="text-xs font-semibold bg-purple-600 hover:bg-purple-700"
-                    disabled={task.completed}
-                    onClick={() => onTaskComplete(task.id)}
-                  >
-                    {task.completed ? "Done" : "Mark Done"}
-                  </Button>
+                  <div className="flex gap-2 items-center">
+                    <Button
+                      size="sm"
+                      className="text-xs font-semibold bg-purple-600 hover:bg-purple-700"
+                      disabled={task.completed || deleteTask.isPending}
+                      onClick={() => onTaskComplete(task.id)}
+                    >
+                      {task.completed ? "Done" : "Mark Done"}
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => {
+                        deleteTask.mutate(task.id);
+                      }}
+                      disabled={deleteTask.isPending || task.completed}
+                    >
+                      <Trash className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -146,7 +253,7 @@ function RoadmapDisplay({ days, onTaskComplete, id }: RoadmapDisplayProps) {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-        {restOfRoadmap.map((day) => (
+        {restOfRoadmap.map((day, index) => (
           <div
             key={day.dayIndex}
             className="rounded-2xl border border-purple-900 bg-gradient-to-br from-[#1f1f22] to-[#151516] p-5"
@@ -159,9 +266,7 @@ function RoadmapDisplay({ days, onTaskComplete, id }: RoadmapDisplayProps) {
                 variant="outline"
                 className="text-purple-300 border-purple-700 text-xs"
               >
-                {day.tasks.some((t) => t.completed)
-                  ? "In Progress"
-                  : "Upcoming"}
+                {getDayStatus(day, index)}
               </Badge>
             </div>
             <div className="space-y-4">
@@ -190,32 +295,28 @@ function RoadmapDisplay({ days, onTaskComplete, id }: RoadmapDisplayProps) {
                         </Badge>
                       </div>
                     </div>
-                    <Button
-                      size="sm"
-                      className="text-xs font-semibold bg-purple-600 hover:bg-purple-700"
-                      disabled={task.completed}
-                      onClick={() => onTaskComplete(task.id)}
-                    >
-                      {task.completed ? "Done" : "Mark Done"}
-                    </Button>
+                    <div className="flex gap-2 items-center">
+                      <Button
+                        size="sm"
+                        className="text-xs font-semibold bg-purple-600 hover:bg-purple-700"
+                        disabled={task.completed}
+                        onClick={() => onTaskComplete(task.id)}
+                      >
+                        {task.completed ? "Done" : "Mark Done"}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          deleteTask.mutate(task.id);
+                        }}
+                        disabled={deleteTask.isPending || task.completed}
+                      >
+                        <Trash className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}
-            </div>
-            <div className="flex justify-between items-center mt-5">
-              {/* <Button
-                variant="ghost"
-                className="text-xs text-purple-300 hover:text-purple-400"
-                onClick={() => onShowBuildLog(day.dayIndex)}
-              >
-                Generate Build Log
-              </Button>
-              <Button
-                variant="outline"
-                className="text-xs text-white border-purple-700 hover:border-purple-500"
-              >
-                <RefreshCcw size={14} className="mr-1" /> Revise Roadmap
-              </Button> */}
             </div>
           </div>
         ))}
@@ -231,6 +332,30 @@ export default function ProductDetailPage({
 }) {
   const { id } = React.use(params);
   const queryClient = useQueryClient();
+  const [isRevising, setIsRevising] = React.useState(false);
+
+  const handleRevise = () => {
+    setIsRevising((prev) => !prev);
+  };
+
+  const handleSaveUpdatedRoadmap = async (updatedDays: Partial<DayTask>[] = []) => {
+    if (!updatedDays.length) return toast("No changes detected");
+    try {
+      const res = await axios.post(`/api/products/${id}/update_tasks`, {
+        productId: id,
+        updatedDays,
+      });
+      if (!res.data.success) {
+        throw new Error(res.data.error || "Failed to update tasks");
+      }
+      queryClient.invalidateQueries({ queryKey: ["roadmap", id] });
+      toast("Roadmap saved successfully");
+      setIsRevising(false);
+    } catch (error) {
+      console.error("Error updating tasks:", error);
+      toast("Failed to save roadmap updates");
+    }
+  };
 
   // Build Log Modal State
   const [buildLog, setBuildLog] = React.useState<{
@@ -254,10 +379,13 @@ export default function ProductDetailPage({
   // Task completion mutation
   const completeMutation = useMutation({
     mutationFn: async (taskId: string) => {
-      const res = await axios.post(`/api/products/${id}/daily_task/mark_complete`, {
-        dayTaskId: taskId,
-        productId: id,
-      });
+      const res = await axios.post(
+        `/api/products/${id}/daily_task/mark_complete`,
+        {
+          dayTaskId: taskId,
+          productId: id,
+        }
+      );
       if (!res.data.success)
         throw new Error(res.data.error || "Failed to complete task");
       return res.data;
@@ -280,37 +408,47 @@ export default function ProductDetailPage({
   const handleTaskComplete = (taskId: string) => {
     completeMutation.mutate(taskId);
   };
-
   return (
     <div className="">
-      <RoadmapDisplay
-        id={id}
-        days={days}
-        onTaskComplete={handleTaskComplete}
-        onShowBuildLog={async (dayIndex: number) => {
-          setBuildLogLoading(true);
-          setBuildLogError(null);
-          try {
-            const res = await axios.post(`/api/products/${id}/build-log`, {
-              dayIndex,
-              productId: id,
-            });
-            const data = res.data;
-            if (data.success) {
-              setBuildLog({
-                summary: data.buildLog.summary,
-                tweet: data.tweet,
+      {isRevising ? (
+        <ReorderRoadmap
+          initialDays={days}
+          onSave={(updatedDayTasks) => {
+            console.log(updatedDayTasks, days);
+            handleSaveUpdatedRoadmap(updatedDayTasks);
+          }}
+        />
+      ) : (
+        <RoadmapDisplay
+          id={id}
+          days={days}
+          onTaskComplete={handleTaskComplete}
+          handleRevise={handleRevise}
+          onShowBuildLog={async (dayIndex: number) => {
+            setBuildLogLoading(true);
+            setBuildLogError(null);
+            try {
+              const res = await axios.post(`/api/products/${id}/build-log`, {
+                dayIndex,
+                productId: id,
               });
-            } else {
-              setBuildLogError(data.error || "Unknown error");
+              const data = res.data;
+              if (data.success) {
+                setBuildLog({
+                  summary: data.buildLog.summary,
+                  tweet: data.tweet,
+                });
+              } else {
+                setBuildLogError(data.error || "Unknown error");
+              }
+            } catch (err) {
+              setBuildLogError((err as Error).toString());
+            } finally {
+              setBuildLogLoading(false);
             }
-          } catch (err) {
-            setBuildLogError((err as Error).toString());
-          } finally {
-            setBuildLogLoading(false);
-          }
-        }}
-      />
+          }}
+        />
+      )}
       {/* Build Log Modal */}
       {buildLogLoading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
