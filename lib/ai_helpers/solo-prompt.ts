@@ -56,7 +56,7 @@ Based on the following SaaS idea, create a **production-grade MVP plan** in JSON
 - **Billing system (e.g. Stripe)**
 
 ### Output format:
-\`\`\`json
+
 {
   "product_name": "<Brandable name>",
   "one_liner": "<What it does in 1 sentence>",
@@ -99,7 +99,7 @@ Based on the following SaaS idea, create a **production-grade MVP plan** in JSON
   ],
   "mvp_summary": "<In plain English: what this MVP does and why it matters>"
 }
-\`\`\`
+
 
 ### INPUT:
 \`\`\`json
@@ -111,6 +111,87 @@ Based on the following SaaS idea, create a **production-grade MVP plan** in JSON
   "additional_context": "${optionalFieldsSummary.replace(/\n\s+/g, " ")}"`
       : ""
   }
+\`\`\`
+`;
+}
+
+// prompt 1.5: MVP Plan (Real-World Upgrade  to use with existing features)
+export function generateMvpPrompt_RealWorld_With_Existing_Features(
+  input: SaaSInput,
+  existing: { name: string; description: string; tasks: string[] }[]
+): string {
+  return `
+You're acting as **two legendary builders** designing an MVP together:
+
+- **Marc Lou** (solo SaaS founder): ruthless about launching lean, fast, and validated. Focuses on value, not fluff.
+- **Theo Browne** (from t3.gg): deeply technical, focused on long-term maintainability, scalable systems, and developer velocity.
+
+You're helping them co-plan a production-grade MVP for a new SaaS tool.
+
+---
+
+### 🧠 The Problem:
+They’re already halfway through building. These **features and their tasks are already implemented or planned**:
+
+\`\`\`json
+${JSON.stringify(existing, null, 2)}
+\`\`\`
+
+- **DO NOT recreate or reword these.**
+- **DO NOT suggest tasks that already exist.**
+- Only suggest **net-new features** or tasks that add meaningful value.
+- If nothing new is needed — leave the feature list empty.
+
+---
+
+### 🚀 Your Mission:
+Build a lean, launchable MVP in **under 7 days**, using battle-tested tools.
+
+If core details are missing (like tech stack or goals), **fill them in based on best practices** for indie SaaS.
+
+---
+
+### 💡 Output Format:
+\`\`\`json
+{
+  "product_name": "Brandable short name",
+  "one_liner": "1-sentence value prop",
+  "core_pain": "Clear problem being solved",
+  "mvp_goal": "What are we validating?",
+  "stack": {
+    "frontend": "...",
+    "backend": "...",
+    "auth": "...",
+    "db": "...",
+    "infra": "...",
+    "ai": "..." // or null
+  },
+  "features": [
+    {
+      "rank": 1,
+      "feature": "Short name",
+      "description": "Why it matters and what it does",
+      "tasks": [
+        "Clear implementation task",
+        "Only if not already handled above"
+      ]
+    }
+    // Add more if truly needed
+  ],
+  "launch_plan": [
+    "Step-by-step lean validation",
+    "First user activation",
+    "How to know it's working"
+  ],
+  "mvp_summary": "Plain-English summary of what is being built and why it matters"
+}
+\`\`\`
+
+---
+
+### 📦 INPUT: Product Brief
+\`\`\`json
+${JSON.stringify(input, null, 2)}
 \`\`\`
 `;
 }
@@ -193,6 +274,7 @@ export function generateBuildLogPromptUpgraded({
   tasks,
   product,
   day,
+  notes,
 }: {
   tasks: {
     title: string;
@@ -208,45 +290,86 @@ export function generateBuildLogPromptUpgraded({
     techStack: string;
     inspirationApps: string;
   };
+  notes?: string;
 }) {
   return `
-  You're a solo founder building **${product.name}**.
-  Today is **Day ${day}** of your build journey.
-  
-  Write:
-  1. A **markdown build log** (raw, honest, gritty — like Theo). Up to 500 chars.
-  2. A **tweet-style summary** (punchy, Marc Lou tone, max 200 chars).
-  
-  ---
-  
-  ### Product:
-  - ${product.description}
-  - ${product.uniqueValueProp}
-  - Stack: ${product.techStack}
-  - Inspiration: ${product.inspirationApps}
-  
-  ### Completed:
-  ${
-    tasks
-      .filter((t) => t.status === "completed")
-      .map((t) => `- ${t.title}${t.category ? ` [${t.category}]` : ""}`)
-      .join("\n") || "- None"
-  }
-  
-  ### Missed:
-  ${
-    tasks
-      .filter((t) => t.status === "missed")
-      .map((t) => `- ${t.title}${t.category ? ` [${t.category}]` : ""}`)
-      .join("\n") || "- None"
-  }
-  
-  Return JSON:
-  \`\`\`json
-  {
-    "markdown": "Day ${day} of building ${product.name} – raw log here",
-    "tweet": "short summary for X"
-  }
-  \`\`\`
-  `;
+You're a solo founder documenting your journey building **${product.name}**.
+
+It’s **Day ${day}**, and your goal is to share a raw, reflective update — one that others can *feel*.
+
+Write two things:
+
+---
+
+## 1. Markdown Build Log  
+**Style**: journal entry or daily dev log  
+**Tone**: honest, sharp, builder-first  
+**Min Length**: 800 characters  
+
+**Guidelines**:
+- Group by what moved the needle (e.g. UI, infra, shipping win)  
+- Mention blockers or tradeoffs if real  
+- No swearing or excessive filler — authenticity matters more than edge  
+- Don’t pretend to be perfect, just be *real*
+
+${
+  notes
+    ? `\n### 📝 Notes:\n\n> ${notes.trim().replace(/\n/g, "\n> ")}\n`
+    : ""
+}
+
+---
+
+## 2. Tweet Summary  
+**Style**: punchy Marc Lou-style  
+**Max Length**: 200 characters  
+
+**Tips**:
+- Highlight ONE big win or insight  
+- Must sound like a builder talking to other indie hackers  
+- Add 2–3 relevant hashtags  
+- Show energy, momentum, or clarity (no corporate fluff)
+
+---
+
+## 🛠 Product Context
+- **Name**: ${product.name}  
+- **What it does**: ${product.description}  
+- **Why it matters**: ${product.uniqueValueProp}  
+- **Stack**: ${product.techStack}  
+- **Inspired by**: ${product.inspirationApps}
+
+---
+
+## ✅ Completed
+${
+  tasks
+    .filter((t) => t.status === "completed")
+    .map((t) => `- **${t.title}**${t.category ? ` _[${t.category}]_` : ""}`)
+    .join("\n") || "- None"
+}
+
+## ❌ Missed
+${
+  tasks
+    .filter((t) => t.status === "missed")
+    .map((t) => `- **${t.title}**${t.category ? ` _[${t.category}]_` : ""}`)
+    .join("\n") || "- None"
+}
+
+---
+
+## 📤 Return in JSON only
+
+\`\`\`json
+{
+  "markdown": "Day ${day} of building ${product.name} – log here",
+  "tweet": "short tweet summary"
+}
+\`\`\`
+
+---
+
+Keep it lean, keep it real. Write like someone will read this 1 year from now and *feel exactly where you were*.
+`;
 }

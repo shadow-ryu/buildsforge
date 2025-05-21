@@ -65,7 +65,7 @@ export default function BuildLogForm({ projectId }: BuildLogFormProps) {
         projectId,
         dayIndex,
         notes,
-        selectedTaskIds: selectedTasks || completedTasks.map((task) => task.id),
+        selectedTaskIds:[ ...selectedTasks, ...completedTasks.map((task) => task.id)],
       });
       if (!res.data.success)
         throw new Error(res.data.error || "Failed to generate build log");

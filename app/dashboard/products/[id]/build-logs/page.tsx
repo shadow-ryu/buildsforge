@@ -94,7 +94,7 @@ export default function BuildLogsPage() {
                 <Separator className="bg-purple-900" />
                 <CardContent>
                   <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-line">
-                    {log.summary}
+                    {log.tweet}
                   </p>
                 </CardContent>
               </Card>

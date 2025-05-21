@@ -35,19 +35,19 @@ export async function generateWithChatGPT({
     content = content
       .replace(/^```(?:json)?\s*/, "")
       .replace(/```$/, "")
-      .trim();
+      .trim()
   }
 
   // Attempt to parse the output JSON
-  let parsed;
-  try {
-    parsed = JSON.parse(content);
-  } catch (err) {
-    console.error("Failed to parse GPT response as JSON", err);
-    throw new Error("Invalid JSON from GPT response");
-  }
+  // let parsed;
+  // try {
+  //   parsed = JSON.parse(content);
+  // } catch (err) {
+  //   console.error("Failed to parse GPT response as JSON", err);
+  //   throw new Error("Invalid JSON from GPT response");
+  // }
 
-  console.log("Parsed GPT Output:\n", parsed);
+  // console.log("Parsed GPT Output:\n", parsed);
 
   // 🔥 Background DB log
   void (async () => {
@@ -79,5 +79,5 @@ export async function generateWithChatGPT({
     }
   })();
 
-  return parsed;
+  return content;
 }

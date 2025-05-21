@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { generateBuildLogPrompt } from "@/lib/ai_helpers/generate-prompts";
 import { auth } from "@clerk/nextjs/server";
 import { generateWithChatGPT } from "@/lib/ai_helpers/chatgptMvpGenerator";
+import { generateBuildLogPromptUpgraded } from "@/lib/ai_helpers/solo-prompt";
 
 export async function POST(req: NextRequest) {
   try {
@@ -65,7 +66,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-
+ console.log({selectedTaskIds},"selectedTaskIds")
     // ✅ Also include explicitly selected dayTasks
     const additionalTasks = selectedTaskIds.length
       ? await prisma.dayTask.findMany({
@@ -78,9 +79,27 @@ export async function POST(req: NextRequest) {
         })
       : [];
 
-    const prompt = generateBuildLogPrompt({
-      // @ts-expect-error Type 'DayTask' is not assignable to type 'Task'
+    console.log({
       tasks: additionalTasks,
+      notes,
+      day: dayIndex,
+      product: {
+        name: project.name,
+        description: project.description || "",
+        uniqueValueProp: project.uniqueValueProp || "",
+        techStack: project.techStack || "",
+        inspirationApps: project.inspirationApps || "",
+      },
+    },"input");
+    const formattedTasks = additionalTasks.map((t) => ({
+      title: t.description ?? "Untitled Task",
+      description: t.description,
+      category: t.category,
+      status: t.status,
+    }));
+    const prompt = generateBuildLogPromptUpgraded({
+      // @ts-expect-error Type 'DayTask' is not assignable to type 'Task'
+      tasks: formattedTasks,
       notes,
       day: dayIndex,
       product: {
@@ -99,12 +118,14 @@ export async function POST(req: NextRequest) {
       type: "build_log",
     });
 
-    console.log("GPT Output:\n", response);
+ const data = JSON.parse(response);
+    console.log("GPT Output:\n", data["markdown"]);
+    console.log("GPT Output:\n", data["tweet"]);
     const buildLog = await prisma.buildLog.create({
       data: {
         logDate,
-        summary: response.markdown.trim(),
-        tweet: response.tweet.trim(),
+        summary: data["markdown"].trim(),
+        tweet: data["tweet"].trim(),
         generatedAt: new Date(),
         dayIndex,
         userId: user.id,

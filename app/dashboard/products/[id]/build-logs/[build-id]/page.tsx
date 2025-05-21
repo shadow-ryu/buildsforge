@@ -10,7 +10,9 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { DayTask } from "@/generated/prisma";
+import { DayTask } from "@prisma/client";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 // Fetcher function
 async function fetchBuildLog(buildLogId: string) {
@@ -62,21 +64,53 @@ function BuildLogContent({ buildLogId }: { buildLogId: string }) {
       transition={{ duration: 0.3 }}
       className="space-y-6"
     >
-      <Card className="bg-[#1a1b22] border border-purple-900">
-        <CardHeader>
-          <CardTitle className="text-xl text-purple-400">
-            Day {buildLog.dayIndex}: {format(new Date(buildLog.logDate), "PPP")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-gray-300 mb-2">{buildLog.summary}</p>
+      <div className=" ">
+        <CardContent className="prose text-white">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[]}
+            components={{
+              h1: ({ node, ...props }) => (
+                <h1 className="text-3xl font-bold mt-6 mb-4" {...props} />
+              ),
+              h2: ({ node, ...props }) => (
+                <h2 className="text-2xl font-semibold mt-6 mb-3" {...props} />
+              ),
+              h3: ({ node, ...props }) => (
+                <h3 className="text-xl font-semibold mt-5 mb-2" {...props} />
+              ),
+              h4: ({ node, ...props }) => (
+                <h4 className="text-lg font-medium mt-4 mb-2" {...props} />
+              ),
+              p: ({ node, ...props }) => (
+                <p className="mb-3 leading-relaxed text-gray-300" {...props} />
+              ),
+              ul: ({ node, ...props }) => (
+                <ul
+                  className="list-disc list-inside mb-3 ml-4 text-gray-300"
+                  {...props}
+                />
+              ),
+              li: ({ node, ...props }) => <li className="mb-1" {...props} />,
+              strong: ({ node, ...props }) => (
+                <strong className="text-white font-semibold" {...props} />
+              ),
+              hr: () => <hr className="my-6 border-purple-700" />,
+              em: ({ node, ...props }) => (
+                <em className="italic text-gray-400" {...props} />
+              ),
+            }}
+          >
+            {buildLog.summary}
+          </ReactMarkdown>
+
           {buildLog.tweet && (
             <p className="text-sm italic text-purple-500">
               Tweet: {buildLog.tweet}
             </p>
           )}
         </CardContent>
-      </Card>
+      </div>
 
       <div>
         <h2 className="text-lg font-semibold text-white mb-2">
