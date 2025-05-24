@@ -322,7 +322,7 @@ ${
 
 ## 2. Tweet Summary  
 **Style**: punchy Marc Lou-style  
-**Max Length**: 200 characters  
+**Min Length**: 400 characters  
 
 **Tips**:
 - Highlight ONE big win or insight  

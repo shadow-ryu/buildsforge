@@ -8,13 +8,14 @@ const isPublicRoute = createRouteMatcher([
   "/",
   "/coming_soon(.*)",
   "/api/join-waitlist(.*)",
-  "/api/stripe/webhook(.*)",
+  "/api/webhook(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req: NextRequest) => {
   if (isPublicRoute(req)) return;
 
   const { userId } = await auth();
+  
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

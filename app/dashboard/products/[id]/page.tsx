@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
-import { CheckCircle, Trash } from "lucide-react";
+import { CheckCircle, MoreHorizontal, Trash } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +27,13 @@ import { EditProductDetails } from "@/components/products/product-details-edit";
 import { Feature, Product, Task } from "@prisma/client";
 import ManualMvpForm from "@/components/products/manual-mvp-form";
 import { EditFeatureModal } from "@/components/products/product-feature-task-edit";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useUsage } from "@/hooks/use-usage";
 
 interface ProductFeatures extends Feature {
   id: string;
@@ -51,6 +58,7 @@ export default function ProductDetailPage({
   const [newDailyCommitmentHrs, setNewDailyCommitmentHrs] = React.useState<
     number | null
   >(null);
+  const { blocked, isLoading: usageLoading } = useUsage();
 
   const { data, isLoading, error } = useQuery<ProductDetail, Error>({
     queryKey: ["product", id],
@@ -115,7 +123,7 @@ export default function ProductDetailPage({
       queryClient.invalidateQueries({ queryKey: ["product", id] }),
   });
 
-  if (isLoading)
+  if (isLoading || usageLoading)
     return (
       <LoadingScreen isLoading={true} message="Loading product..." header="" />
     );
@@ -145,23 +153,130 @@ export default function ProductDetailPage({
       dailyCommitmentHrs: newDailyCommitmentHrs || 2,
     });
   };
-  console.log("Product:", product.features);
 
   const handleDeleteFeature = (featureId: string) => {
     deleteFeatureMutation.mutate(featureId);
   };
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10 text-white bg-[#0f0f11]">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
+    <div className="max-w-full mx-auto px-6 py-10 text-white bg-[#0f0f11]">
+      <div className="grid grid-cols-1 md:grid-cols-2 items-start justify-between gap-4 mb-8">
         <h1 className="text-4xl font-bold text-white tracking-tight">
           {product.name}
         </h1>
-        <EditProductDetails
-          product={product}
-          onSave={() =>
-            queryClient.invalidateQueries({ queryKey: ["product", id] })
-          }
-        />
+        <div className="flex  gap-4 w-full items-end justify-end">
+          <div className="flex gap-4  justify-end">
+            <Button
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+              onClick={() => mvpMutation.mutate(id)}
+              disabled={mvpMutation.isPending || blocked?.mvp}
+            >
+              {mvpMutation.isPending
+                ? "Generating MVP..."
+                : product.isMvpGenerated
+                ? "Regenerate MVP"
+                : "Generate MVP"}
+            </Button>
+
+            <ManualMvpForm productId={id} />
+          </div>
+          <EditProductDetails
+            product={product}
+            onSave={() =>
+              queryClient.invalidateQueries({
+                queryKey: ["product", id],
+              })
+            }
+          />
+          <div className="flex items-center gap-4 justify-end">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="flex gap-2 items-center text-black"
+                >
+                  <MoreHorizontal size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {product.isRoadmapGenerated && (
+                  <DropdownMenuItem asChild>
+                    <Link href={`/dashboard/products/${id}/roadmap`}>
+                      <span>Roadmap</span>
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+
+                <DropdownMenuItem asChild>
+                  <Link href={`/dashboard/products/${id}/build-logs`}>
+                    <span>Build Logs</span>
+                  </Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem asChild>
+                  <Link href={`/dashboard/products/${id}/settings`}>
+                    <span>Settings</span>
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            {!product.isRoadmapGenerated && product.features.length > 0 && (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="bg-blue-600 text-white">
+                    Continue to Roadmap Setup
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-[#181A20] border border-purple-700 text-white">
+                  <DialogHeader>
+                    <DialogTitle>🚧 Plan Your Launch Timeline</DialogTitle>
+                    <DialogDescription>
+                      Set your start date, deadline, and how many hours per day
+                      you can commit.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form className="space-y-4">
+                    <Input
+                      type="date"
+                      value={newStartDate || ""}
+                      onChange={(e) => setNewStartDate(e.target.value)}
+                      placeholder="Start Date"
+                    />
+                    <Input
+                      type="date"
+                      value={newDeadline || ""}
+                      onChange={(e) => setNewDeadline(e.target.value)}
+                      placeholder="Deadline"
+                    />
+                    <Input
+                      type="number"
+                      min="1"
+                      value={newDailyCommitmentHrs || ""}
+                      onChange={(e) =>
+                        setNewDailyCommitmentHrs(Number(e.target.value))
+                      }
+                      placeholder="Daily Focus Hours (e.g. 2)"
+                    />
+                    <DialogFooter>
+                      <Button
+                        type="submit"
+                        className="w-full bg-purple-600 hover:bg-purple-700"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleRoadmapSubmit();
+                        }}
+                        disabled={roadmapMutation.isPending}
+                      >
+                        {roadmapMutation.isPending
+                          ? "Generating..."
+                          : "Generate Roadmap"}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            )}
+          </div>
+        </div>
       </div>
 
       <p className="text-gray-400 text-lg mb-6">{product.description}</p>
@@ -210,18 +325,6 @@ export default function ProductDetailPage({
         </CardContent>
       </Card>
 
-      <div className="flex gap-4 mb-6">
-        {!product.isMvpGenerated && (
-          <Button
-            className="bg-purple-600 hover:bg-purple-700 text-white mb-6"
-            onClick={() => mvpMutation.mutate(id)}
-            disabled={mvpMutation.isPending}
-          >
-            {mvpMutation.isPending ? "Generating MVP..." : "Generate MVP"}
-          </Button>
-        )}
-        <ManualMvpForm productId={id} />
-      </div>
       {product.features.length && (
         <Card className="bg-[#181A20] border border-purple-800/40 rounded-2xl mb-10">
           <CardHeader>
@@ -271,73 +374,6 @@ export default function ProductDetailPage({
             </div>
           </CardContent>
         </Card>
-      )}
-
-      {!product.isRoadmapGenerated && product.features.length > 0 && (
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button className="bg-blue-600 text-white">
-              Continue to Roadmap Setup
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="bg-[#181A20] border border-purple-700 text-white">
-            <DialogHeader>
-              <DialogTitle>🚧 Plan Your Launch Timeline</DialogTitle>
-              <DialogDescription>
-                Set your start date, deadline, and how many hours per day you
-                can commit.
-              </DialogDescription>
-            </DialogHeader>
-            <form className="space-y-4">
-              <Input
-                type="date"
-                value={newStartDate || ""}
-                onChange={(e) => setNewStartDate(e.target.value)}
-                placeholder="Start Date"
-              />
-              <Input
-                type="date"
-                value={newDeadline || ""}
-                onChange={(e) => setNewDeadline(e.target.value)}
-                placeholder="Deadline"
-              />
-              <Input
-                type="number"
-                min="1"
-                value={newDailyCommitmentHrs || ""}
-                onChange={(e) =>
-                  setNewDailyCommitmentHrs(Number(e.target.value))
-                }
-                placeholder="Daily Focus Hours (e.g. 2)"
-              />
-              <DialogFooter>
-                <Button
-                  type="submit"
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleRoadmapSubmit();
-                  }}
-                  disabled={roadmapMutation.isPending}
-                >
-                  {roadmapMutation.isPending
-                    ? "Generating..."
-                    : "Generate Roadmap"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-      )}
-
-      {product.isRoadmapGenerated && (
-        <div className="mt-8">
-          <Link href={`/dashboard/products/${id}/roadmap`}>
-            <Button className="bg-purple-700 text-white hover:bg-purple-800">
-              View Roadmap
-            </Button>
-          </Link>
-        </div>
       )}
     </div>
   );

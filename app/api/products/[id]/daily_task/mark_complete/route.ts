@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
+import { updateStreak } from "@/lib/streak-system/update-streaks";
 
 export async function POST(req: NextRequest) {
   try {
@@ -50,7 +51,6 @@ export async function POST(req: NextRequest) {
         { status: 404 }
       );
     }
-    console.log(task, "task");
 
     const updatedTask = await prisma.dayTask.update({
       where: { id: dayTaskId },
@@ -60,39 +60,14 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Kick off background streak update without blocking response
+    // ✅ Kick off streak update using centralized function
     (async () => {
       try {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const existingStreak = await prisma.dailyStreak.findFirst({
-          where: {
-            userId: user.id,
-            productId: productId,
-            date: today,
-          },
+        await updateStreak({
+          userId: user.id,
+          productId,
+          date: new Date(),
         });
-
-        if (!existingStreak) {
-          await prisma.dailyStreak.create({
-            data: {
-              userId: user.id,
-              productId: productId,
-              date: today,
-
-              hasBuildLog: false,
-            },
-          });
-          await prisma.product.update({
-            where: { id: productId },
-            data: {
-              currentStreak: {
-                increment: 1,
-              },
-            },
-          });
-        }
       } catch (err) {
         console.error("Background streak update failed:", err);
       }

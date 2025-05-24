@@ -52,13 +52,13 @@ export function NavMain({
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton
-                      className={`text-white ${hoverTextClass}`}
+                      className={`text-white hover:text-black`}
                       tooltip={item.title}
                     >
                       {item.icon && (
                         <item.icon className={`text-purple-400 ${hoverTextClass}`} />
                       )}
-                      <span className={`text-gray-500 ${hoverTextClass}`}>
+                      <span className={` ${hoverTextClass}`}>
                         {item.title}
                       </span>
                       <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -69,7 +69,7 @@ export function NavMain({
                       {item?.items?.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton
-                            className={`text-gray-500 ${hoverTextClass} hover:text-purple-500`}
+                            className={`text-white ${hoverTextClass} hover:text-purple-500`}
                             asChild
                           >
                             <a href={subItem.url}>
@@ -97,7 +97,7 @@ export function NavMain({
                     {item.icon && (
                       <item.icon className={`text-purple-400 ${hoverTextClass}`} />
                     )}
-                    <span className={`text-gray-500 ${hoverTextClass}`}>
+                    <span className={` ${hoverTextClass}`}>
                       {item.title}
                     </span>
                   </a>

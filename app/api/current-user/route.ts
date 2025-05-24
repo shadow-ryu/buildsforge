@@ -2,7 +2,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { $Enums } from "@/generated/prisma";
+import { checkAndResetStreaks } from "@/lib/streak-system/update-streaks";
+import { $Enums } from "@prisma/client";
 
 export async function GET() {
   try {
@@ -46,6 +47,11 @@ export async function GET() {
     const activeProject = user.products.find((p: { active: any }) => p.active);
     const streak = activeProject?.currentStreak || 0;
 
+    // ✅ Call streak reset logic
+    if (activeProject) {
+      await checkAndResetStreaks(user.id, activeProject.id);
+    }
+
     const todayTasks =
       activeProject?.features.flatMap((feature: { tasks: any[] }) =>
         feature.tasks
@@ -85,7 +91,6 @@ export async function GET() {
           }))
       ) || [];
 
-    // Check and update user's best overall streak if the active product has a better one
     if (
       activeProject?.currentStreak &&
       activeProject.currentStreak > user.bestStreakOverall
@@ -97,7 +102,6 @@ export async function GET() {
         },
       });
 
-      // Update the in-memory value so response is accurate
       user.bestStreakOverall = activeProject.currentStreak;
     }
 
@@ -142,123 +146,6 @@ export async function GET() {
       isNewUser: user.products.length === 0,
     };
 
-    (async () => {
-      try {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const yesterday = new Date(today);
-        yesterday.setDate(today.getDate() - 1);
-
-        const dayBeforeYesterday = new Date(today);
-        dayBeforeYesterday.setDate(today.getDate() - 2);
-
-        const [yesterdayStreak, twoDaysAgoStreak] = await Promise.all([
-          prisma.dailyStreak.findFirst({
-            where: {
-              userId: user.id,
-              productId: activeProject?.id,
-              date: yesterday,
-            },
-          }),
-          prisma.dailyStreak.findFirst({
-            where: {
-              userId: user.id,
-              productId: activeProject?.id,
-              date: dayBeforeYesterday,
-            },
-          }),
-        ]);
-
-        const product = await prisma.product.findUnique({
-          where: { id: activeProject?.id, userId: user.id },
-        });
-        if (!product) {
-          return;
-        }
-
-        // Missed 2 days in a row: reset
-        if (!yesterdayStreak && !twoDaysAgoStreak) {
-          const bestStreak = Math.max(
-            product.currentStreak,
-            product.AllTimeBestStreak
-          );
-
-          await prisma.product.update({
-            where: { id: activeProject?.id },
-            data: {
-              currentStreak: 0,
-              AllTimeBestStreak: bestStreak,
-              losingStreak: false, // Reset state
-            },
-          });
-
-          await prisma.dailyStreak.deleteMany({
-            where: {
-              userId: user.id,
-              productId: activeProject?.id,
-            },
-          });
-
-          return;
-        }
-
-        // Missed only yesterday: mark as losing streak
-        if (!yesterdayStreak) {
-          await prisma.product.update({
-            where: { id: activeProject?.id },
-            data: {
-              losingStreak: true,
-            },
-          });
-        }
-
-        // Add today's streak if not exists
-        const existingTodayStreak = await prisma.dailyStreak.findFirst({
-          where: {
-            userId: user.id,
-            productId: activeProject?.id,
-            date: today,
-          },
-        });
-
-        if (!existingTodayStreak && activeProject?.id) {
-          await prisma.dailyStreak.create({
-            data: {
-              userId: user.id,
-              productId: activeProject?.id,
-              date: today,
-              hasBuildLog: false,
-            },
-          });
-
-          // Streak continues
-          if (yesterdayStreak) {
-            await prisma.product.update({
-              where: { id: product.id },
-              data: {
-                currentStreak: {
-                  increment: 1,
-                },
-                losingStreak: false,
-              },
-            });
-          } else {
-            // New streak starts
-            await prisma.product.update({
-              where: { id: product.id },
-              data: {
-                currentStreak: 1,
-                losingStreak: false,
-              },
-            });
-          }
-        }
-      } catch (err) {
-        console.error("Background streak update failed:", err);
-      }
-    })();
-
     return NextResponse.json({
       success: true,
       data: {
@@ -291,7 +178,6 @@ export async function GET() {
   }
 }
 
-// Utility: progress = % of dayTasks with completedAt
 function calculateProgress(product: {
   features: ({
     tasks: ({

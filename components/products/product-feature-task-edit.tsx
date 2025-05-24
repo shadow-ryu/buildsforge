@@ -81,9 +81,9 @@ export function EditFeatureModal({
         <Button
           variant="outline"
           size="sm"
-          className="gap-1 text-[#FBBF24] border-[#FBBF24] hover:bg-[#FBBF24]/10"
+          className="gap-1"
         >
-          <Pencil size={16} /> Edit Feature + Tasks
+          <Pencil size={16} /> Edit
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-[#181A20] text-[#F4F4F5]">

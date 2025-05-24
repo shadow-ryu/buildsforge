@@ -5,17 +5,6 @@ import { currentUser } from "@clerk/nextjs/server";
 export async function POST(req: NextRequest) {
   try {
     const { name, role, discovery, username } = await req.json();
-
-    console.log(
-      "Received data for MVP generation:",
-      name,
-      role,
-      discovery,
-      username
-    );
-
-    // Get current user via Clerk
-    console.log("Current user:", await currentUser());
     const user = await currentUser();
 
     if (!name || !username || !user) {
@@ -31,12 +20,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ onboardingComplete: true }, { status: 200 });
     }
 
-    // Check waitlist
     const email = user.emailAddresses[0].emailAddress;
-    const waitListUser = await prisma.earlyAccess.findUnique({
-      where: { email },
-    });
 
+    // Generate slug and bio
+    const slug = username.toLowerCase();
+    const bio = `I’m @${username}, building something awesome on BuildsForge 🚀`;
+
+    // Create new user with slug and bio
     const newUser = await prisma.user.create({
       data: {
         clerkId: user.id,
@@ -46,50 +36,22 @@ export async function POST(req: NextRequest) {
         role,
         username,
         onboardingCompleted: true,
+        settings: {
+          create: {
+            preferredAiModel: "gemini-2.5-flash",
+            slug,
+            bio,
+          },
+        },
+      },
+      include: {
+        settings: true,
       },
     });
 
-    if (waitListUser) {
-      await prisma.earlyAccess.update({
-        where: { email },
-        data: {
-          claimed: true,
-          invited: true,
-          claimedAt: new Date(),
-          tier: "BETA",
-        },
-      });
-
-      await prisma.trial.create({
-        data: {
-          userId: newUser.id,
-          plan: "BETA",
-          startDate: new Date(),
-          endDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 days later
-        },
-      });
-    }else{
-      await prisma.trial.create({
-        data: {
-          userId: newUser.id,
-
-          startDate: new Date(),
-          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days later
-        },
-      });
-    }
-
-
-    // Update Clerk public metadata
-    // Update the current session's claims so the user is not redirected to onboarding again
-    // Find the current session for this user
-
-    return NextResponse.json({ onboardingComplete: true }, { status: 200 });
+    return NextResponse.json({ onboardingComplete: true, user: newUser }, { status: 200 });
   } catch (error) {
     console.error("Error creating user:", error);
-    return NextResponse.json(
-      { error: error },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error }, { status: 500 });
   }
 }

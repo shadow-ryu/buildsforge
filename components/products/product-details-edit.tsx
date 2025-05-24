@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+
 import { Product } from "@prisma/client";
 
 export function EditProductDetails({
@@ -44,8 +44,8 @@ export function EditProductDetails({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="">
-          <Pencil size={16} /> Edit Details
+        <Button variant="ghost" className="text-md  w-fit">
+          Edit
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-[#181A20]">

@@ -1,41 +1,38 @@
 import { startOfDay, subDays, isSameDay } from "date-fns";
 import prisma from "@/lib/prisma";
 
-/**
- * Input parameters for updating a user's streak
- */
 interface UpdateStreakParams {
   userId: string;
   productId: string;
   date: Date;
 }
 
-/**
- * Updates a user's streak for a specific product
- * Creates a new streak entry if one doesn't exist for today
- * Updates the product's current streak and all-time best streak
- */
-async function updateStreak({ userId, productId, date }: UpdateStreakParams): Promise<void> {
+export async function updateStreak({
+  userId,
+  productId,
+  date,
+}: UpdateStreakParams): Promise<void> {
   const today = startOfDay(date);
 
-  // Create or update today's streak entry
+  // Create today's streak entry if it doesn't exist
   await prisma.dailyStreak.upsert({
     where: {
-      date: today,
+      userId_productId_date: {
+        userId,
+        productId,
+        date: today,
+      },
     },
-    update: {
-      completedTaskCount: { increment: 1 },
-    },
+    update: {}, // No fields to update
     create: {
       userId,
       productId,
       date: today,
-      completedTaskCount: 1,
     },
   });
 
-  // Get last 2 streak entries to check for continuity
-  const lastTwoDays = await prisma.dailyStreak.findMany({
+  // Check last 2 days for continuity
+  const lastTwoStreaks = await prisma.dailyStreak.findMany({
     where: {
       userId,
       productId,
@@ -50,9 +47,8 @@ async function updateStreak({ userId, productId, date }: UpdateStreakParams): Pr
   });
 
   const yesterday = subDays(today, 1);
-  const hasYesterday = lastTwoDays.some((s: { date: Date }) => isSameDay(s.date, yesterday));
+  const hadYesterday = lastTwoStreaks.some((s) => isSameDay(s.date, yesterday));
 
-  // Handle streak count
   const product = await prisma.product.findUnique({
     where: { id: productId },
     select: {
@@ -61,22 +57,74 @@ async function updateStreak({ userId, productId, date }: UpdateStreakParams): Pr
     },
   });
 
-  if (!product) {
-    throw new Error(`Product with ID ${productId} not found`);
-  }
+  if (!product) throw new Error(`Product with ID ${productId} not found`);
 
-  // Calculate new streak values
-  const newStreak: number = hasYesterday ? product.currentStreak + 1 : 1;
-  const newBest: number = Math.max(product.AllTimeBestStreak, newStreak);
+  const newStreak = hadYesterday ? product.currentStreak + 1 : 1;
+  const newBest = Math.max(product.AllTimeBestStreak, newStreak);
 
-  // Update product with new streak values
   await prisma.product.update({
     where: { id: productId },
     data: {
       currentStreak: newStreak,
       AllTimeBestStreak: newBest,
+      losingStreak: false,
     },
   });
 }
 
-export default updateStreak;
+export async function checkAndResetStreaks(
+  userId: string,
+  productId: string
+): Promise<void> {
+  const today = startOfDay(new Date());
+  const yesterday = subDays(today, 1);
+  const dayBeforeYesterday = subDays(today, 2);
+
+  const [yesterdayStreak, twoDaysAgoStreak, product] = await Promise.all([
+    prisma.dailyStreak.findFirst({
+      where: { userId, productId, date: yesterday },
+    }),
+    prisma.dailyStreak.findFirst({
+      where: { userId, productId, date: dayBeforeYesterday },
+    }),
+    prisma.product.findUnique({
+      where: { id: productId },
+      select: { currentStreak: true, AllTimeBestStreak: true },
+    }),
+  ]);
+
+  if (!product) throw new Error("Product not found");
+
+  const best = Math.max(product.currentStreak, product.AllTimeBestStreak);
+
+  // Missed 2 days in a row: full reset
+  if (!yesterdayStreak && !twoDaysAgoStreak) {
+    await Promise.all([
+      prisma.product.update({
+        where: { id: productId },
+        data: {
+          currentStreak: 0,
+          AllTimeBestStreak: best,
+          losingStreak: false,
+        },
+      }),
+      prisma.dailyStreak.deleteMany({
+        where: {
+          userId,
+          productId,
+        },
+      }),
+    ]);
+    return;
+  }
+
+  // Missed only yesterday: mark as losing
+  if (!yesterdayStreak) {
+    await prisma.product.update({
+      where: { id: productId },
+      data: {
+        losingStreak: true,
+      },
+    });
+  }
+}

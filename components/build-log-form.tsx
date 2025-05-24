@@ -30,7 +30,6 @@ export default function BuildLogForm({ projectId }: BuildLogFormProps) {
   const [search, setSearch] = useState("");
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
 
-
   const { data: completedTasks = [], isLoading: tasksLoading } = useQuery<
     Task[]
   >({
@@ -47,7 +46,7 @@ export default function BuildLogForm({ projectId }: BuildLogFormProps) {
     Task[]
   >({
     queryKey: ["searchTasks", projectId, search],
-    enabled: search.length > 2 && completedTasks.length === 0,
+    enabled: search.length > 2 ,
     queryFn: async () => {
       const res = await axios.get(
         `/api/products/${projectId}/daily_task/search?query=${search}`
@@ -58,14 +57,22 @@ export default function BuildLogForm({ projectId }: BuildLogFormProps) {
   });
 
   const buildLogMutation = useMutation({
-    
     mutationFn: async (notes: string) => {
-      console.log("Selected task IDs:", selectedTasks,completedTasks, dayIndex, projectId);
+      console.log(
+        "Selected task IDs:",
+        selectedTasks,
+        completedTasks,
+        dayIndex,
+        projectId
+      );
       const res = await axios.post(`/api/products/generate/build-log`, {
         projectId,
         dayIndex,
         notes,
-        selectedTaskIds:[ ...selectedTasks, ...completedTasks.map((task) => task.id)],
+        selectedTaskIds: [
+          ...selectedTasks,
+          ...completedTasks.map((task) => task.id),
+        ],
       });
       if (!res.data.success)
         throw new Error(res.data.error || "Failed to generate build log");
@@ -97,83 +104,79 @@ export default function BuildLogForm({ projectId }: BuildLogFormProps) {
         />
       </div>
       <div>
-        {tasksLoading ? (
+        {tasksLoading && (
           <div className="flex items-center justify-center py-4">
             <Loader2 className="w-5 h-5 text-purple-500 animate-spin" />
             <span className="ml-2 text-sm text-gray-400">Loading tasks...</span>
           </div>
-        ) : completedTasks.length > 0 ? (
-          <ScrollArea className="h-40">
-            <ul className="space-y-2 max-h-60 overflow-y-auto">
-              {completedTasks.map((task) => (
-                <li
-                  key={task.id}
-                  className="flex items-start gap-2 bg-[#121316] p-2 rounded-md border border-[#2A2D36]"
-                >
-                  <CheckCircle className="text-purple-500 w-4 h-4 mt-1" />
-                  <div>
-                    <p className="text-sm text-white font-medium">
-                      {task.title}
-                    </p>
-                    <p className="text-xs text-gray-400">{task.description}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </ScrollArea>
-        ) : (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Search className="w-4 h-4 text-gray-400" />
-              <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search missed tasks..."
-                className="bg-[#121316] border border-[#2A2D36] text-white"
-              />
-            </div>
-            {searchLoading ? (
-              <div className="text-sm text-gray-500 py-2">Searching...</div>
-            ) : (
-              <ScrollArea className="h-40">
-                <ul className="max-h-48 overflow-y-auto space-y-2">
-                  {searchResults.map((task) => (
-                    <li
-                      key={task.id}
-                      className={`p-2 rounded-md border flex justify-between items-start text-sm bg-[#121316] border-[#2A2D36] cursor-pointer ${
-                        selectedTasks.includes(task.id)
-                          ? "border-purple-500"
-                          : "hover:border-purple-700"
-                      }`}
-                      onClick={() => {
-                        setSelectedTasks((prev) =>
-                          prev.includes(task.id)
-                            ? prev.filter((id) => id !== task.id)
-                            : [...prev, task.id]
-                        );
-                      }}
-                    >
-                      <div>
-                        <p className="text-white font-medium">
-                          {task.task?.title}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          {task.description}
-                        </p>
-                        <Badge className="text-xs bg-purple-900 border border-purple-700 text-purple-400 mt-1">
-                          {task.category}
-                        </Badge>
-                      </div>
-                      {selectedTasks.includes(task.id) && (
-                        <CheckCircle className="text-purple-500 w-4 h-4" />
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </ScrollArea>
-            )}
-          </div>
         )}
+        <ScrollArea className="max-h-40 h-12">
+          <ul className="space-y-2 max-h-60 overflow-y-auto">
+            {completedTasks.map((task) => (
+              <li
+                key={task.id}
+                className="flex items-start gap-2 bg-[#121316] p-2 rounded-md border border-[#2A2D36]"
+              >
+                <CheckCircle className="text-purple-500 w-4 h-4 mt-1" />
+                <div>
+                  <p className="text-sm text-white font-medium">{task.title}</p>
+                  <p className="text-xs text-gray-400">{task.description}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </ScrollArea>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Search className="w-4 h-4 text-gray-400" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search missed tasks..."
+              className="bg-[#121316] border border-[#2A2D36] text-white"
+            />
+          </div>
+          {searchLoading ? (
+            <div className="text-sm text-gray-500 py-2">Searching...</div>
+          ) : (
+            <ScrollArea className="h-40">
+              <ul className="max-h-48 overflow-y-auto space-y-2">
+                {searchResults.map((task) => (
+                  <li
+                    key={task.id}
+                    className={`p-2 rounded-md border flex justify-between items-start text-sm bg-[#121316] border-[#2A2D36] cursor-pointer ${
+                      selectedTasks.includes(task.id)
+                        ? "border-purple-500"
+                        : "hover:border-purple-700"
+                    }`}
+                    onClick={() => {
+                      setSelectedTasks((prev) =>
+                        prev.includes(task.id)
+                          ? prev.filter((id) => id !== task.id)
+                          : [...prev, task.id]
+                      );
+                    }}
+                  >
+                    <div>
+                      <p className="text-white font-medium">
+                        {task.task?.title}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {task.description}
+                      </p>
+                      <Badge className="text-xs bg-purple-900 border border-purple-700 text-purple-400 mt-1">
+                        {task.category}
+                      </Badge>
+                    </div>
+                    {selectedTasks.includes(task.id) && (
+                      <CheckCircle className="text-purple-500 w-4 h-4" />
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </ScrollArea>
+          )}
+        </div>
       </div>
 
       <div>

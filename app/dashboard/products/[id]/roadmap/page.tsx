@@ -19,6 +19,8 @@ import BuildLogForm from "@/components/build-log-form";
 import { cn } from "@/lib/utils";
 import ReorderRoadmap from "@/components/roadmaps/redo-roadmap";
 import { toast } from "sonner";
+import DayTaskCreateForm from "@/components/products/daytask-create-form";
+import { useUsage } from "@/hooks/use-usage";
 
 // Backend DayTask type (minimal, for type conversion)
 type DayTask = {
@@ -59,6 +61,7 @@ interface RoadmapDisplayProps {
   id: string;
   onShowBuildLog: (dayIndex: number) => void;
   handleRevise: () => void;
+  blocked: { buildlog: boolean };
 }
 export function useDeleteTask(productId: string) {
   const queryClient = useQueryClient();
@@ -90,6 +93,7 @@ function RoadmapDisplay({
   onTaskComplete,
   id,
   handleRevise,
+  blocked,
 }: RoadmapDisplayProps) {
   const totalCompleted = days.reduce(
     (acc, day) => acc + day.tasks.filter((task) => task.completed).length,
@@ -166,7 +170,7 @@ function RoadmapDisplay({
           </p>
         </Badge>
         <Dialog>
-          <DialogTrigger>
+          <DialogTrigger disabled={blocked.buildlog}>
             <div
               className={cn(
                 buttonVariants({ variant: "default" }),
@@ -193,6 +197,7 @@ function RoadmapDisplay({
         >
           Revise Roadmap
         </Button>
+        <DayTaskCreateForm productId={id} />
       </div>
 
       {todaysTasks.length > 0 && (
@@ -333,12 +338,15 @@ export default function ProductDetailPage({
   const { id } = React.use(params);
   const queryClient = useQueryClient();
   const [isRevising, setIsRevising] = React.useState(false);
+  const { blocked, isLoading: usageLoading } = useUsage();
 
   const handleRevise = () => {
     setIsRevising((prev) => !prev);
   };
 
-  const handleSaveUpdatedRoadmap = async (updatedDays: Partial<DayTask>[] = []) => {
+  const handleSaveUpdatedRoadmap = async (
+    updatedDays: Partial<DayTask>[] = []
+  ) => {
     if (!updatedDays.length) return toast("No changes detected");
     try {
       const res = await axios.post(`/api/products/${id}/update_tasks`, {
@@ -399,7 +407,7 @@ export default function ProductDetailPage({
     },
   });
 
-  if (isLoading)
+  if (isLoading || usageLoading)
     return (
       <LoadingScreen isLoading={true} message="Loading roadmap..." header="" />
     );
@@ -421,6 +429,7 @@ export default function ProductDetailPage({
       ) : (
         <RoadmapDisplay
           id={id}
+          blocked={blocked}
           days={days}
           onTaskComplete={handleTaskComplete}
           handleRevise={handleRevise}

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Home, Rocket, Settings, Zap } from "lucide-react";
+import { Home, Rocket, Settings } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import {
@@ -11,6 +11,7 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
+import Image from "next/image";
 
 const buildsForgeNav = {
   navMain: [
@@ -65,7 +66,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     >
       <SidebarHeader className="bg-[#0f0f11]  tborder-b border-purple-900/20">
         <div className="flex items-center gap-2  justify-start">
-          <Zap className="h-6 w-6 text-purple-500" />
+          <Image
+            src="/builds-forge.png"
+            className="w-8 h-8"
+            alt="Logo"
+            width={24}
+            height={24}
+          />
           {open && <span className="font-bold text-white">BuildsForge</span>}
         </div>
       </SidebarHeader>
