@@ -19,7 +19,6 @@ export async function GET() {
     const user = await prisma.user.findUnique({
       where: { clerkId: userId },
       include: {
-        trial: true,
         products: {
           include: {
             features: {
@@ -151,7 +150,6 @@ export async function GET() {
       data: {
         user: limitedUserDetails,
         streak,
-        trial: user.trial,
         activeProject: activeProject
           ? {
               id: activeProject.id,

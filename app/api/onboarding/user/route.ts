@@ -43,13 +43,25 @@ export async function POST(req: NextRequest) {
             bio,
           },
         },
+        subscriptions: {
+          create: {
+            lemonSqueezyCustomerId: "free-" + user.id,
+            lemonSqueezySubscriptionId: "free-plan" + user.id,
+            lemonSqueezyProductId: "111111",
+            planName: "Free",
+            status: "active",
+          },
+        },
       },
       include: {
         settings: true,
       },
     });
 
-    return NextResponse.json({ onboardingComplete: true, user: newUser }, { status: 200 });
+    return NextResponse.json(
+      { onboardingComplete: true, user: newUser },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error creating user:", error);
     return NextResponse.json({ error: error }, { status: 500 });

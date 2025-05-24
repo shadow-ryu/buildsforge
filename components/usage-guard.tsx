@@ -6,22 +6,26 @@ import { usePathname } from "next/navigation";
 export function UsageGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const usage = useUsage();
-  console.log(usage, "plams");
-  // Early return if loading or context not ready yet
+
+  // Show nothing while usage context is loading
   if (usage.loading) return null;
 
   const isOnDashboard =
     pathname.includes("/dashboard") &&
     !pathname.includes("/plans") &&
     !pathname.includes("/settings");
+
+  // Safely extract blocked features
   // @ts-expect-error blocked
-  const overLimitFeatures = Object.entries(usage.blocked)
-    .filter(([isBlocked]) => isBlocked)
+  const overLimitFeatures = Object.entries(usage.blocked || {})
+    .filter(([, isBlocked]) => isBlocked === true)
     .map(([key]) => key);
 
-  if (isOnDashboard && overLimitFeatures.length > 0) {
-    return (
-      <>
+  const shouldShowBanner = isOnDashboard && overLimitFeatures.length > 0;
+
+  return (
+    <>
+      {shouldShowBanner && (
         <div className="p-4 bg-yellow-100 border border-yellow-300 text-yellow-800 text-sm mb-4 rounded">
           You&apos;ve reached your usage limit for{" "}
           <strong>{overLimitFeatures.join(", ")}</strong>.{" "}
@@ -30,10 +34,8 @@ export function UsageGuard({ children }: { children: React.ReactNode }) {
           </a>{" "}
           to continue using these features.
         </div>
-        {children}
-      </>
-    );
-  }
-
-  return <>{children}</>;
+      )}
+      {children}
+    </>
+  );
 }

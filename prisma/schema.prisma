@@ -40,7 +40,6 @@ model User {
   // Relations
   products    Product[]
   buildLogs   BuildLog[]
-  trial       Trial?
   DailyStreak DailyStreak[]
   aiLogs      AiLog[]
   tokenUsages TokenUsage[]
@@ -61,15 +60,6 @@ model EarlyAccess {
   updatedAt DateTime   @default(now())
 }
 
-model Trial {
-  id        String     @id @default(cuid())
-  userId    String     @unique
-  user      User       @relation(fields: [userId], references: [id])
-  plan      AccessTier @default(NORMAL)
-  startDate DateTime
-  endDate   DateTime
-  expired   Boolean    @default(false)
-}
 
 model Product {
   id                 String   @id @default(cuid())

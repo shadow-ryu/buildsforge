@@ -5,11 +5,13 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import ManageSubs from "@/components/subscriptions/manage-subs";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 const fetchSettings = async () => {
   const { data } = await axios.get("/api/settings");
@@ -211,14 +213,24 @@ export default function SettingsPage() {
               <span className="text-white">Features:</span>
               <div className="flex flex-col gap-1 mx-4">
                 <ul className="text-white list-disc">
-                  {settings?.data.subscriptions?.features?.map(
-                    (f: string) => (
-                      <li key={f}>{f}</li>
-                    )
-                  )}
+                  {settings?.data.subscriptions?.features?.map((f: string) => (
+                    <li key={f}>{f}</li>
+                  ))}
                 </ul>
               </div>
-              <ManageSubs />
+              {settings?.data.subscriptions?.productId === "111111" ? (
+                <Link
+                  className={cn(
+                    "text-purple-300 hover:text-purple-400 transition-colors",
+                    buttonVariants({ variant: "secondary" })
+                  )}
+                  href="/dashboard/plans"
+                >
+                  Upgrade
+                </Link>
+              ) : (
+                <ManageSubs />
+              )}
             </CardContent>
           </Card>
         </TabsContent>

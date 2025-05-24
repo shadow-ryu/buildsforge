@@ -21,6 +21,7 @@ import ReorderRoadmap from "@/components/roadmaps/redo-roadmap";
 import { toast } from "sonner";
 import DayTaskCreateForm from "@/components/products/daytask-create-form";
 import { useUsage } from "@/hooks/use-usage";
+import { useRouter } from "next/navigation";
 
 // Backend DayTask type (minimal, for type conversion)
 type DayTask = {
@@ -162,7 +163,7 @@ function RoadmapDisplay({
           <h2 className="text-2xl font-bold text-white">Your Roadmap</h2>
         </div>
       </div>
-      <div className="flex items-center gap-2 text-sm justify-end w-full">
+      <div className="flex items-center gap-2 text-sm justify-end w-full mb-2">
         <Badge className="flex items-center gap-2 text-sm">
           <Flame className="w-4 h-4 text-purple-800" />
           <p className="text-white">
@@ -338,7 +339,9 @@ export default function ProductDetailPage({
   const { id } = React.use(params);
   const queryClient = useQueryClient();
   const [isRevising, setIsRevising] = React.useState(false);
-  const { blocked, isLoading: usageLoading } = useUsage();
+  const router = useRouter();
+  // @ts-expect-error blocked is not defined
+  const { blocked, loading: usageLoading } = useUsage();
 
   const handleRevise = () => {
     setIsRevising((prev) => !prev);
@@ -447,6 +450,7 @@ export default function ProductDetailPage({
                   summary: data.buildLog.summary,
                   tweet: data.tweet,
                 });
+                router.push(`/dashboard/products/${id}/build-logs/${data.buildLog.id}`);
               } else {
                 setBuildLogError(data.error || "Unknown error");
               }

@@ -136,7 +136,6 @@ export default function ProductForm() {
               <Field label="Unique Value Proposition (optional)">
                 <Textarea
                   className="text-white"
-
                   {...form.register("unique_value_proposition")}
                   placeholder="What makes your product unique?"
                 />
@@ -145,7 +144,6 @@ export default function ProductForm() {
               <TagInput
                 label="Inspiration Apps"
                 placeholder="e.g. Notion, Gusto"
-                
                 tags={inspirationApps}
                 setTags={setInspirationApps}
                 inputValue={newInspirationApp}
@@ -156,7 +154,6 @@ export default function ProductForm() {
                 <Input
                   {...form.register("tech_stack")}
                   className="text-white"
-
                   placeholder="e.g. Next.js, Supabase, GPT-4"
                 />
               </Field>
@@ -223,7 +220,6 @@ function TagInput({
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder={placeholder}
-
           className="flex-1 text-white"
         />
         <Button

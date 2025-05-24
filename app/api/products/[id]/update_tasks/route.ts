@@ -28,11 +28,10 @@ export async function POST(request: NextRequest) {
   const { productId, updatedDays } = body as {
     productId: string;
     updatedDays: Array<{
+      id: string;
+      taskId: string;
       dayIndex: number;
       dueDate: string;
-      tasks: Array<{
-        id: string; // this is DayTask.id
-      }>;
     }>;
   };
 
@@ -43,14 +42,34 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  console.log("[api/products/update_tasks] Received request:", {
-    productId,
-    updatedDays,
-  });
   try {
-    const updateOperations = updatedDays.map((task) =>
+    // Step 1: Group tasks by original dayIndex to preserve task/day groupings
+    const grouped: Record<number, typeof updatedDays> = {};
+    for (const task of updatedDays) {
+      if (!grouped[task.dayIndex]) grouped[task.dayIndex] = [];
+      grouped[task.dayIndex].push(task);
+    }
+
+    // Step 2: Reassign compacted dayIndex (0, 1, 2, ...)
+    const sortedDayIndices = Object.keys(grouped)
+      .map(Number)
+      .sort((a, b) => a - b);
+
+    const compactedTasks: typeof updatedDays = [];
+
+    sortedDayIndices.forEach((originalDayIdx, newDayIdx) => {
+      const tasks = grouped[originalDayIdx];
+      tasks.forEach((task) => {
+        compactedTasks.push({
+          ...task,
+          dayIndex: newDayIdx, // reassign compacted index
+        });
+      });
+    });
+
+    // Step 3: Update in DB
+    const updateOperations = compactedTasks.map((task) =>
       prisma.dayTask.update({
-        // @ts-expect-error id is DayTask.id
         where: { id: task.id },
         data: {
           dayIndex: task.dayIndex,

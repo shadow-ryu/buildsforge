@@ -54,7 +54,6 @@ export default function ReorderRoadmap({
 }: ReorderRoadmapProps) {
   const [days, setDays] = React.useState<Day[]>(initialDays);
   const [activeTask, setActiveTask] = React.useState<Task | null>(null);
-  const [hasChanges, setHasChanges] = React.useState(false);
 
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -128,7 +127,7 @@ export default function ReorderRoadmap({
     });
 
     setDays(updatedDays);
-    setHasChanges(true);
+    // setHasChanges(true);
   };
 
   // --- EmptyDropZone component ---
@@ -172,7 +171,7 @@ export default function ReorderRoadmap({
       }))
     );
     onSave(payload);
-    setHasChanges(false);
+    // setHasChanges(false);
   };
 
   return (
@@ -182,7 +181,7 @@ export default function ReorderRoadmap({
         <Button
           className="bg-purple-600 hover:bg-purple-700 text-white"
           onClick={saveReorder}
-          disabled={!hasChanges}
+          // disabled={!hasChanges}
         >
           Save Changes
         </Button>

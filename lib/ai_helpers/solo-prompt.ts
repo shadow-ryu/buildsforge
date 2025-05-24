@@ -237,11 +237,10 @@ export function generateRoadmapPromptUpgraded({
   - Ships **core value** fast
   - Includes milestone + visual progress
   - Prioritizes shipping over perfection
-  
+  -- DOnt mention any notes
   ---
   
-  ### Output Format:
-  \`\`\`json
+  ### Output  Format  :
   [
     {
       "day": 1,
@@ -260,7 +259,6 @@ export function generateRoadmapPromptUpgraded({
       "total_hours": X
     }
   ]
-  \`\`\`
   
   Now generate the roadmap using this task list:
   ${tasks

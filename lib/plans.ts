@@ -24,9 +24,9 @@ const plans = [
     features: ["1 Project", "1 Roadmap", "1 MVP", "2 Buildlogs"],
     limits: {
       project: 1,
-      roadmap: 1,
-      mvp: 1,
-      buildlog: 2,
+      roadmap: 3,
+      mvp: 3,
+      buildlog: 5,
     },
   },
   {

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
-import { generateRoadmapPrompt } from "@/lib/ai_helpers/generate-prompts";
 import { generateWithChatGPT } from "@/lib/ai_helpers/chatgptMvpGenerator";
+import { generateRoadmapPromptUpgraded } from "@/lib/ai_helpers/solo-prompt";
 
 // import { generateWithGemini } from "@/lib/ai_helpers/geminiMvpGenerator";
 
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
       }))
     );
 
-    const prompt = generateRoadmapPrompt({
+    const prompt = generateRoadmapPromptUpgraded({
       tasks: flatTasks,
       startDate,
       dailyHours: product.dailyCommitmentHrs,
@@ -96,12 +96,14 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const roadmap = await generateWithChatGPT({
+    const response = await generateWithChatGPT({
       prompt,
       userId: user.id,
       productId: product.id,
       type: "roadmap",
     });
+    console.log(typeof response, "roadmap");
+    const roadmap = JSON.parse(response);
 
     const existingTasksMap = new Map(flatTasks.map((t) => [t.id, t]));
     const featureMap = new Map(

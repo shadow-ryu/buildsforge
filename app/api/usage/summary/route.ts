@@ -26,18 +26,15 @@ export async function GET() {
     (sub) => sub.status === "active"
   );
   const aiLogs = dbUser.aiLogs ?? [];
-  console.log(activeSubscription, "activeSubscription");
   const usage = {
     roadmap: aiLogs.filter((log) => log.type === "roadmap").length,
     mvp: aiLogs.filter((log) => log.type === "mvp_generation").length,
     buildlog: aiLogs.filter((log) => log.type === "build_log").length,
   };
 
-  console.log(usage, "usage");
   const matchedPlan = plans.find(
     (plan) => plan.productId === activeSubscription?.lemonSqueezyProductId
   );
-  console.log(matchedPlan, "matchedPlan", plans);
 
   const limits = matchedPlan?.limits ?? {
     project: 0,
@@ -51,8 +48,8 @@ export async function GET() {
     roadmap: limits.roadmap === "unlimited" || usage.roadmap < limits.roadmap,
     // @ts-expect-error string comparison
     mvp: limits.mvp === "unlimited" || usage.mvp < limits.mvp,
-    // @ts-expect-error string comparison
     buildlog:
+      // @ts-expect-error string comparison
       limits.buildlog === "unlimited" || usage.buildlog < limits.buildlog,
   };
 
