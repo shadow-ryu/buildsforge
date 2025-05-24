@@ -1,230 +1,298 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
 
-export default function LandingPage() {
+export default function BuildsForgeLanding() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-
-  const [successMessage, setSuccessMessage] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
+  const [suppressPopup] = useState(false);
   const emailInputRef = useRef<HTMLInputElement>(null);
-
-  const focusEmailInput = () => {
-    emailInputRef.current?.focus();
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const response = await fetch("/api/join-waitlist", {
+    const res = await fetch("/api/join-waitlist", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
     });
-
-    if (!response.ok) {
-      console.error("Failed to join waitlist");
-      return;
-    }
-    const data = await response.json();
-    console.log("Joined waitlist successfully");
-    setEmail("");
-    setLoading(false);
+    await res.json();
     setSuccess(true);
-    setSuccessMessage(data.message);
+    setLoading(false);
+    setEmail("");
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (success) return;
+      if (suppressPopup) {
+        setShowPopup(false);
+        return;
+      }
+      const footer = document.querySelector("footer");
+      if (!footer) return;
+      const rect = footer.getBoundingClientRect();
+      const isVisible = rect.top < window.innerHeight;
+      setShowPopup(
+        !isVisible &&
+          window.scrollY / (document.body.scrollHeight - window.innerHeight) >
+            0.4
+      );
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [success, suppressPopup]);
+
   return (
-    <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-6 ">
-      <header className="w-full py-6 px-6 border-b border-gray-800">
+    <main className="bg-[#0f0f11] text-white px-6">
+      <header className="py-6 border-b border-[#23262F]">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Image
-              src="/builds-forge.png"
-              className="w-6 h-8"
-              alt="Logo"
-              width={24}
-              height={24}
-            />
-            <div className="text-2xl font-bold text-white">BuildsForge</div>
+            <Image src="/builds-forge.png" alt="Logo" width={28} height={28} />
+            <h1 className="text-2xl font-bold text-white">BuildsForge</h1>
           </div>
-          <nav className="space-x-4 text-sm text-gray-300">
-            <a href="#features" className="hover:text-white">
-              Features
-            </a>
-          </nav>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="max-w-4xl w-full text-center space-y-6 mt-6"
-        id="waitlist"
-      >
-        <h1 className="text-5xl sm:text-6xl font-bold leading-tight text-zinc-100">
-          Stop abandoning projects.
+      {/* Hero */}
+      <section className="text-center max-w-3xl mx-auto mt-20 px-4 space-y-6">
+        <h1 className="text-4xl sm:text-5xl font-bold leading-tight text-white">
+          Set a Launch Date. Get a Custom Plan. Build Daily. Ship Confidently.
         </h1>
-        <p className="text-xl text-zinc-300">
-          You start with energy. Then life hits. You get pulled into other
-          things. You forget. You stall.
-        </p>
-        <p className="text-md text-zinc-400">
-          You’re not lazy. You’re not broken. But you’re building alone. That’s
-          the problem.
+
+        <p className="text-zinc-400 text-lg">
+          BuildsForge gives you the plan, the streaks, and the momentum. You
+          just have to build.
         </p>
 
-        {success ? (
-          <p className="text-green-500 mt-2">{successMessage}</p>
-        ) : (
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
+        {!success && (
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col sm:flex-row justify-center gap-3 mt-6"
+          >
             <Input
-              type="email"
               ref={emailInputRef}
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Your email address"
-              className="bg-white text-black w-full sm:w-80"
+              placeholder="Enter your email"
+              className="sm:w-80 bg-[#181A20] border border-zinc-700 text-white placeholder-zinc-500"
             />
             <Button
-              variant="default"
-              className="px-6 py-3 text-base font-semibold rounded-2xl bg-[#009FCC] text-white transition-colors duration-300 hover:bg-[#00CFFF] focus:ring-2 focus:ring-[#00CFFF] focus:outline-none"
-              onClick={handleSubmit}
+              type="submit"
               disabled={loading}
+              className="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-6 py-3 rounded-xl"
             >
-              {loading ? "Joining..." : "Join the Waiting List"}
+              {loading ? "Joining..." : "Join the wait list"}
             </Button>
-          </div>
+          </form>
         )}
-        <p className="text-xs text-zinc-500">
-          Early access. No spam. Just a better way to finish what you start.
-        </p>
-      </motion.section>
 
-      <section className="mt-28 w-full max-w-5xl mx-auto text-center">
-        <h2 className="text-3xl font-bold mb-12">
-          How BuildsForge helps you launch
-        </h2>
-        <div className="grid md:grid-cols-3 gap-8">
-          <motion.div
-            className="bg-zinc-900 rounded-xl p-6 space-y-3"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            <div className="text-4xl">💡</div>
-            <h3 className="text-xl font-semibold">The idea strikes</h3>
-            <p className="text-gray-400 text-sm">
-              You’ve got the next big idea. But distractions creep in, and you
-              lose momentum.
-            </p>
-          </motion.div>
-          <motion.div
-            className="bg-zinc-900 rounded-xl p-6 space-y-3 border border-zinc-700"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="text-4xl">🤖</div>
-            <h3 className="text-xl font-semibold">BuildsForge steps in</h3>
-            <p className="text-gray-400 text-sm">
-              Get an AI-powered MVP roadmap + daily build plan. Stay accountable
-              with build logs, dashboards, and streaks.
-            </p>
-          </motion.div>
-          <motion.div
-            className="bg-zinc-900 rounded-xl p-6 space-y-3"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="text-4xl">🚀</div>
-            <h3 className="text-xl font-semibold">You ship the thing</h3>
-            <p className="text-gray-400 text-sm">
-              Your daily progress builds momentum. You finally launch that MVP —
-              no more graveyard of ideas.
-            </p>
-          </motion.div>
+        {success && (
+          <p className="text-green-500 text-sm">You&apos;re on the list! 🚀</p>
+        )}
+
+        <p className="text-sm text-zinc-500 mt-4">
+          You commit. The system keeps you on track. That’s it.
+        </p>
+      </section>
+
+      {/* Why I Built This */}
+      <section className="mt-28 max-w-3xl mx-auto px-4 space-y-6 text-center">
+        <h2 className="text-3xl font-bold text-white">Why I built this</h2>
+        <p className="text-zinc-400 text-base leading-relaxed">
+          I’ve started too many projects that never shipped. Not because the
+          idea was bad — but because I got lost halfway. No roadmap. No
+          momentum. No system.
+        </p>
+        <p className="text-zinc-400 text-base leading-relaxed">
+          BuildsForge is what I wish I had: a tool that turns your idea into a
+          real plan, then helps you show up every day and track progress — even
+          if it’s messy.
+        </p>
+        <p className="text-zinc-400 text-base leading-relaxed">
+          It’s not a task app. It’s a launch engine. One that helps you actually
+          finish something.
+        </p>
+        <div className="mt-6">
+          <span className="text-sm text-zinc-500">
+            – The solo builder behind BuildsForge
+          </span>
         </div>
       </section>
 
-      {/* Features Section - Styled as tiles */}
-      <section className="mt-24 w-full max-w-6xl " id="features">
-        <h2 className="text-3xl font-bold mb-12 text-center">Features</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {/* Features */}
+      <section className="mt-28 max-w-6xl mx-auto text-center">
+        <h3 className="text-3xl font-bold mb-12">What it gives you</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
           {[
             {
-              title: "🧠 Clarity without Overwhelm",
+              emoji: (
+                <Image
+                  src="/treasure-map.svg"
+                  alt="Treasure Map"
+                  width={32}
+                  height={32}
+                />
+              ),
+              title: "AI roadmap",
               desc:
-                "Turn the idea in your head into a real roadmap. Not a spreadsheet. Not a wish. Just what to do next.",
+                "Instantly turns your idea into a day-by-day launch plan. Edit, tweak, ship.",
             },
             {
-              title: "📆 Something to Show Every Day",
+              emoji: "🔥",
+              title: "Streak system",
               desc:
-                "No more invisible work. Log a win every day. Ship tiny things. Build momentum.",
+                "Track momentum. Stay accountable. Build habits, not burnout.",
             },
             {
-              title: "📊 Watch Yourself Make Progress",
+              emoji: "📣",
+              title: "Build logs",
               desc:
-                "You’ve started before. This time, you’ll finish. And you’ll see it happen in real time.",
+                "Generate daily logs to reflect, share, and keep your streak alive.",
             },
-            {
-              title: "🔥 Keep Going When It’s Hard",
-              desc:
-                "This isn’t motivation. It’s structure. It’s a system to make sure you keep showing up.",
-            },
-          ].map((feature, i) => (
+          ].map(({ emoji, title, desc }, i) => (
             <motion.div
               key={i}
-              className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow hover:shadow-xl transition"
+              className="bg-[#181A20] p-6 rounded-xl border border-[#23262F]"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
             >
-              <h2 className="text-xl font-semibold mb-2">{feature.title}</h2>
-              <p className="text-zinc-400">{feature.desc}</p>
+              <div className="text-3xl mb-2">{emoji}</div>
+              <h4 className="font-semibold text-lg mb-1">{title}</h4>
+              <p className="text-zinc-400 text-sm">{desc}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* CTA Footer */}
-      <motion.footer
-        className="mt-32 w-full max-w-3xl text-center space-y-6 px-4 py-12 border-t border-zinc-800"
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.7 }}
-      >
-        <h2 className="text-3xl font-bold text-zinc-100">
-          You don’t need more ideas.
-        </h2>
-        <p className="text-zinc-400">
-          You need to finish what you started. We’ll help you stick with it —
-          day after day.
+      {/* Screenshots */}
+      <section className="mt-24 text-center max-w-6xl mx-auto">
+        <h3 className="text-3xl font-bold mb-6">See it in action</h3>
+        <p className="text-zinc-400 mb-10">
+          Idea → roadmap → logs → launch. All in one place.
         </p>
-        <Button
-          variant="default"
-          onClick={focusEmailInput}
-          className="px-6 py-3 text-base font-semibold rounded-2xl bg-[#009FCC] text-white transition-colors duration-300 hover:bg-[#00CFFF] focus:ring-2 focus:ring-[#00CFFF] focus:outline-none"
-        >
-          Join the Waiting List Now
-        </Button>
+        {["roadmap", "dashboard", "progress"].map((key) => (
+          <div key={key} className="mb-12">
+            <div className="w-full max-w-5xl mx-auto  rounded-xl border border-[#2a2a2a] shadow-2xl overflow-hidden">
+              {/* Browser mock header */}
+              <div className="flex items-center gap-2 px-4 py-2 bg-[#2c2c2f] border-b border-[#3a3a3d] mb-4">
+                <span className="w-3 h-3 bg-red-500 rounded-full" />
+                <span className="w-3 h-3 bg-yellow-400 rounded-full" />
+                <span className="w-3 h-3 bg-green-500 rounded-full" />
+                <span className="ml-4 text-xs text-zinc-400">{key}</span>
+              </div>
+              {/* Screenshot */}
+              <Image
+                src={`/screenshot-${key}.png`}
+                alt={`${key} screenshot`}
+                width={960}
+                height={540}
+                className="w-full h-auto p-3"
+              />
+            </div>
+          </div>
+        ))}
+      </section>
 
-        <p className="text-xs text-zinc-600">
-          © {new Date().getFullYear()} BuildsForge. All rights reserved.
+      {/* Not Another AI App */}
+      <section className="mt-8 max-w-3xl mx-auto px-4 space-y-6 text-center">
+        <h2 className="text-3xl font-bold text-white">
+          Is this just another AI tool?
+        </h2>
+        <p className="text-zinc-400 text-base leading-relaxed">
+          Honestly, most “AI productivity” tools are wrappers — they generate a
+          wall of tasks you’ll never follow.
         </p>
-      </motion.footer>
+        <p className="text-zinc-400 text-base leading-relaxed">
+          BuildsForge is different. It gives you a launch plan you’ll actually
+          use, tracks your progress, and helps you finish.
+        </p>
+        <p className="text-zinc-400 text-base leading-relaxed">
+          This isn’t a dashboard. It’s a deadline. And a system that makes you
+          stick to it.
+        </p>
+      </section>
+
+      {/* Footer CTA */}
+      <footer className="mt-28 py-16 border-t border-zinc-800 text-center px-4">
+        <div className="max-w-2xl mx-auto space-y-6">
+          <h2 className="text-3xl font-bold text-white">
+            Don’t let another idea fade away.
+          </h2>
+          <p className="text-zinc-400 text-base">
+            Most builders quit before they ship. Join the waitlist and get the
+            system that helps you finish what you start — without burning out.
+          </p>
+
+          {!success && (
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col sm:flex-row justify-center gap-3"
+            >
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="sm:w-80 bg-[#181A20] border border-zinc-700 text-white placeholder-zinc-500"
+              />
+              <Button
+                type="submit"
+                disabled={loading}
+                className="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-6 py-3 rounded-xl"
+              >
+                {loading ? "Joining..." : "Join the wait list"}
+              </Button>
+            </form>
+          )}
+
+          {success && (
+            <p className="text-green-500 text-sm">
+              You&apos;re on the list! 🚀
+            </p>
+          )}
+
+          <p className="text-xs text-zinc-600 pt-6">
+            © {new Date().getFullYear()} BuildsForge — built in public by a solo
+            dev who finally shipped.
+          </p>
+        </div>
+      </footer>
+
+      {/* Sticky Join Box */}
+      {showPopup && !success && (
+        <div className="fixed bottom-4 right-4 bg-[#181A20] p-5 rounded-xl border border-[#2a2a2a] shadow-lg z-50">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+            <p className="text-sm text-white font-semibold">
+              🚀 Start your build streak
+            </p>
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="enter your email"
+              className="w-64"
+            />
+            <Button
+              type="submit"
+              disabled={loading}
+              className="bg-purple-600 hover:bg-purple-500 text-white w-full"
+            >
+              {loading ? "Joining..." : "Join Now"}
+            </Button>
+          </form>
+        </div>
+      )}
     </main>
   );
 }
