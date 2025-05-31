@@ -18,9 +18,12 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
   const hostname = req.headers.get("host") || "";
   const subdomain = hostname.split(".")[0];
   // const isRootDomain = ["buildsforge", "www", "localhost"].includes(subdomain);
-  const isRootDomain = ["localhost"].includes(subdomain) || hostname === "localhost:3000";
+  const isRootDomain =
+    ["buildsforge", "www", "localhost"].includes(subdomain) ||
+    hostname === "localhost:3000" ||
+    hostname === "dev.buildsforge.com";
 
-  // 1. Rewrite subdomain to path-based route
+  // 1. Rew rite subdomain to path-based route
   if (!isRootDomain) {
     const url = req.nextUrl.clone();
 
