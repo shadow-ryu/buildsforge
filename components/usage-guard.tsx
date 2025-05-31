@@ -1,6 +1,7 @@
 "use client";
 
 import { useUsage } from "@/hooks/use-usage";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export function UsageGuard({ children }: { children: React.ReactNode }) {
@@ -29,9 +30,9 @@ export function UsageGuard({ children }: { children: React.ReactNode }) {
         <div className="p-4 bg-yellow-100 border border-yellow-300 text-yellow-800 text-sm mb-4 rounded">
           You&apos;ve reached your usage limit for{" "}
           <strong>{overLimitFeatures.join(", ")}</strong>.{" "}
-          <a href="/pricing" className="underline font-medium">
+          <Link href="/pricing" className="underline font-medium">
             Upgrade your plan
-          </a>{" "}
+          </Link>{" "}
           to continue using these features.
         </div>
       )}
