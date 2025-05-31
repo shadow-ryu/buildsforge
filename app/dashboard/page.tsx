@@ -1,299 +1,240 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React from "react";
-import { Card } from "@/components/ui/card";
 
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-
-import { Plus, Settings, ArrowUpRight, MoreVertical } from "lucide-react";
-import Link from "next/link";
-
-// const HeatMapvalue = [
-//   { date: "2016/01/11", count: 2 },
-//   { date: "2016/01/12", count: 20 },
-//   { date: "2016/01/13", count: 10 },
-//   ...[...Array(17)].map((_, idx) => ({
-//     date: `2016/02/${idx + 10}`,
-//     count: idx,
-//     content: "",
-//   })),
-//   { date: "2016/04/11", count: 2 },
-//   { date: "2016/05/01", count: 5 },
-//   { date: "2016/05/02", count: 5 },
-//   { date: "2016/05/04", count: 11 },
-// ];
-
-const stats = [
-  {
-    label: "Active Project",
-    value: "buildsforge",
-    icon: <ArrowUpRight className="w-4 h-4 text-green-400 inline ml-1" />,
-    badge: { label: "12 streak", color: "success" },
-  },
-  {
-    label: "Current best streak",
-    value: 12,
-    icon: null,
-    badge: { label: "Personal Best!", color: "purple" },
-  },
-  {
-    label: "Current progress",
-    value: "68%",
-    icon: null,
-    // badge: { label: "On Track", color: "success" },
-  },
-];
-
-const products = [
-  {
-    name: "ProductX",
-    status: { label: "Completed", color: "success" },
-    progress: 100,
-    updated: "14 days ago",
-  },
-  {
-    name: "BuildsForge API",
-    status: { label: "Completed", color: "success" },
-    progress: 100,
-    updated: "20 day ago",
-  },
-];
-
-const quickActions = [
-  { label: "Add Feature", icon: <Plus className="w-5 h-5" /> },
-  { label: "Log Update", icon: <ArrowUpRight className="w-5 h-5" /> },
-  { label: "Share Progress", icon: <ArrowUpRight className="w-5 h-5" /> },
-  { label: "Settings", icon: <Settings className="w-5 h-5" /> },
-];
-
-function WelcomeCard() {
-  // Simulate a 28-day heatmap (true = active day)
-  // visx heatmap setup
-  // 7 columns (days of week), 4 rows (weeks)
-  const streakDays = 12;
-  // const totalDays = 28;
-  // const today = new Date();
-  // const heatmapData = Array.from({ length: totalDays }, (_, i) => {
-  //   const date = new Date(today);
-  //   date.setDate(today.getDate() - (totalDays - 1 - i));
-  //   // Format as YYYY-MM-DD
-  //   const dateStr = date.toISOString().split("T")[0];
-  //   return {
-  //     date: dateStr,
-  //     count: i >= totalDays - streakDays ? 1 : 0,
-  //   };
-  // });
-
-  // // Custom SVG gradient
-  // const gradientDefs = (
-  //   <defs>
-  //     <linearGradient id="heatmapGradient" x1="0" y1="0" x2="1" y2="1">
-  //       <stop offset="0%" stopColor="#a78bfa" />
-  //       <stop offset="100%" stopColor="#06b6d4" />
-  //     </linearGradient>
-  //   </defs>
-  // );
-
-  return (
-    <div className="relative grid grid-cols-1">
-      <div className=" text-white  flex justify-start items-end pt-8 h-full ">
-        {/* Abstract SVG background mesh/wave */}
-
-        {/* Content Grid */}
-
-        {/* Left: Large Heading */}
-        <div className="flex flex-col justify-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-2 drop-shadow-lg">
-            Welcome back, <span className="text-[#a5b4fc]">Alex</span>
-          </h1>
-          <div className="text-base md:text-lg text-white/80 mt-3 font-medium">
-            You&apos;re on a{" "}
-            <span className="text-[#a5b4fc] font-bold">{streakDays} day</span>{" "}
-            streak!
-          </div>
-        </div>
-      </div>
-      {/* Right: Build Streak Heatmap */}
-
-      {/* <HeatMap
-          value={heatmapData}
-          width={140}
-          height={80}
-          rectSize={18}
-          rectProps={{ rx: 4, stroke: '#23262F', strokeWidth: 1 }}
-          legendCellSize={0}
-          panelColors={{ 1: 'url(#heatmapGradient)', 0: '#23262F' }}
-          startDate={new Date(heatmapData[0].date)}
-          endDate={new Date(heatmapData[heatmapData.length - 1].date)}
-          weekLabels={['S', 'M', 'T', 'W', 'T', 'F', 'S']}
-          monthLabels={[]}
-        /> */}
-      {/* <div className=" bg-gray-400 rounded-md w-full"> */}
-      {/* <HeatMap
-          value={HeatMapvalue}
-          className=" text-gray-200 w-full"
-          weekLabels={["Sun", "Mon", "Tue", "Wed", "Thurs", "Fri", "Sat"]}
-          startDate={new Date("2025/01/01")}
-          endDate={new Date("2025/12/31")}
-        /> */}
-      {/* </div> */}
-    </div>
-  );
-}
-
-function StatsSection() {
-  return (
-    <div className="flex flex-col items-start gap-4 w-full mb-6">
-      <h2 className="text-2xl font-bold">Active project status</h2>
-      <div className="grid grid-cols-3 gap-4 mb-6 w-full">
-        {stats.map((stat) => (
-          <Card
-            key={stat.label}
-            className="bg-[#2B2B30] rounded-2xl shadow p-6 flex flex-col gap-2"
-          >
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-sm text-[#A1A1AA] font-medium">
-                {stat.label}
-              </span>
-              {stat.icon && stat.icon}
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-2xl font-bold text-white">
-                {stat.value}
-              </span>
-              {stat.badge && (
-                <Badge
-                  variant={
-                    stat.badge.color === "success"
-                      ? "success"
-                      : stat.badge.color === "purple"
-                      ? "purple"
-                      : "blue"
-                  }
-                  className="ml-2"
-                >
-                  {stat.badge.label}
-                </Badge>
-              )}
-            </div>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ProductList() {
-  return (
-    <div className="grid grid-cols-2 gap-4 mb-6">
-      {products.map((product) => (
-        <Card
-          key={product.name}
-          className="bg-[#1A1A1D] rounded-2xl shadow p-6 flex flex-col gap-2"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <div className="font-semibold text-white text-base">
-              {product.name}
-            </div>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <MoreVertical className="w-5 h-5 text-[#A1A1AA]" />
-            </Button>
-          </div>
-          <Progress value={product.progress} className="h-2 bg-[#23262F]" />
-          <div className="flex items-center justify-between mt-2">
-            <Badge>{product.status.label}</Badge>
-            <span className="text-xs text-[#A1A1AA]">{product.updated}</span>
-          </div>
-        </Card>
-      ))}
-    </div>
-  );
-}
-
-function TodaysFocus() {
-  return (
-    <div className="flex flex-col gap-4 items-start w-full">
-      <h3 className="font-semibold text-white text-base">Today&apos;s Focus</h3>
-
-      <Card className="bg-[#2B2B30] rounded-2xl shadow p-6 flex flex-col gap-2 mb-4 w-full">
-        <div className="flex items-center justify-between mb-2">
-          <Badge variant="purple">High Priority</Badge>
-        </div>
-        <div className="text-sm text-[#A1A1AA] mb-2">
-          Complete the user authentication flow for ProductX
-        </div>
-        <Link
-          href="#"
-          className="flex items-center gap-1 text-blue-400 hover:underline text-sm font-medium"
-        >
-          View Task <ArrowUpRight className="w-4 h-4" />
-        </Link>
-      </Card>
-    </div>
-  );
-}
-
-function QuickActions() {
-  return (
-    <div className=" flex flex-col justify-center items-start gap-5">
-      <h3> Quick actions</h3>
-      <div className="grid grid-cols-2 gap-4">
-        {quickActions.map((action) => (
-          <Button
-            key={action.label}
-            variant="outline"
-            className="flex items-center gap-2 border-[#23262F] text-white bg-[#1A1A1D] hover:bg-[#23262F] rounded-xl shadow font-medium"
-          >
-            {action.icon} {action.label}
-          </Button>
-        ))}
-      </div>
-    </div>
-  );
-}
+import GlassCard from "@/components/ui/glass-card";
+import { useDashboardData } from "@/react-query/dashboard-queries";
+import { LoadingScreen } from "@/components/loading-screen";
+import TrialStatusCard from "@/components/dashbord/trial-status-card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function DashboardPage() {
+  const { data, isLoading, error } = useDashboardData({});
+
+  if (isLoading) {
+    return (
+      <LoadingScreen
+        isLoading={isLoading}
+        header="Welcome"
+        message="loading your data for dashboard"
+      />
+    );
+  }
+
+  if (error) return <div>Error: {error.message}</div>;
+
+  const {
+    streak,
+    todayTasks,
+    shippedProducts,
+    activeProject,
+    user,
+    trial,
+    pendingTasks,
+  } = data || {};
+
   return (
-    <div className="flex-1 px-8 pb-8 grid grid-cols-12 gap-6">
-      {/* Welcome Card */}
-      <div className="col-span-12 flex-1 px-8 pb-8 grid grid-cols-12 gap-4">
-        <div className="col-span-6">
-          <WelcomeCard />
-        </div>
-        <div className="col-span-6">
-          <div className="col-span-4 flex flex-col gap-4 items-center w-full">
-            <TodaysFocus />
-          </div>
-        </div>
-      </div>
-      {/* Stats */}
-      <div className="col-span-12">
-        <StatsSection />
+    <div className="p-6 md:p-10 bg-[#0f0f11] min-h-screen space-y-10">
+      {/* Header */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
+        <h1 className="text-3xl md:text-4xl font-extrabold text-white">
+          Welcome back, <span className="text-purple-400">{user?.name}</span>
+        </h1>
+        {(streak || 0) > 1 && (
+          <Badge className="bg-purple-900 text-purple-300 px-4 py-2 rounded-full">
+            🔥 {streak} day streak — Keep going!
+          </Badge>
+        )}
       </div>
 
-      {/* Product List */}
-      <div className="col-span-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold mb-4 text-[#F4F4F5]">
-            {" "}
-            Shipped Products
-          </h2>
-          <div className="col-span-12 flex justify-start">
-            <Link href="/products/new">
-              <Button className="bg-blue-600 text-white rounded-full px-5 py-2 font-semibold text-base hover:bg-blue-700 flex items-center gap-2 mb-4">
-                Create New Product
+      {/* @ts-expect-error isNewUser */}
+      {user?.isNewUser && (
+        <GlassCard className="bg-[#181A20] border border-purple-900 rounded-2xl px-6 py-5">
+          <div className="flex gap-4 items-center">
+            <div className="h-12 w-12 rounded-full bg-purple-950 flex items-center justify-center">
+              <span className="text-xl">🧩</span>
+            </div>
+            <div className="flex-1">
+              <h2 className="text-white font-semibold">First Project Setup</h2>
+              <p className="text-sm text-gray-400">
+                You’re all set up! Kickstart your journey by creating your first
+                project and let AI craft your daily roadmap.
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Built with AI — here to keep your momentum going
+              </p>
+            </div>
+            <Link href="/dashboard/products/new">
+              <Button className="bg-purple-600 hover:bg-purple-700 text-white font-medium">
+                Create Project
               </Button>
             </Link>
           </div>
-        </div>
+        </GlassCard>
+      )}
 
-        <ProductList />
+      {/* Stats and Focus */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/*  @ts-expect-error TrialStatusCard */}
+        {trial && <TrialStatusCard trial={trial} />}
+
+        <GlassCard className="bg-[#181A20] border-none p-6">
+          <CardTitle className="text-white text-lg mb-2">
+            Streak Stats
+          </CardTitle>
+          <div className="text-2xl font-semibold text-white mb-1">
+            🔥 {user?.bestStreakOverall ?? 0} days
+          </div>
+          <p className="text-sm text-gray-400 mb-3">
+            Your personal best streak
+          </p>
+          {/* <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
+            <span>This week</span>
+            <span>9/10 days active</span>
+          </div>
+          <Progress value={90} className="h-2 bg-purple-900" /> */}
+        </GlassCard>
+
+        <GlassCard className="bg-[#181A20] border-none p-6">
+          <CardTitle className="text-white text-lg mb-2">
+            Active Project
+          </CardTitle>{" "}
+          {activeProject ? (
+            <Card className="bg-[#181A20] p-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-white font-semibold">
+                  {activeProject.name}
+                </h3>
+                <Badge className="bg-purple-800 text-white text-xs">
+                  Due: {new Date(activeProject.deadline).toLocaleDateString()}
+                </Badge>
+              </div>
+              <p className="text-xs text-gray-400 mt-1">
+                Streak: {activeProject.currentStreak} days
+              </p>
+              <p className="text-xs text-gray-600 mt-1">
+                Last updated:{" "}
+                {new Date(activeProject.updatedAt).toLocaleDateString()}
+              </p>
+              <Link href={`/dashboard/products/${activeProject.id}`}>
+                <Button variant="secondary" className="mt-3 text-sm">
+                  View Project
+                </Button>
+              </Link>
+            </Card>
+          ) : (
+            <p className="text-sm text-gray-500">No active project</p>
+          )}
+        </GlassCard>
+
+        <GlassCard className="bg-[#181A20] border-none p-6">
+          <CardTitle className="text-white text-lg mb-2">
+            Today&apos;s Focus
+          </CardTitle>
+          <div className="w-full">
+            <ScrollArea className=" h-[400px] w-full p-2">
+              {todayTasks && todayTasks?.length > 0 ? (
+                todayTasks.map((task: any, i: number) => (
+                  <div
+                    key={i}
+                    className="bg-[#0f0f11] border border-purple-900 p-4 rounded-lg flex flex-col gap-1"
+                  >
+                    <div className="flex justify-between items-center">
+                      <Badge
+                        variant="default"
+                        className="bg-purple-700 text-white text-xs"
+                      >
+                        {task.status}
+                      </Badge>
+                      <span className="text-xs text-gray-400">
+                        Due: {task.due}
+                      </span>
+                    </div>
+                    <p className="text-sm text-white font-medium">
+                      {task.title}
+                    </p>
+                    <Link
+                      href={task.link}
+                      className="text-xs text-purple-400 hover:underline inline-flex items-center gap-1"
+                    >
+                      View Task <ArrowUpRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">No tasks today</p>
+              )}
+            </ScrollArea>
+          </div>
+        </GlassCard>
+        <GlassCard className="bg-[#181A20] border-none p-6">
+          <CardTitle className="text-white text-lg mb-4">
+            Pending Tasks
+          </CardTitle>
+          <ScrollArea className=" h-[400px] w-full p-4">
+            {pendingTasks && pendingTasks.length > 0 ? (
+              pendingTasks.map((task: any, i: number) => (
+                <div
+                  key={i}
+                  className="bg-[#0f0f11] border border-purple-900 p-4 rounded-lg flex flex-col gap-1 my-2"
+                >
+                  <div className="flex justify-between items-center">
+                    <Badge
+                      variant="default"
+                      className="bg-yellow-600 text-white text-xs"
+                    >
+                      {task.status}
+                    </Badge>
+                    <span className="text-xs text-gray-400">
+                      Due: {task.due}
+                    </span>
+                  </div>
+                  <p className="text-sm text-white font-medium">{task.title}</p>
+                  <Link
+                    href={task.link}
+                    className="text-xs text-purple-400 hover:underline inline-flex items-center gap-1"
+                  >
+                    View Task <ArrowUpRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">No pending tasks</p>
+            )}
+          </ScrollArea>
+        </GlassCard>
       </div>
-      <div className="col-span-4">
-        <QuickActions />
-      </div>
-      {/* Right Side: Today&apos;s Focus & Quick Actions */}
+
+      {/* Shipped Products */}
+      {shippedProducts?.length ? (
+        <div className="bg-[#181A20] border border-purple-900/20 p-6 rounded-xl">
+          <CardTitle className="text-white text-lg mb-4">
+            Shipped Products
+          </CardTitle>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {shippedProducts.map((prod: any) => (
+              <Card key={prod.name} className="bg-[#181A20] p-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-white font-semibold">{prod.name}</span>
+                  <Badge className="bg-green-600 text-white text-xs">
+                    {prod.status}
+                  </Badge>
+                </div>
+                <Progress value={100} className="h-2 bg-purple-900" />
+                <p className="text-xs text-gray-500 mt-2">
+                  Shipped: {prod.shipped}
+                </p>
+              </Card>
+            ))}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

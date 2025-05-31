@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import prisma from "@/lib/prisma";
+import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "@/components/ui/sonner";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -85,9 +87,12 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#181A20]`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased text-white bg-[#0f0f11]`}
       >
-        {children}
+        <ClerkProvider>
+          {children}
+          <Toaster />
+        </ClerkProvider>
         <Analytics />
       </body>
     </html>

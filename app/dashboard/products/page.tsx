@@ -2,8 +2,12 @@
 
 import React from "react";
 import Link from "next/link";
+import { Product } from "@/generated/prisma";
 import { Progress } from "@/components/ui/progress";
-import { Product } from "@prisma/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function ProductsPage() {
   const [products, setProducts] = React.useState<Partial<Product>[]>([]);
@@ -25,53 +29,96 @@ export default function ProductsPage() {
   }, []);
 
   return (
-    <div className="mx-auto w-full p-12 min-h-screen bg-[#181A20] shadow-lg border border-[#23262F]">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-[#F4F4F5] tracking-tight">
+    <div className="w-full min-h-screen bg-[#0f0f11] px-6 md:px-12 py-10">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <h1 className="text-3xl font-bold text-white tracking-tight">
           Your Products
         </h1>
-        <Link
-          href="/products/new"
-          className="bg-[#FBBF24] text-[#181A20] font-bold px-4 py-2 rounded shadow hover:bg-[#fbbf24]/90 transition"
-        >
-          Create New Product
+        <Link href="/dashboard/products/new">
+          <div
+            className={cn(
+              buttonVariants({ variant: "default" }),
+              "bg-purple-500 hover:bg-purple-600 text-white"
+            )}
+          >
+            Create New Product
+          </div>
         </Link>
       </div>
+
       {loading ? (
-        <div className="text-[#A1A1AA] text-center py-12">
-          Loading products...
+        <div className="space-y-4 mt-10">
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              className="h-24 bg-purple-900/10 rounded-lg animate-pulse"
+            />
+          ))}
         </div>
       ) : error ? (
         <div className="text-red-400 text-center py-12">{error}</div>
+      ) : products.length === 0 ? (
+        <div className="text-center text-gray-400 mt-24">
+          No products yet.
+          <div className="mt-4">
+            <Link
+              href="/products/new"
+              className="text-purple-400 underline text-sm"
+            >
+              Create your first product →
+            </Link>
+          </div>
+        </div>
       ) : (
-        <div className="space-y-6 mt-8">
-          {products.length === 0 ? (
-            <div className="text-[#A1A1AA] text-center py-12">
-              No products found.
-            </div>
-          ) : (
-            products.map((product) => (
-              <Link
-                key={product.id}
-                href={`/dashboard/products/${product.id}`}
-                className="block bg-[#23262F] border border-[#23262F] p-6 rounded-lg shadow-sm hover:bg-[#23262F]/90 transition"
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-semibold text-lg text-[#F4F4F5]">
-                    {product.name}
-                  </span>
-                  <span className="text-xs text-[#FBBF24]">
-                    {/* {product.percent}% complete */}
-                  </span>
-                </div>
-                <Progress
-                  // value={product.percent}
-                  value={50}
-                  className="h-2 rounded-full bg-[#FBBF24]/30"
-                />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.map((product) => {
+            // @ts-expect-error progress is not a property of Product
+            const progress = Number(product.progress ?? 0);
+            return (
+              <Link key={product.id} href={`/dashboard/products/${product.id}`}>
+                <Card className="bg-[#1a1b22] border border-purple-900 hover:border-purple-700 transition shadow-md">
+                  <CardHeader>
+                    <CardTitle className="text-white">{product.name}</CardTitle>
+                    <p className="text-sm text-gray-400">
+                      {product.description || "No description"}
+                    </p>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex justify-between items-center text-xs text-gray-400">
+                      <div className="space-x-1">
+                        <Badge
+                          variant="default"
+                          className="bg-purple-600 text-white"
+                        >
+                          {progress}% complete
+                        </Badge>
+                        {product.active && (
+                          <Badge
+                            variant="outline"
+                            className="text-purple-400 border-purple-700"
+                          >
+                            Active
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <div className="font-mono">
+                          🔥 {product.currentStreak}d streak
+                        </div>
+                      </div>
+                    </div>
+                    <Progress value={progress} className="h-2 bg-purple-800" />
+                    <div className="text-xs text-gray-500">
+                      Deadline:{" "}
+                      <span className="text-gray-300">
+                        {new Date(product.deadline!).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
               </Link>
-            ))
-          )}
+            );
+          })}
         </div>
       )}
     </div>

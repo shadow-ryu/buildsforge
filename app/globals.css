@@ -120,3 +120,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+[data-sandbox-heatmap="true"] g rect {
+  height: 20px;
+  width: 20px;
+  border-radius: 20px;
+}
+[data-sandbox-heatmap="true"] first-child {
+  display: flex;
+  gap: 10px;
+}

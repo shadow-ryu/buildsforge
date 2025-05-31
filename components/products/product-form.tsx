@@ -1,42 +1,50 @@
 "use client";
-
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { useForm } from "react-hook-form";
 
-// import { format } from "date-fns";
-// import { CalendarIcon } from "lucide-react";
-// import { generateRoadmap, RoadmapTask } from "@/lib/roadmap-generator";
+import { useMutation } from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import axios from "axios";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { useUsage } from "@/hooks/use-usage";
 
 const productSchema = z.object({
   app_name: z.string().min(1, "Product name is required"),
   problem_statement: z.string().min(1, "Description is required"),
-  target_audience: z.string().min(1, "Target audience is required"),
+  target_audience: z.string().optional(),
   user_goals: z.string().min(1, "User goals are required"),
-  unique_value_proposition: z
-    .string()
-    .min(1, "Unique value proposition is required"),
+  unique_value_proposition: z.string().optional(),
   inspiration_apps: z
     .array(z.string())
     .min(1, "At least one inspiration app required"),
-  tech_stack: z.string().min(1, "Tech stack is required"),
+  tech_stack: z.string().optional(),
   initial_features: z.array(z.string()).min(1, "At least one feature required"),
   launchDeadline: z.date().optional(), // keep for internal use if needed
   dailyTimeCommitment: z.number().min(15, "Minimum 15 minutes").optional(), // keep for internal use if needed
 });
 
 export default function ProductForm() {
-  // State for multi-input fields
+  const router = useRouter();
   const [features, setFeatures] = useState<string[]>([]);
-  const [newFeature, setNewFeature] = useState("");
   const [inspirationApps, setInspirationApps] = useState<string[]>([]);
+  const [newFeature, setNewFeature] = useState("");
   const [newInspirationApp, setNewInspirationApp] = useState("");
-
+  const usage = useUsage();
+  const blocked =
+    "blocked" in usage
+      ? usage.blocked
+      : { roadmap: false, mvp: false, buildlog: false, project: false };
+  const isProjectBlocked = blocked.project;
+  const usageLoading = usage.loading;
   const form = useForm({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -48,289 +56,251 @@ export default function ProductForm() {
       inspiration_apps: [],
       tech_stack: "",
       initial_features: [],
-      launchDeadline: undefined,
-      dailyTimeCommitment: undefined,
     },
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const projectMutation = useMutation({
+    mutationFn: async (data) => axios.post("/api/products/create", data),
+    onSuccess: (result) => {
+      toast.success("Product created!");
+      router.push(`/dashboard/products/${result.data.productId}`);
+    },
+    onError: () => toast.error("Something went wrong!"),
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Gather all values
     const values = form.getValues();
-    const data = {
-      app_name: values.app_name,
-      problem_statement: values.problem_statement,
-      target_audience: values.target_audience,
-      user_goals: values.user_goals,
-      unique_value_proposition: values.unique_value_proposition,
-      inspiration_apps: inspirationApps,
-      tech_stack: values.tech_stack,
+    const payload = {
+      ...values,
       initial_features: features,
-      // Optionally add launchDeadline and dailyTimeCommitment if needed
+      inspiration_apps: inspirationApps,
     };
-    console.log("SaaSInput data:", data);
-
-
-    const response = await fetch("/api/products/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-    const result = await response.json();
-    console.log("Result from /api/products/create:", result);
-    if (result.success) {
-      console.log("MVP generated successfully!");
-    } else {
-      console.error("Failed to generate MVP:", result.error);
-    }
+    // @ts-expect-error rfce
+    projectMutation.mutate(payload);
   };
 
+  if(usageLoading) {
+    return (
+      <main className="min-h-screen w-full bg-[#0f0f11] px-4 py-10 text-white">
+        <div className="max-w-4xl mx-auto space-y-6">
+          <Card className="bg-[#1c1c21] border border-purple-900">
+            <CardHeader className="pb-4 border-b border-purple-800 flex items-center justify-start gap-2">
+              <CardTitle className="text-2xl text-white">
+                Product Creation
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="mt-4 space-y-6">
+              <div className="text-sm text-purple-300">
+                Loading your product...
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    );
+  }
+
+  if (isProjectBlocked) {
+    return (
+      <main className="min-h-screen w-full bg-[#0f0f11] px-4 py-10 text-white">
+        <div className="max-w-4xl mx-auto space-y-6">
+          <Card className="bg-[#1c1c21] border border-purple-900">
+            <CardHeader className="pb-4 border-b border-purple-800 flex items-center justify-start gap-2">
+              <CardTitle className="text-2xl text-white">
+                Product Creation Limit
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="mt-4 space-y-6">
+              <div className="text-sm text-purple-300">
+                You have reached your project limit. Please upgrade your plan to
+                continue.
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    );
+  }
   return (
-    <div className="flex items-center justify-center w-full min-h-screen bg-[#181A20] px-2 py-6">
-      <Card className="w-full max-w-full  bg-[#181A20] text-white shadow-xl border-0">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl md:text-2xl lg:text-3xl">
-            Start Your Product Journey
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4 md:p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Test Data Loader Button */}
-            <div className="w-full flex justify-end">
+    <main className="min-h-screen w-full bg-[#0f0f11] px-4 py-10 text-white">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <Card className="bg-[#1c1c21] border border-purple-900">
+          <CardHeader className="pb-4 border-b border-purple-800 flex items-center justify-start gap-2">
+            <Link href="/dashboard/products">
               <Button
-                type="button"
-                variant="outline"
-                className="mb-2 text-black border-blue-600 hover:bg-blue-100"
-                onClick={() => {
-                  // Example test data
-                  const testData = {
-                    app_name: "BuildsForge",
-                    problem_statement:
-                      "Solo founders struggle to stay accountable and track their daily progress when building products alone.",
-                    target_audience:
-                      "Indie hackers and solo startup founders working on side projects or MVPs.",
-                    user_goals:
-                      "Track progress, generate build logs, stay accountable, and maintain consistency.",
-                    unique_value_proposition:
-                      "Combines AI task generation with habit tracking and visual progress for product builders.",
-                    initial_features: [
-                      "Daily task log",
-                      "AI-generated MVP roadmap",
-                      "Streak tracker",
-                      "Project dashboard",
-                    ],
-                    inspiration_apps: [
-                      "WIP.co",
-                      "Trello",
-                      "Product Hunt",
-                      "BuildStreak",
-                    ],
-                    tech_stack: "Next.js, Supabase, OpenAI API,Gemini",
-                  };
-                  form.setValue("app_name", testData.app_name);
-                  form.setValue(
-                    "problem_statement",
-                    testData.problem_statement
-                  );
-                  form.setValue("target_audience", testData.target_audience);
-                  form.setValue("user_goals", testData.user_goals);
-                  form.setValue(
-                    "unique_value_proposition",
-                    testData.unique_value_proposition
-                  );
-                  form.setValue("tech_stack", testData.tech_stack);
-                  // Set state for multi-inputs
-                  setInspirationApps(testData.inspiration_apps);
-                  setFeatures(testData.initial_features);
-                }}
+                variant="ghost"
+                className=" hover:bg-purple-700 text-white"
               >
-                Load Test Data
+                <ArrowLeft className=" h-4 w-4" />
               </Button>
-            </div>
-            <div className="space-y-2 flex flex-col items-start gap-2 w-full">
-              <label className="text-sm md:text-base">Product Name</label>
-              <Input
-                {...form.register("app_name")}
-                placeholder="My Awesome Product"
-                className="w-full"
-              />
-            </div>
-
-            <div className="space-y-2 flex flex-col items-start gap-2 w-full">
-              <label className="text-sm md:text-base">
-                Description / Problem Statement
-              </label>
-              <Textarea
-                {...form.register("problem_statement")}
-                placeholder="What problem does your product solve?"
-                className="w-full"
-              />
-            </div>
-
-            <div className="space-y-2 flex flex-col items-start gap-2 w-full">
-              <label className="text-sm md:text-base">Target Audience</label>
-              <Input
-                {...form.register("target_audience")}
-                placeholder="Who is this product for?"
-                className="w-full"
-              />
-            </div>
-
-            <div className="space-y-2 flex flex-col items-start gap-2 w-full">
-              <label className="text-sm md:text-base">User Goals</label>
-              <Textarea
-                {...form.register("user_goals")}
-                placeholder="What are the main goals users want to achieve?"
-                className="w-full"
-              />
-            </div>
-
-            <div className="space-y-2 flex flex-col items-start gap-2 w-full">
-              <label className="text-sm md:text-base">
-                Unique Value Proposition
-              </label>
-              <Textarea
-                {...form.register("unique_value_proposition")}
-                placeholder="What sets your product apart?"
-                className="w-full"
-              />
-            </div>
-
-            <div className="space-y-2 flex flex-col items-start gap-2 w-full">
-              <label className="text-sm md:text-base">Inspiration Apps</label>
-              <div className="flex flex-col sm:flex-row gap-4 w-full">
+            </Link>
+            <CardTitle className="text-2xl text-white">
+              Create a New Project
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="mt-4 space-y-6">
+            <form
+              onSubmit={handleSubmit}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  // Prevent Enter key from submitting the form
+                  e.preventDefault();
+                }
+              }}
+              className="space-y-6"
+            >
+              <Field label="Product Name">
                 <Input
-                  value={newInspirationApp}
-                  onChange={(e) => setNewInspirationApp(e.target.value)}
-                  placeholder="Add an inspiration app"
-                  className="flex-1"
+                  {...form.register("app_name")}
+                  className="text-white"
+                  placeholder="My Awesome App"
                 />
-                <Button
-                  type="button"
-                  variant={"outline"}
-                  onClick={() => {
-                    if (newInspirationApp) {
-                      setInspirationApps([
-                        ...inspirationApps,
-                        newInspirationApp,
-                      ]);
-                      setNewInspirationApp("");
-                    }
-                  }}
-                  className="w-full sm:w-auto text-black"
-                >
-                  Add
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2 mt-2 w-full">
-                {inspirationApps.map((app, index) => (
-                  <div
-                    key={index}
-                    className="bg-secondary px-3 py-1 text-black rounded-full text-sm flex items-center gap-2"
-                  >
-                    {app}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setInspirationApps(
-                          inspirationApps.filter((_, i) => i !== index)
-                        )
-                      }
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
+              </Field>
 
-            <div className="space-y-2 flex flex-col items-start gap-2 w-full">
-              <label className="text-sm md:text-base">Tech Stack</label>
-              <Input
-                {...form.register("tech_stack")}
-                placeholder="e.g. Next.js, Supabase, OpenAI API"
-                className="w-full"
-              />
-            </div>
+              <Field label="Problem Statement">
+                <Textarea
+                  {...form.register("problem_statement")}
+                  className="text-white"
+                  placeholder="Describe the core problem your product solves"
+                />
+              </Field>
 
-            <div className="space-y-2 flex flex-col items-start gap-2 w-full">
-              <label className="text-sm md:text-base">Core Features</label>
-              <div className="flex flex-col sm:flex-row gap-4 w-full">
+              <Field label="Target Audience (optional)">
                 <Input
-                  value={newFeature}
-                  onChange={(e) => setNewFeature(e.target.value)}
-                  placeholder="Add a feature"
-                  className="flex-1"
+                  {...form.register("target_audience")}
+                  className="text-white"
+                  placeholder="Who is this for?"
                 />
-                <Button
-                  type="button"
-                  variant={"outline"}
-                  onClick={() => {
-                    if (newFeature) {
-                      setFeatures([...features, newFeature]);
-                      setNewFeature("");
-                    }
-                  }}
-                  className="w-full sm:w-auto text-black"
-                >
-                  Add
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2 mt-2 w-full">
-                {features.map((feature, index) => (
-                  <div
-                    key={index}
-                    className="bg-secondary px-3 py-1 text-black rounded-full text-sm flex items-center gap-2"
-                  >
-                    {feature}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setFeatures(features.filter((_, i) => i !== index))
-                      }
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
+              </Field>
 
-            {/* Optionally keep launchDeadline and dailyTimeCommitment inputs for internal use */}
-            {/*
-  <div className="space-y-2 flex flex-col items-start gap-2 text-black">
-    <label className="text-white">Launch Deadline</label>
-    <DatePicker
-      selected={form.watch("launchDeadline")}
-      onSelect={(date) => form.setValue("launchDeadline", date)}
-    />
-  </div>
+              <Field label="User Goals (optional)">
+                <Textarea
+                  className="text-white"
+                  {...form.register("user_goals")}
+                  placeholder="What are the main things your users want to accomplish?"
+                />
+              </Field>
 
-  <div className="space-y-2 flex flex-col items-start gap-2">
-    <label>Daily Time Commitment (minutes)</label>
-    <Input
-      type="number"
-      {...form.register("dailyTimeCommitment", {
-        valueAsNumber: true,
-      })}
-      min={15}
-    />
-  </div>
-  */}
+              <Field label="Unique Value Proposition (optional)">
+                <Textarea
+                  className="text-white"
+                  {...form.register("unique_value_proposition")}
+                  placeholder="What makes your product unique?"
+                />
+              </Field>
 
-            <div className="w-[200]">
+              <TagInput
+                label="Inspiration Apps"
+                placeholder="e.g. Notion, Gusto"
+                tags={inspirationApps}
+                setTags={setInspirationApps}
+                inputValue={newInspirationApp}
+                setInputValue={setNewInspirationApp}
+              />
+
+              <Field label="Tech Stack (optional)">
+                <Input
+                  {...form.register("tech_stack")}
+                  className="text-white"
+                  placeholder="e.g. Next.js, Supabase, GPT-4"
+                />
+              </Field>
+
+              <TagInput
+                label="Core Features"
+                placeholder="e.g. AI policy editor"
+                tags={features}
+                setTags={setFeatures}
+                inputValue={newFeature}
+                setInputValue={setNewFeature}
+              />
+
               <Button
-                className="bg-blue-600 text-white rounded-full px-5 py-2 font-semibold text-base hover:bg-blue-700 flex items-center gap-2 mb-4 w-full"
                 type="submit"
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                disabled={projectMutation.isPending}
               >
-                Create
+                {projectMutation.isPending ? "Creating..." : "Create Product"}
               </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </main>
+  );
+}
+
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-2">
+      <label className="text-sm text-purple-300">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function TagInput({
+  label,
+  tags,
+  setTags,
+  inputValue,
+  setInputValue,
+  placeholder,
+}: {
+  label: string;
+  tags: string[];
+  setTags: (t: string[]) => void;
+  inputValue: string;
+  setInputValue: (v: string) => void;
+  placeholder: string;
+}) {
+  return (
+    <div className="space-y-2">
+      <label className="text-sm text-purple-300">{label}</label>
+      <div className="flex gap-2">
+        <Input
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder={placeholder}
+          className="flex-1 text-white"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => {
+            if (inputValue.trim()) {
+              setTags([...tags, inputValue.trim()]);
+              setInputValue("");
+            }
+          }}
+          className="border-purple-700"
+        >
+          Add
+        </Button>
+      </div>
+      <div className="flex flex-wrap gap-2 mt-2">
+        {tags.map((tag, idx) => (
+          <span
+            key={idx}
+            className="bg-purple-800 text-white text-xs px-3 py-1 rounded-full flex items-center gap-1"
+          >
+            {tag}
+            <button
+              onClick={() => setTags(tags.filter((_, i) => i !== idx))}
+              className="text-white text-sm hover:text-red-300"
+            >
+              ×
+            </button>
+          </span>
+        ))}
+      </div>
     </div>
   );
 }

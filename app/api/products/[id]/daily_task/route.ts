@@ -13,7 +13,7 @@ export async function GET(
         { status: 400 }
       );
     }
-    // Get all DayTasks for all features of this product
+
     const features = await prisma.feature.findMany({
       where: { productId },
       select: {
@@ -23,23 +23,12 @@ export async function GET(
           select: {
             id: true,
             title: true,
-            completed: true,
-            dayTask: {
-              select: {
-                id: true,
-                dayIndex: true,
-                dueDate: true,
-                category: true,
-                description: true,
-                status: true,
-              },
-            },
+            dayTask: true,
           },
         },
       },
     });
-    console.log(features, "features task");
-    // Flatten all DayTasks and group by dayIndex
+
     const dayTaskMap: Record<
       number,
       {
@@ -47,6 +36,7 @@ export async function GET(
         taskId: string;
         title: string;
         completed: boolean;
+        dayIdx: number;
         featureId: string;
         featureName: string;
         dueDate: Date;
@@ -55,36 +45,40 @@ export async function GET(
         status: string;
       }[]
     > = {};
+
     features.forEach((feature) => {
       feature.tasks.forEach((task) => {
-        if (task.dayTask) {
-          const dayIdx = task.dayTask.dayIndex;
+        const dayTask = task.dayTask;
+        if (dayTask) {
+          const dayIdx = dayTask.dayIndex;
           if (!dayTaskMap[dayIdx]) dayTaskMap[dayIdx] = [];
           dayTaskMap[dayIdx].push({
-            id: task.dayTask.id,
+            id: dayTask.id,
             taskId: task.id,
             title: task.title,
-            completed: task.completed,
+            completed: dayTask.status === "completed",
+            dayIdx,
             featureId: feature.id,
             featureName: feature.name,
-            dueDate: task.dayTask.dueDate,
-            category: task.dayTask.category,
-            description: task.dayTask.description,
-            status: task.dayTask.status,
+            dueDate: dayTask.dueDate,
+            category: dayTask.category,
+            description: dayTask.description,
+            status: dayTask.status,
           });
         }
       });
     });
-    // Build response array
+
     const days = Object.keys(dayTaskMap)
-      .map((dayIdx : string) => ({
+      .map((dayIdx: string) => ({
         dayIndex: Number(dayIdx),
-        // @ts-expect-error  type error
+        // @ts-expect-error type error
         dueDate: dayTaskMap[dayIdx][0]?.dueDate,
-        // @ts-expect-error  type error
+        // @ts-expect-error type error
         tasks: dayTaskMap[dayIdx],
       }))
       .sort((a, b) => a.dayIndex - b.dayIndex);
+
     return NextResponse.json({ success: true, days });
   } catch (error) {
     console.error("Error fetching daily tasks:", error);

@@ -9,7 +9,10 @@ export async function GET(
   try {
     const { id } = await context.params;
     if (!id) {
-      return NextResponse.json({ success: false, error: "Product ID required" }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: "Product ID required" },
+        { status: 400 }
+      );
     }
 
     const product = await prisma.product.findUnique({
@@ -20,18 +23,22 @@ export async function GET(
             tasks: true,
           },
         },
-        roadmap: true,
       },
     });
 
     if (!product) {
-      return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: "Product not found" },
+        { status: 404 }
+      );
     }
 
-    console.log(product , "product")
     return NextResponse.json({ success: true, product });
   } catch (error) {
     console.error("Error fetching product by ID:", error);
-    return NextResponse.json({ success: false, error: error?.toString() }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error?.toString() },
+      { status: 500 }
+    );
   }
 }

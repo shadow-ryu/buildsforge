@@ -1,23 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { currentUser } from "@clerk/nextjs/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { projectId, completedTasks, notes } = await req.json();
-    if (!projectId || !Array.isArray(completedTasks)) {
+    const { projectId, completedTask, notes } = await req.json();
+    if (!projectId || !completedTask) {
       return NextResponse.json(
         { success: false, error: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    const clerkId = "user_clerk_123456";
+    const loggedUser = await currentUser();
+    if (!loggedUser) {
+      return NextResponse.json(
+        { success: false, error: "User not found" },
+        { status: 404 }
+      );
+    }
+
     const user = await prisma.user.findFirst({
-      where: { clerkId },
+      where: { clerkId: loggedUser.id },
     });
     if (!user) {
       return NextResponse.json(
-        { success: false, error: "User not found" },
+        { success: false, error: "User not found", clerkId: loggedUser.id },
         { status: 404 }
       );
     }
@@ -25,16 +33,23 @@ export async function POST(req: NextRequest) {
     const today = new Date();
     const logDate = new Date(today.toISOString().split("T")[0]); // zero time component
     // Mark tasks as completed
-    console.log(completedTasks, "completedTasks");
-    for (const taskId of completedTasks) {
-      console.log(taskId, "taskId");
+    console.log(completedTask, "completedTasks");
 
-      await prisma.dayTask.update({
-        where: { id:taskId },
-        data: { status: "completed" },
-      });
-    }
+    const currentTask = await prisma.dayTask.findFirst({
+      where: { id: completedTask },
+    });
 
+    await prisma.dayTask.update({
+      where: { id: completedTask },
+      data: { status: "completed" },
+    });
+
+    const completedTasks = await prisma.dayTask.findMany({
+      where: {
+        dayIndex: currentTask?.dayIndex,
+        status: "completed",
+      },
+    });
     // Create daily log entry
     const log = await prisma.dailyLog.create({
       data: {
