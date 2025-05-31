@@ -3,12 +3,14 @@
 import React, { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import axios from "axios";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Loader2, Search } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "./ui/scroll-area";
+import { useRouter } from "next/navigation";
 
 interface Task {
   [x: string]: any;
@@ -29,7 +31,7 @@ export default function BuildLogForm({ projectId }: BuildLogFormProps) {
   const [dayIndex, setDayIndex] = useState(0);
   const [search, setSearch] = useState("");
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
-
+  const router = useRouter();
   const { data: completedTasks = [], isLoading: tasksLoading } = useQuery<
     Task[]
   >({
@@ -58,13 +60,6 @@ export default function BuildLogForm({ projectId }: BuildLogFormProps) {
 
   const buildLogMutation = useMutation({
     mutationFn: async (notes: string) => {
-      console.log(
-        "Selected task IDs:",
-        selectedTasks,
-        completedTasks,
-        dayIndex,
-        projectId
-      );
       const res = await axios.post(`/api/products/generate/build-log`, {
         projectId,
         dayIndex,
@@ -74,14 +69,31 @@ export default function BuildLogForm({ projectId }: BuildLogFormProps) {
           ...completedTasks.map((task) => task.id),
         ],
       });
-      if (!res.data.success)
+      if (!res.data.success) {
         throw new Error(res.data.error || "Failed to generate build log");
+      }
       return res.data.buildLog;
     },
     onSuccess: () => {
+      toast.success("Build log generated successfully!");
+      router.push(`/dashboard/products/${projectId}/build-logs`);
       // queryClient.invalidateQueries({ queryKey: ["buildLogs", projectId] });
-      // setNotes("");
-      // setSelectedTasks([]);
+      setNotes("");
+      setSelectedTasks([]);
+      setSearch("");
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.error || error.message || "An error occurred";
+      
+      if (errorMessage.includes("Log already exists")) {
+        toast.error("A build log already exists for this day");
+      } else if (errorMessage.includes("No tasks found")) {
+        toast.error("No tasks found to include in the build log");
+      } else {
+        toast.error(`Error: ${errorMessage}`);
+      }
+      
+      console.error("Build log error:", error);
     },
   });
 

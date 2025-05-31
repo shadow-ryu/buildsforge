@@ -107,6 +107,7 @@ export default function DayTaskCreateForm({
       return axios.post("/api/products/daytask/create", {
         taskId: selectedTask,
         ...form,
+        productId,
         dayIndex: Number(form.dayIndex),
       });
     },

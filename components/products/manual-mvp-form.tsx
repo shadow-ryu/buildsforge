@@ -17,13 +17,24 @@ import axios from "axios";
 import { cn } from "@/lib/utils";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
-function ManualMvpForm({ productId }: { productId: string }) {
-  const [summary, setSummary] = useState("");
+function ManualMvpForm({
+  productId,
+  mvpSummary,
+}: {
+  productId: string;
+  mvpSummary: string;
+}) {
+  const [summary, setSummary] = useState(mvpSummary || "");
   const [features, setFeatures] = useState([
     { name: "", description: "", tasks: [""], expanded: true },
   ]);
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
+
+  const resetForm = () => {
+    setSummary(mvpSummary || "");
+    setFeatures([{ name: "", description: "", tasks: [""], expanded: true }]);
+  };
 
   const handleFeatureChange = (
     i: number,
@@ -108,7 +119,14 @@ function ManualMvpForm({ productId }: { productId: string }) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog 
+      open={open} 
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (!isOpen) {
+          resetForm();
+        }
+      }}>
       <DialogTrigger asChild>
         <div
           className={cn(

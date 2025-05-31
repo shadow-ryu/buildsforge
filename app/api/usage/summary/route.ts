@@ -30,6 +30,7 @@ export async function GET() {
     roadmap: aiLogs.filter((log) => log.type === "roadmap").length,
     mvp: aiLogs.filter((log) => log.type === "mvp_generation").length,
     buildlog: aiLogs.filter((log) => log.type === "build_log").length,
+    project: aiLogs.filter((log) => log.type === "project").length,
   };
 
   const matchedPlan = plans.find(

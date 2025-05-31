@@ -24,8 +24,18 @@ console.log(userId,"userId");
       newTask, // { title }
     } = await req.json();
 console.log(productId, dayIndex, dueDate, taskId, newTask,"newTask");
-    if (!productId || !dayIndex || !dueDate || (!taskId || !newTask)) {
-      return NextResponse.json({ success: false, error: "Missing required fields" }, { status: 400 });
+    if (!productId || !dayIndex || !dueDate ) {
+      return NextResponse.json({ 
+        success: false, 
+        error: "Missing required fields",
+        details: {
+          productId: !productId, 
+          dayIndex: !dayIndex, 
+          dueDate: !dueDate, 
+          taskId: !taskId, 
+          newTask: !newTask 
+        }
+      }, { status: 400 });
     }
     const user = await prisma.user.findUnique({
       where: { clerkId: userId },
@@ -87,6 +97,19 @@ console.log(productId, dayIndex, dueDate, taskId, newTask,"newTask");
       });
 
       finalTaskId = createdTask.id;
+    }
+
+    // Check if DayTask already exists for this task
+    const existingDayTask = await prisma.dayTask.findUnique({
+      where: { taskId: finalTaskId }
+    });
+
+    if (existingDayTask) {
+      return NextResponse.json({
+        success: false,
+        error: "A day task already exists for this task",
+        existingDayTaskId: existingDayTask.id
+      }, { status: 400 });
     }
 
     // 💾 Create the DayTask

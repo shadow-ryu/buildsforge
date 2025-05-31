@@ -94,6 +94,7 @@ model Product {
   buildLogs   BuildLog[]
   DailyStreak DailyStreak[]
   aiLogs      AiLog[]
+  settings    ProductSettings?
 }
 
 model Feature {
@@ -120,8 +121,8 @@ model Task {
 
 model DayTask {
   id            String    @id @default(cuid())
-  taskId        String    @unique
-  task          Task      @relation(fields: [taskId], references: [id])
+  taskId        String?    @unique
+  task          Task?     @relation(fields: [taskId], references: [id])
   dayIndex      Int
   dueDate       DateTime
   completedAt   DateTime?
@@ -197,6 +198,17 @@ model Subscription {
   trialEndsAt                DateTime?
   createdAt                  DateTime  @default(now())
   updatedAt                  DateTime  @updatedAt
+}
+
+model ProductSettings {
+  id              String   @id @default(cuid())
+  productId       String   @unique
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  roadmapPublic   Boolean  @default(false)
+  buildLogsPublic Boolean  @default(false)
+  detailsPublic   Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Settings {

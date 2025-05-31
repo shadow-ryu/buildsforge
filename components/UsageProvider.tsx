@@ -7,6 +7,7 @@ type UsageLimits = {
   roadmap: number | "unlimited";
   mvp: number | "unlimited";
   buildlog: number | "unlimited";
+  project: number | "unlimited";
 };
 
 type UsageData = {
@@ -15,12 +16,14 @@ type UsageData = {
     roadmap: number;
     mvp: number;
     buildlog: number;
+    project: number;
   };
   limits: UsageLimits;
   canUse: {
     roadmap: boolean;
     mvp: boolean;
     buildlog: boolean;
+    project: boolean;
   };
 };
 

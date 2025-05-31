@@ -43,99 +43,84 @@ export async function GET() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const activeProject = user.products.find((p: { active: any }) => p.active);
-    const streak = activeProject?.currentStreak || 0;
+    const products = user.products || [];
 
-    // ✅ Call streak reset logic
-    if (activeProject) {
-      await checkAndResetStreaks(user.id, activeProject.id);
-    }
+    const todayTasks: any[] = [];
+    const pendingTasks: any[] = [];
+    const shippedProducts: any[] = [];
+    const activeProjects: any[] = [];
 
-    const todayTasks =
-      activeProject?.features.flatMap((feature: { tasks: any[] }) =>
-        feature.tasks
-          .filter(
-            (task: { dayTask: { dueDate: string | number | Date } }) =>
-              task.dayTask?.dueDate &&
-              new Date(task.dayTask.dueDate).toDateString() ===
-                today.toDateString()
-          )
-          .map((task: { id: any; title: any; status: any; dayTask: any }) => ({
-            id: task.id,
-            title: task.title,
-            status: task.status,
-            due: new Date(task.dayTask!.dueDate).toLocaleDateString(),
-            link: `/dashboard/products/${activeProject.id}#task-${task.id}`,
-          }))
-      ) || [];
+    for (const product of products) {
+      const isActive = product.active;
+      const currentStreak = product.currentStreak || 0;
 
-    const pendingTasks =
-      activeProject?.features.flatMap((feature: { tasks: any[] }) =>
-        feature.tasks
-          .filter((task) => {
-            const dueDate = task.dayTask?.dueDate
-              ? new Date(task.dayTask.dueDate)
-              : null;
-            const isIncomplete = task.status !== "COMPLETED";
-            return isIncomplete && (!dueDate || dueDate < today);
-          })
-          .map((task) => ({
-            id: task.id,
-            title: task.title,
-            status: task.status,
-            due: task.dayTask?.dueDate
-              ? new Date(task.dayTask.dueDate).toLocaleDateString()
-              : "No due date",
-            link: `/dashboard/products/${activeProject.id}#task-${task.id}`,
-          }))
-      ) || [];
+      if (isActive) {
+        await checkAndResetStreaks(user.id, product.id);
 
-    if (
-      activeProject?.currentStreak &&
-      activeProject.currentStreak > user.bestStreakOverall
-    ) {
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          bestStreakOverall: activeProject.currentStreak,
-        },
-      });
+        if (currentStreak > user.bestStreakOverall) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              bestStreakOverall: currentStreak,
+            },
+          });
 
-      user.bestStreakOverall = activeProject.currentStreak;
-    }
-
-    const shippedProducts = user.products
-      .filter(
-        // @ts-expect-error cdc
-        (product: {
-          features: {
-            tasks: { dayTask: { completedAt: Date | null } }[];
-          }[];
-        }) => {
-          const allDayTasks = product.features.flatMap((f) =>
-            f.tasks
-              .map((t: { dayTask: { completedAt: Date | null } }) => t.dayTask)
-              .filter(Boolean)
-          ) as { completedAt: Date | null }[];
-
-          return (
-            allDayTasks.length > 0 &&
-            allDayTasks.every((dt) => dt.completedAt != null)
-          );
+          user.bestStreakOverall = currentStreak;
         }
-      )
-      .map(
-        (product: {
-          id: string;
-          name: string;
-          updatedAt: string | number | Date;
-        }) => ({
+
+        activeProjects.push({
+          id: product.id,
+          name: product.name,
+          deadline: product.deadline,
+          updatedAt: product.updatedAt,
+          currentStreak: currentStreak,
+          isMvpGenerated: product.isMvpGenerated,
+          isRoadmapGenerated: product.isRoadmapGenerated,
+          progress: calculateProgress(product),
+        });
+      }
+
+      for (const feature of product.features) {
+        for (const task of feature.tasks) {
+          const dueDate = task.dayTask?.dueDate
+            ? new Date(task.dayTask.dueDate)
+            : null;
+          const dueStr = dueDate?.toLocaleDateString() || "No due date";
+          const isToday = dueDate?.toDateString() === today.toDateString();
+          const isIncomplete = task.status === "backlog";
+
+          const taskMeta = {
+            id: task.id,
+            title: task.title,
+            status: task.status,
+            due: dueStr,
+            link: `/dashboard/products/${product.id}#task-${task.id}`,
+          };
+
+          if (isToday) todayTasks.push(taskMeta);
+          if (isIncomplete && (!dueDate || dueDate < today)) {
+            pendingTasks.push(taskMeta);
+          }
+        }
+      }
+
+      const allDayTasks = product.features.flatMap((f) =>
+        f.tasks.map((t: any) => t.dayTask).filter(Boolean)
+      ) as { completedAt: Date | null }[];
+
+      const isShipped =
+        allDayTasks.length > 0 &&
+        allDayTasks.every((dt) => dt.completedAt != null);
+
+      if (isShipped) {
+        shippedProducts.push({
           id: product.id,
           name: product.name,
           status: "Shipped",
           shipped: new Date(product.updatedAt).toLocaleDateString(),
-        })
-      );
+        });
+      }
+    }
 
     const limitedUserDetails = {
       name: user.name,
@@ -149,19 +134,7 @@ export async function GET() {
       success: true,
       data: {
         user: limitedUserDetails,
-        streak,
-        activeProject: activeProject
-          ? {
-              id: activeProject.id,
-              name: activeProject.name,
-              deadline: activeProject.deadline,
-              updatedAt: activeProject.updatedAt,
-              currentStreak: activeProject.currentStreak,
-              isMvpGenerated: activeProject.isMvpGenerated,
-              isRoadmapGenerated: activeProject.isRoadmapGenerated,
-              progress: calculateProgress(activeProject),
-            }
-          : null,
+        activeProjects,
         todayTasks,
         pendingTasks,
         shippedProducts,

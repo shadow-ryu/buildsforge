@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { useUsage } from "@/hooks/use-usage";
 
 const productSchema = z.object({
   app_name: z.string().min(1, "Product name is required"),
@@ -37,7 +38,13 @@ export default function ProductForm() {
   const [inspirationApps, setInspirationApps] = useState<string[]>([]);
   const [newFeature, setNewFeature] = useState("");
   const [newInspirationApp, setNewInspirationApp] = useState("");
-
+  const usage = useUsage();
+  const blocked =
+    "blocked" in usage
+      ? usage.blocked
+      : { roadmap: false, mvp: false, buildlog: false, project: false };
+  const isProjectBlocked = blocked.project;
+  const usageLoading = usage.loading;
   const form = useForm({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -73,6 +80,48 @@ export default function ProductForm() {
     projectMutation.mutate(payload);
   };
 
+  if(usageLoading) {
+    return (
+      <main className="min-h-screen w-full bg-[#0f0f11] px-4 py-10 text-white">
+        <div className="max-w-4xl mx-auto space-y-6">
+          <Card className="bg-[#1c1c21] border border-purple-900">
+            <CardHeader className="pb-4 border-b border-purple-800 flex items-center justify-start gap-2">
+              <CardTitle className="text-2xl text-white">
+                Product Creation
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="mt-4 space-y-6">
+              <div className="text-sm text-purple-300">
+                Loading your product...
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    );
+  }
+
+  if (isProjectBlocked) {
+    return (
+      <main className="min-h-screen w-full bg-[#0f0f11] px-4 py-10 text-white">
+        <div className="max-w-4xl mx-auto space-y-6">
+          <Card className="bg-[#1c1c21] border border-purple-900">
+            <CardHeader className="pb-4 border-b border-purple-800 flex items-center justify-start gap-2">
+              <CardTitle className="text-2xl text-white">
+                Product Creation Limit
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="mt-4 space-y-6">
+              <div className="text-sm text-purple-300">
+                You have reached your project limit. Please upgrade your plan to
+                continue.
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    );
+  }
   return (
     <main className="min-h-screen w-full bg-[#0f0f11] px-4 py-10 text-white">
       <div className="max-w-4xl mx-auto space-y-6">

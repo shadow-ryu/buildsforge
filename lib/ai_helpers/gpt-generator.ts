@@ -1,5 +1,5 @@
 import { OpenAI } from "openai";
-import prisma from "@/lib/prisma"; // adjust to your project structure
+import prisma from "@/lib/prisma";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -22,34 +22,22 @@ export async function generateWithChatGPT({
     temperature: 0.7,
   });
 
-  let content = response.choices[0].message.content;
-  console.log("Raw GPT Output:\n", content);
+  let content = response.choices[0].message.content?.trim();
+  if (!content) throw new Error("No content received from OpenAI");
 
-  if (!content) {
-    throw new Error("No content received from OpenAI");
+  content = content
+    .replace(/^```json\s*/, "")
+    .replace(/```$/, "")
+    .trim();
+
+  let parsed;
+  try {
+    parsed = JSON.parse(content);
+  } catch (err) {
+    console.error("Failed to parse GPT response", err);
+    throw new Error("Invalid JSON from GPT");
   }
 
-  // Normalize and strip markdown code fences
-  content = content.trim();
-  if (content.startsWith("```json") || content.startsWith("```")) {
-    content = content
-      .replace(/^```(?:json)?\s*/, "")
-      .replace(/```$/, "")
-      .trim()
-  }
-
-  // Attempt to parse the output JSON
-  // let parsed;
-  // try {
-  //   parsed = JSON.parse(content);
-  // } catch (err) {
-  //   console.error("Failed to parse GPT response as JSON", err);
-  //   throw new Error("Invalid JSON from GPT response");
-  // }
-
-  // console.log("Parsed GPT Output:\n", parsed);
-
-  // 🔥 Background DB log
   void (async () => {
     try {
       const tokenUsage =
@@ -63,7 +51,7 @@ export async function generateWithChatGPT({
           type,
           ai_model: "gpt-4",
           input: { prompt },
-          output: content,
+          output: parsed,
         },
       });
 
@@ -75,9 +63,9 @@ export async function generateWithChatGPT({
         },
       });
     } catch (err) {
-      console.error("GPT DB logging failed:", err);
+      console.error("GPT DB logging failed", err);
     }
   })();
 
-  return content;
+  return parsed;
 }

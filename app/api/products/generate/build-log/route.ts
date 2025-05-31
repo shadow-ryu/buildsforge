@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { generateWithChatGPT } from "@/lib/ai_helpers/chatgptMvpGenerator";
 import { generateBuildLogPromptUpgraded } from "@/lib/ai_helpers/solo-prompt";
+import { generateWithModel } from "@/lib/ai_helpers/model-selector";
 
 export async function POST(req: NextRequest) {
   try {
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
- console.log({selectedTaskIds},"selectedTaskIds")
+    console.log({ selectedTaskIds }, "selectedTaskIds");
     // ✅ Also include explicitly selected dayTasks
     const additionalTasks = selectedTaskIds.length
       ? await prisma.dayTask.findMany({
@@ -78,18 +78,21 @@ export async function POST(req: NextRequest) {
         })
       : [];
 
-    console.log({
-      tasks: additionalTasks,
-      notes,
-      day: dayIndex,
-      product: {
-        name: project.name,
-        description: project.description || "",
-        uniqueValueProp: project.uniqueValueProp || "",
-        techStack: project.techStack || "",
-        inspirationApps: project.inspirationApps || "",
+    console.log(
+      {
+        tasks: additionalTasks,
+        notes,
+        day: dayIndex,
+        product: {
+          name: project.name,
+          description: project.description || "",
+          uniqueValueProp: project.uniqueValueProp || "",
+          techStack: project.techStack || "",
+          inspirationApps: project.inspirationApps || "",
+        },
       },
-    },"input");
+      "input"
+    );
     const formattedTasks = additionalTasks.map((t) => ({
       title: t.description ?? "Untitled Task",
       description: t.description,
@@ -110,21 +113,18 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const response = await generateWithChatGPT({
+    const result = await generateWithModel({
       prompt,
       userId: user.id,
       productId: projectId,
       type: "build_log",
     });
 
- const data = JSON.parse(response);
-    console.log("GPT Output:\n", data["markdown"]);
-    console.log("GPT Output:\n", data["tweet"]);
-    const buildLog = await prisma.buildLog.create({
+    await prisma.buildLog.create({
       data: {
         logDate,
-        summary: data["markdown"].trim(),
-        tweet: data["tweet"].trim(),
+        summary: result.markdown.trim(),
+        tweet: result.tweet.trim(),
         generatedAt: new Date(),
         dayIndex,
         userId: user.id,
@@ -133,19 +133,19 @@ export async function POST(req: NextRequest) {
     });
 
     // ✅ Link only completed dayTasks
-    const buildLogEligibleTasks = additionalTasks.filter(
-      (t) => t.status === "completed"
-    );
-    await prisma.dayTask.updateMany({
-      where: {
-        id: { in: buildLogEligibleTasks.map((t) => t.id) },
-      },
-      data: {
-        buildLogId: buildLog.id,
-      },
-    });
+    // const buildLogEligibleTasks = additionalTasks.filter(
+    //   (t) => t.status === "completed"
+    // );
+    // await prisma.dayTask.updateMany({
+    //   where: {
+    //     id: { in: buildLogEligibleTasks.map((t) => t.id) },
+    //   },
+    //   data: {
+    //     buildLogId: buildLog.id,
+    //   },
+    // });
 
-    return NextResponse.json({ success: true, buildLog });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error generating build log:", error);
     return NextResponse.json(

@@ -14,6 +14,7 @@ export function useUsage() {
       roadmap: !usage.canUse.roadmap,
       mvp: !usage.canUse.mvp,
       buildlog: !usage.canUse.buildlog,
+      project: !usage.canUse.project,
     },
     loading: false,
   };

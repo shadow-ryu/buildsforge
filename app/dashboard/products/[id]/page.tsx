@@ -58,7 +58,9 @@ export default function ProductDetailPage({
   const [newDailyCommitmentHrs, setNewDailyCommitmentHrs] = React.useState<
     number | null
   >(null);
-  const { blocked, isLoading: usageLoading } = useUsage();
+  const usage = useUsage();
+  const blocked = 'blocked' in usage ? usage.blocked : { roadmap: false, mvp: false, buildlog: false };
+  const usageLoading = usage.loading;
 
   const { data, isLoading, error } = useQuery<ProductDetail, Error>({
     queryKey: ["product", id],
@@ -177,7 +179,7 @@ export default function ProductDetailPage({
                 : "Generate MVP"}
             </Button>
 
-            <ManualMvpForm productId={id} />
+            <ManualMvpForm productId={id} mvpSummary={product.mvpSummary || ""} />
           </div>
           <EditProductDetails
             product={product}

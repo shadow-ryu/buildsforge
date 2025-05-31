@@ -20,19 +20,21 @@ const plans = [
   {
     name: "Explore",
     price: "Free",
+    model: "gemini",
     productId: "111111",
-    features: ["1 Project", "1 Roadmap", "1 MVP", "2 Buildlogs"],
+    features: ["4 Projects", "10 Roadmap", "5 MVP ", "10 Build logs"],
     limits: {
-      project: 1,
-      roadmap: 3,
-      mvp: 3,
-      buildlog: 5,
+      project: 4,
+      roadmap: 10,
+      mvp: 5,
+      buildlog: 10,
     },
   },
   {
     name: "Founder’s Pass",
     price: "₹999/month",
     productId: "517014",
+    model: "gemini",
     features: ["10 Projects", "3 Roadmaps", "2 MVPs", "5 Buildlogs"],
     limits: {
       project: 10,
@@ -47,6 +49,7 @@ const plans = [
     price: "₹1,999/month",
     discount: "40% off",
     productId: "517015",
+    model: "gpt",
     features: ["unlimited Projects", "10 Roadmaps", "10 MVPs", "20 Buildlogs"],
     limits: {
       project: "unlimited",
@@ -60,6 +63,7 @@ const plans = [
     name: "Founder+",
     price: "₹3,999/month",
     discount: "50% off",
+    model: "gpt",
     productId: "517016",
     features: ["unlimited Projects", "50 Roadmaps", "30 MVPs", "50 Buildlogs"],
     limits: {

@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
-import { generateWithChatGPT } from "@/lib/ai_helpers/chatgptMvpGenerator";
 import { generateRoadmapPromptUpgraded } from "@/lib/ai_helpers/solo-prompt";
+import { generateWithModel } from "@/lib/ai_helpers/model-selector";
 
-// import { generateWithGemini } from "@/lib/ai_helpers/geminiMvpGenerator";
 
 export async function POST(req: NextRequest) {
   try {
@@ -96,14 +95,14 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const response = await generateWithChatGPT({
+    const roadmap = await generateWithModel({
+      model: "gpt",
       prompt,
       userId: user.id,
       productId: product.id,
       type: "roadmap",
     });
-    console.log(typeof response, "roadmap");
-    const roadmap = JSON.parse(response);
+
 
     const existingTasksMap = new Map(flatTasks.map((t) => [t.id, t]));
     const featureMap = new Map(
@@ -149,16 +148,24 @@ export async function POST(req: NextRequest) {
           taskId = newTask.id;
         }
 
-        await prisma.dayTask.create({
-          data: {
-            taskId,
-            dayIndex: day.day,
-            dueDate,
-            category: task.category,
-            description: task.description,
-            status: "backlog",
-          },
+        // Check if DayTask already exists for this task
+        const existingDayTask = await prisma.dayTask.findUnique({
+          where: { taskId }
         });
+
+        // Only create if it doesn't exist
+        if (!existingDayTask) {
+          await prisma.dayTask.create({
+            data: {
+              taskId,
+              dayIndex: day.day,
+              dueDate,
+              category: task.category,
+              description: task.description,
+              status: "backlog",
+            },
+          });
+        }
       }
     }
 

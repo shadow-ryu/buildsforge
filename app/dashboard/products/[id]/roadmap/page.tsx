@@ -19,7 +19,7 @@ import BuildLogForm from "@/components/build-log-form";
 import { cn } from "@/lib/utils";
 import ReorderRoadmap from "@/components/roadmaps/redo-roadmap";
 import { toast } from "sonner";
-import DayTaskCreateForm from "@/components/products/daytask-create-form";
+// import DayTaskCreateForm from "@/components/products/daytask-create-form";
 import { useUsage } from "@/hooks/use-usage";
 import { useRouter } from "next/navigation";
 
@@ -198,7 +198,7 @@ function RoadmapDisplay({
         >
           Revise Roadmap
         </Button>
-        <DayTaskCreateForm productId={id} />
+        {/* <DayTaskCreateForm productId={id} /> */}
       </div>
 
       {todaysTasks.length > 0 && (
@@ -425,7 +425,7 @@ export default function ProductDetailPage({
         <ReorderRoadmap
           initialDays={days}
           onSave={(updatedDayTasks) => {
-            console.log(updatedDayTasks, days);
+            // @ts-expect-error taskId is not defined
             handleSaveUpdatedRoadmap(updatedDayTasks);
           }}
         />

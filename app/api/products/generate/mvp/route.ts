@@ -5,28 +5,8 @@ import {
   generateMvpPrompt_RealWorld,
   generateMvpPrompt_RealWorld_With_Existing_Features,
 } from "@/lib/ai_helpers/solo-prompt";
-import { generateWithChatGPT } from "@/lib/ai_helpers/chatgptMvpGenerator";
 
-interface FeatureDetail {
-  feature: string;
-  description: string;
-  rank: number;
-  tasks: string[];
-}
-
-interface AIResponse {
-  features: FeatureDetail[];
-  target_audience?: string;
-  user_goals?: string;
-  unique_value_proposition?: string;
-  stack?: {
-    frontend?: string;
-    backend?: string;
-    database?: string;
-  };
-  mvp_summary?: string;
-  one_liner?: string;
-}
+import { generateWithModel } from "@/lib/ai_helpers/model-selector";
 
 export async function POST(req: NextRequest) {
   try {
@@ -91,17 +71,16 @@ export async function POST(req: NextRequest) {
             existingFeaturesDetailed
           )
         : generateMvpPrompt_RealWorld(basePromptData);
-
-    const aiRes: string = await generateWithChatGPT({
+    console.log(prompt, "prompt");
+    const aiRes = await generateWithModel({
+      model: "gemini",
       prompt,
       userId: user.id,
-      productId,
+      productId: product.id,
       type: "mvp_generation",
     });
-
-    const data: AIResponse = JSON.parse(aiRes);
-    console.log(typeof data, "data");
-    if (!data || !Array.isArray(data.features)) {
+    console.log(aiRes, "aiRes");
+    if (!aiRes || !Array.isArray(aiRes.features)) {
       return NextResponse.json(
         { success: false, error: "Invalid AI response" },
         { status: 500 }
@@ -109,7 +88,7 @@ export async function POST(req: NextRequest) {
     }
 
     await prisma.$transaction(async (tx) => {
-      for (const feature of data.features) {
+      for (const feature of aiRes.features) {
         const createdFeature = await tx.feature.create({
           data: {
             name: feature.feature,
@@ -121,7 +100,7 @@ export async function POST(req: NextRequest) {
 
         if (feature.tasks.length > 0) {
           await tx.task.createMany({
-            data: feature.tasks.map((title) => ({
+            data: feature.tasks.map((title: string) => ({
               title,
               completed: false,
               featureId: createdFeature.id,
@@ -132,14 +111,14 @@ export async function POST(req: NextRequest) {
     });
 
     const updates: Record<string, string> = {};
-    if (!product.targetAudience && data.target_audience)
-      updates.targetAudience = data.target_audience;
-    if (!product.userGoals && data.user_goals)
-      updates.userGoals = data.user_goals;
-    if (!product.uniqueValueProp && data.unique_value_proposition)
-      updates.uniqueValueProp = data.unique_value_proposition;
-    if (!product.techStack && data.stack) {
-      updates.techStack = Object.values(data.stack).filter(Boolean).join(", ");
+    if (!product.targetAudience && aiRes.target_audience)
+      updates.targetAudience = aiRes.target_audience;
+    if (!product.userGoals && aiRes.mvp_goal)
+      updates.userGoals = aiRes.mvp_goal;
+    if (!product.uniqueValueProp && aiRes.unique_value_proposition)
+      updates.uniqueValueProp = aiRes.unique_value_proposition;
+    if (!product.techStack && aiRes.stack) {
+      updates.techStack = Object.values(aiRes.stack).filter(Boolean).join(", ");
     }
 
     await prisma.product.update({
@@ -147,16 +126,17 @@ export async function POST(req: NextRequest) {
       data: {
         ...updates,
         isMvpGenerated: true,
-        mvpSummary: data.mvp_summary,
-        description: data.one_liner,
+        mvpSummary: aiRes.mvp_summary,
+        description: aiRes.one_liner,
       },
     });
 
     return NextResponse.json({
       success: true,
       productId: product.id,
-      mvpSummary: data.mvp_summary,
-      description: data.one_liner,
+      mvpSummary: aiRes.mvp_summary,
+      description: aiRes.one_liner,
+      response: aiRes,
       slug: product.slug,
     });
   } catch (error) {
