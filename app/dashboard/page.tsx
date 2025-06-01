@@ -32,12 +32,12 @@ export default function DashboardPage() {
     streak,
     todayTasks,
     shippedProducts,
-    activeProject,
+    activeProjects,
     user,
 
     pendingTasks,
   } = data || {};
-
+  console.log("pendingTasks", activeProjects);
   return (
     <div className="p-6 md:p-10 bg-[#0f0f11] min-h-screen space-y-10">
       {/* Header */}
@@ -100,29 +100,31 @@ export default function DashboardPage() {
           <CardTitle className="text-white text-lg mb-2">
             Active Project
           </CardTitle>{" "}
-          {activeProject ? (
-            <Card className="bg-[#181A20] p-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-white font-semibold">
-                  {activeProject.name}
-                </h3>
-                <Badge className="bg-purple-800 text-white text-xs">
-                  Due: {new Date(activeProject.deadline).toLocaleDateString()}
-                </Badge>
-              </div>
-              <p className="text-xs text-gray-400 mt-1">
-                Streak: {activeProject.currentStreak} days
-              </p>
-              <p className="text-xs text-gray-600 mt-1">
-                Last updated:{" "}
-                {new Date(activeProject.updatedAt).toLocaleDateString()}
-              </p>
-              <Link href={`/dashboard/products/${activeProject.id}`}>
-                <Button variant="secondary" className="mt-3 text-sm">
-                  View Project
-                </Button>
-              </Link>
-            </Card>
+          {activeProjects && activeProjects?.length > 0 ? (
+            <ScrollArea>
+              {activeProjects.map((prod: any) => (
+                <Card className="bg-[#181A20] p-4 mb-4" key={prod.id}>
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-white font-semibold">{prod.name}</h3>
+                    <Badge className="bg-purple-800 text-white text-xs">
+                      Due: {new Date(prod.deadline).toLocaleDateString()}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Streak: {prod.currentStreak} days
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Last updated:{" "}
+                    {new Date(prod.updatedAt).toLocaleDateString()}
+                  </p>
+                  <Link href={`/dashboard/products/${prod.id}`}>
+                    <Button variant="secondary" className="mt-3 text-sm">
+                      View Project
+                    </Button>
+                  </Link>
+                </Card>
+              ))}
+            </ScrollArea>
           ) : (
             <p className="text-sm text-gray-500">No active project</p>
           )}
@@ -138,7 +140,7 @@ export default function DashboardPage() {
                 todayTasks.map((task: any, i: number) => (
                   <div
                     key={i}
-                    className="bg-[#0f0f11] border border-purple-900 p-4 rounded-lg flex flex-col gap-1"
+                    className="bg-[#0f0f11] border border-purple-900 p-4 rounded-lg flex flex-col gap-1 mt-1"
                   >
                     <div className="flex justify-between items-center">
                       <Badge
@@ -177,7 +179,7 @@ export default function DashboardPage() {
               pendingTasks.map((task: any, i: number) => (
                 <div
                   key={i}
-                  className="bg-[#0f0f11] border border-purple-900 p-4 rounded-lg flex flex-col gap-1 my-2"
+                  className="bg-[#0f0f11] border border-purple-900 p-4 rounded-lg flex flex-col gap-1 mb-2"
                 >
                   <div className="flex justify-between items-center">
                     <Badge

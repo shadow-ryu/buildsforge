@@ -21,7 +21,7 @@ export type DashboardData = {
   todayTasks: Array<object>;
   shippedProducts: Array<DayTask>;
   pendingTasks: Array<DayTask>;
-  activeProject: Product | null;
+  activeProjects: Product[] | null;
   user: User;
 };
 
