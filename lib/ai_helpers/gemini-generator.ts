@@ -31,7 +31,7 @@ export async function generateWithGemini({
 
   let fullText = "";
   let usageMetadata = null;
-  console.log(stream, "stream");
+
 
   for await (const chunk of stream) {
     const part = chunk?.candidates?.[0]?.content?.parts?.[0];
@@ -47,6 +47,7 @@ export async function generateWithGemini({
     .trim()
     .replace(/^```json\s*/, "")
     .replace(/```$/, "");
+
   let parsed;
   try {
     parsed = JSON.parse(cleaned);
@@ -58,6 +59,7 @@ export async function generateWithGemini({
   void (async () => {
     try {
       const estimatedTokens =
+      // @ts-expect-error Property 'totalTokens' does not exist on type 'GenerateContentResponseUsageMetadata'.
         usageMetadata?.totalTokens ??
         Math.ceil(prompt.length / 4 + fullText.length / 4);
 

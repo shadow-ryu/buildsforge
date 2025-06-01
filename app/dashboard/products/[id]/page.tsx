@@ -335,7 +335,7 @@ export default function ProductDetailPage({
         </CardContent>
       </Card>
 
-      {product.features.length && (
+      {product.features.length ? (
         <Card className="bg-[#181A20] border border-purple-800/40 rounded-2xl mb-10">
           <CardHeader>
             <CardTitle className="text-xl text-white"> MVP Details</CardTitle>
@@ -384,7 +384,7 @@ export default function ProductDetailPage({
             </div>
           </CardContent>
         </Card>
-      )}
+      ): null}
     </div>
   );
 }

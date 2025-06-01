@@ -10,7 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import GlassCard from "@/components/ui/glass-card";
 import { useDashboardData } from "@/react-query/dashboard-queries";
 import { LoadingScreen } from "@/components/loading-screen";
-import TrialStatusCard from "@/components/dashbord/trial-status-card";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function DashboardPage() {
@@ -34,7 +34,7 @@ export default function DashboardPage() {
     shippedProducts,
     activeProject,
     user,
-    trial,
+
     pendingTasks,
   } = data || {};
 
@@ -52,7 +52,6 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* @ts-expect-error isNewUser */}
       {user?.isNewUser && (
         <GlassCard className="bg-[#181A20] border border-purple-900 rounded-2xl px-6 py-5">
           <div className="flex gap-4 items-center">
@@ -80,9 +79,6 @@ export default function DashboardPage() {
 
       {/* Stats and Focus */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/*  @ts-expect-error TrialStatusCard */}
-        {trial && <TrialStatusCard trial={trial} />}
-
         <GlassCard className="bg-[#181A20] border-none p-6">
           <CardTitle className="text-white text-lg mb-2">
             Streak Stats

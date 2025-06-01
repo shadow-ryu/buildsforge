@@ -45,7 +45,7 @@ export default function OnboardingPage() {
       await user?.reload?.();
     },
     onSuccess: () => {
-      router.push("/dashboard/plans");
+      router.push("/dashboard");
     },
     onError: (err) => {
       console.error("Onboarding failed:", err);

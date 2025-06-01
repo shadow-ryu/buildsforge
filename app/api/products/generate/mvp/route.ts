@@ -71,9 +71,8 @@ export async function POST(req: NextRequest) {
             existingFeaturesDetailed
           )
         : generateMvpPrompt_RealWorld(basePromptData);
-    console.log(prompt, "prompt");
+
     const aiRes = await generateWithModel({
-      model: "gemini",
       prompt,
       userId: user.id,
       productId: product.id,
