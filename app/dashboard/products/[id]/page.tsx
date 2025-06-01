@@ -59,7 +59,10 @@ export default function ProductDetailPage({
     number | null
   >(null);
   const usage = useUsage();
-  const blocked = 'blocked' in usage ? usage.blocked : { roadmap: false, mvp: false, buildlog: false };
+  const blocked =
+    "blocked" in usage
+      ? usage.blocked
+      : { roadmap: false, mvp: false, buildlog: false };
   const usageLoading = usage.loading;
 
   const { data, isLoading, error } = useQuery<ProductDetail, Error>({
@@ -179,7 +182,10 @@ export default function ProductDetailPage({
                 : "Generate MVP"}
             </Button>
 
-            <ManualMvpForm productId={id} mvpSummary={product.mvpSummary || ""} />
+            <ManualMvpForm
+              productId={id}
+              mvpSummary={product.mvpSummary || ""}
+            />
           </div>
           <EditProductDetails
             product={product}
@@ -221,11 +227,13 @@ export default function ProductDetailPage({
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            {!product.isRoadmapGenerated && product.features.length > 0 && (
+            {product.features.length > 0 ? (
               <Dialog>
                 <DialogTrigger asChild>
                   <Button className="bg-blue-600 text-white">
-                    Continue to Roadmap Setup
+                    {!product.isRoadmapGenerated
+                      ? "Continue to Roadmap Setup"
+                      : "Re-generate Roadmap"}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="bg-[#181A20] border border-purple-700 text-white">
@@ -276,7 +284,7 @@ export default function ProductDetailPage({
                   </form>
                 </DialogContent>
               </Dialog>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

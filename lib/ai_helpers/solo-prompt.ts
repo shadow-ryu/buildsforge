@@ -101,7 +101,15 @@ Context:
 - Deadline: ${new Date(product.deadline).toISOString().split("T")[0]}
 - Daily Hours: ${dailyHours}
 
-Generate a roadmap as a valid JSON array of daily objects like:
+Instructions:
+- Distribute each task **only once**, and use its estimated effort (1–2 hours).
+- If a task requires more hours than \`dailyHours\`, split it across multiple days, clearly indicating it's a continuation.
+- For each day, \`total_hours\` must not exceed \`dailyHours\`, unless the deadline is too close to fit all tasks within that limit.
+- If the available days are too few to fit all tasks within dailyHours, then **relax the dailyHours constraint** and pack extra hours per day as needed.
+- Group related tasks into coherent daily milestone goals.
+- Ensure all task IDs are accounted for and not duplicated.
+
+Output format (as valid JSON):
 [
   {
     "day": 1,
@@ -114,14 +122,15 @@ Generate a roadmap as a valid JSON array of daily objects like:
         "description": "...",
         "category": "core" | "ui" | "infra" | "auth" | "polish" | "payment",
         "estimated_hours": 1 or 2,
-        "parent_task_id": "..."
+        "parent_task_id": "...",
+        "part": "1 of 2" // Optional: if task is split over multiple days
       }
     ],
     "total_hours": number
   }
 ]
 
-Task list to use:
+Available Tasks:
 ${tasks
   .map((t) => `- ${t.title} [${t.category}]: ${t.description} (id: ${t.id})`)
   .join("\n")}

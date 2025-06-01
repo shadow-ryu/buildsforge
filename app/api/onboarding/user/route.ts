@@ -12,11 +12,20 @@ export async function POST(req: NextRequest) {
     }
 
     // Check for existing user
-    const existingUser = await prisma.user.findUnique({
-      where: { clerkId: user.id },
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { clerkId: user.id },
+          { email: user.emailAddresses[0].emailAddress },
+        ],
+      },
     });
 
     if (existingUser) {
+      await prisma.user.update({
+        where: { clerkId: user.id },
+        data: { onboardingCompleted: true },
+      });
       return NextResponse.json({ onboardingComplete: true }, { status: 200 });
     }
 

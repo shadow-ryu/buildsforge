@@ -4,7 +4,6 @@ import { currentUser } from "@clerk/nextjs/server";
 import { generateRoadmapPromptUpgraded } from "@/lib/ai_helpers/solo-prompt";
 import { generateWithModel } from "@/lib/ai_helpers/model-selector";
 
-
 export async function POST(req: NextRequest) {
   try {
     const loggedUser = await currentUser();
@@ -70,6 +69,17 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Delete all previous DayTasks for this product
+    await prisma.dayTask.deleteMany({
+      where: {
+        task: {
+          feature: {
+            productId: product.id,
+          },
+        },
+      },
+    });
+
     const flatTasks = product.features.flatMap((feature) =>
       feature.tasks.map((task) => ({
         title: task.title,
@@ -96,13 +106,11 @@ export async function POST(req: NextRequest) {
     });
 
     const roadmap = await generateWithModel({
-      model: "gpt",
       prompt,
       userId: user.id,
       productId: product.id,
       type: "roadmap",
     });
-
 
     const existingTasksMap = new Map(flatTasks.map((t) => [t.id, t]));
     const featureMap = new Map(
@@ -150,7 +158,7 @@ export async function POST(req: NextRequest) {
 
         // Check if DayTask already exists for this task
         const existingDayTask = await prisma.dayTask.findUnique({
-          where: { taskId }
+          where: { taskId },
         });
 
         // Only create if it doesn't exist
