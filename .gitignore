@@ -9,6 +9,8 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+# Prisma generated files
+generated/
 
 # testing
 /coverage

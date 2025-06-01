@@ -1,40 +1,70 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
 
 export async function GET() {
   try {
-    // For now, use hardcoded user
-    const user = await prisma.user.findFirst({ where: { clerkId: "user_clerk_123456" } });
-    if (!user) {
-      return NextResponse.json({ success: false, error: "User not found" }, { status: 404 });
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: "Not authenticated" },
+        { status: 401 }
+      );
     }
-    // Fetch all products for the user
+
+    const user = await prisma.user.findFirst({ where: { clerkId: userId } });
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: "User record not found" },
+        { status: 404 }
+      );
+    }
+
     const products = await prisma.product.findMany({
       where: { userId: user.id },
       include: {
         features: {
           include: {
-            tasks: true,
+            tasks: {
+              include: {
+                dayTask: true, // ✅ needed to assess completion
+              },
+            },
           },
         },
       },
     });
-    // Calculate completion ratio for each product
-    const productSummaries = products.map(product => {
-      const allTasks = product.features.flatMap(f => f.tasks);
-      const totalTasks = allTasks.length;
-      const completedTasks = allTasks.filter(t => t.completed).length;
-      const percent = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+
+    const productSummaries = products.map((product) => {
+      const allDayTasks = product.features.flatMap((f) =>
+        f.tasks.flatMap((t) => (t.dayTask ? [t.dayTask] : []))
+      );
+
+      const total = allDayTasks.length;
+      const completed = allDayTasks.filter((dt) => dt.completedAt).length;
+      const progress = total === 0 ? 0 : Math.round((completed / total) * 100);
+
       return {
         id: product.id,
         name: product.name,
-        description: product.description,
-        percent,
+        description: product.description ?? null,
+        progress,
+        startDate: product.startDate,
+        deadline: product.deadline,
+        currentStreak: product.currentStreak,
+        bestStreak: product.AllTimeBestStreak,
+        isMvpGenerated: product.isMvpGenerated,
+        isRoadmapGenerated: product.isRoadmapGenerated,
+        active: product.active,
       };
     });
+
     return NextResponse.json({ success: true, products: productSummaries });
   } catch (err) {
-    console.error("Error fetching products:", err);
-    return NextResponse.json({ success: false, error: err?.toString() }, { status: 500 });
+    console.error("Error in /api/products:", err);
+    return NextResponse.json(
+      { success: false, error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
