@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-// /app/api/products/[id]/daily_task/route.ts
-
 export async function GET(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: { id: string } }
 ) {
   try {
-    const { id: productId } = await context.params;
+    const { id: productId } = context.params;
 
     if (!productId) {
       return NextResponse.json(
@@ -37,11 +35,13 @@ export async function GET(
     );
 
     if (!hasDayTasks) {
-      return NextResponse.json({
-        success: false,
-        status: "processing",
-        message: "Roadmap is still being generated.",
-      });
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Roadmap is still being generated.",
+        },
+        { status: 102 } // ✅ HTTP 102: Processing
+      );
     }
 
     const dayTaskMap: Record<
@@ -95,7 +95,10 @@ export async function GET(
       })
       .sort((a, b) => a.dayIndex - b.dayIndex);
 
-    return NextResponse.json({ success: true, days, status:200 });
+    return NextResponse.json(
+      { success: true, days },
+      { status: 200 } // ✅ Explicit status
+    );
   } catch (error) {
     console.error("Error fetching daily tasks:", error);
     return NextResponse.json(

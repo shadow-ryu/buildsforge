@@ -381,11 +381,11 @@ export default function ProductDetailPage({
     queryKey: ["roadmap", id],
     queryFn: async () => {
       const res = await axios.get(`/api/products/${id}/daily_task`, {
-        validateStatus: () => true, // allow non-200
+        validateStatus: () => true,
       });
 
       if (res.status === 102) {
-        throw new Error("processing"); // triggers retry below
+        throw new Error("processing"); // triggers retry
       }
 
       if (!res.data.success) {
@@ -394,8 +394,12 @@ export default function ProductDetailPage({
 
       return res.data.days;
     },
-
-    refetchInterval: 3000, // Poll every 3s
+    select: (data) => data,
+    refetchInterval: (query) => {
+      const days = query?.state?.data;
+      console.log(days, "refetch");
+      return Array.isArray(days) && days.length > 0 ? false : 10000;
+    },
   });
 
   // Task completion mutation
