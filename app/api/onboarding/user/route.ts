@@ -58,6 +58,21 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // First, check if the email exists in earlyAccess
+    const earlyAccessEntry = await prisma.earlyAccess.findUnique({
+      where: { email },
+    });
+
+    // Only update if the entry exists
+    if (earlyAccessEntry) {
+      await prisma.earlyAccess.update({
+        where: { email },
+        data: {
+          claimed: true,
+          claimedAt: new Date(),
+        },
+      });
+    }
     return NextResponse.json(
       { onboardingComplete: true, user: newUser },
       { status: 200 }
