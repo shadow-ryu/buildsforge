@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+// /app/api/products/[id]/daily_task/route.ts
+
 export async function GET(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id: productId } = await context.params;
+
     if (!productId) {
       return NextResponse.json(
         { success: false, error: "Missing productId" },
@@ -28,6 +31,18 @@ export async function GET(
         },
       },
     });
+
+    const hasDayTasks = features.some((f) =>
+      f.tasks.some((t) => t.dayTask !== null)
+    );
+
+    if (!hasDayTasks) {
+      return NextResponse.json({
+        success: false,
+        status: "processing",
+        message: "Roadmap is still being generated.",
+      });
+    }
 
     const dayTaskMap: Record<
       number,
@@ -70,16 +85,17 @@ export async function GET(
     });
 
     const days = Object.keys(dayTaskMap)
-      .map((dayIdx: string) => ({
-        dayIndex: Number(dayIdx),
-        // @ts-expect-error type error
-        dueDate: dayTaskMap[dayIdx][0]?.dueDate,
-        // @ts-expect-error type error
-        tasks: dayTaskMap[dayIdx],
-      }))
+      .map((dayIdx) => {
+        const idx = Number(dayIdx);
+        return {
+          dayIndex: idx,
+          dueDate: dayTaskMap[idx]?.[0]?.dueDate,
+          tasks: dayTaskMap[idx] ?? [],
+        };
+      })
       .sort((a, b) => a.dayIndex - b.dayIndex);
 
-    return NextResponse.json({ success: true, days });
+    return NextResponse.json({ success: true, days, status:200 });
   } catch (error) {
     console.error("Error fetching daily tasks:", error);
     return NextResponse.json(

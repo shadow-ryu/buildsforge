@@ -377,14 +377,25 @@ export default function ProductDetailPage({
   const [buildLogError, setBuildLogError] = React.useState<string | null>(null);
 
   // Fetch tasks with React Query
-  const { data: days = [], isLoading } = useQuery<Day[]>({
+  const { data: days = [], isLoading, isFetching, error } = useQuery<Day[]>({
     queryKey: ["roadmap", id],
     queryFn: async () => {
-      const res = await axios.get(`/api/products/${id}/daily_task`);
-      if (!res.data.success)
+      const res = await axios.get(`/api/products/${id}/daily_task`, {
+        validateStatus: () => true, // allow non-200
+      });
+
+      if (res.status === 102) {
+        throw new Error("processing"); // triggers retry below
+      }
+
+      if (!res.data.success) {
         throw new Error(res.data.error || "Failed to fetch roadmap");
+      }
+
       return res.data.days;
     },
+
+    refetchInterval: 3000, // Poll every 3s
   });
 
   // Task completion mutation
@@ -410,10 +421,14 @@ export default function ProductDetailPage({
     },
   });
 
-  if (isLoading || usageLoading)
+  if (isLoading || usageLoading || isFetching)
     return (
       <LoadingScreen isLoading={true} message="Loading roadmap..." header="" />
     );
+
+  if (error?.message === "processing" || days.length === 0) {
+    return <p>Generating roadmap...</p>;
+  }
 
   // Handler for task completion using React Query mutation
   const handleTaskComplete = (taskId: string) => {
@@ -450,7 +465,9 @@ export default function ProductDetailPage({
                   summary: data.buildLog.summary,
                   tweet: data.tweet,
                 });
-                router.push(`/dashboard/products/${id}/build-logs/${data.buildLog.id}`);
+                router.push(
+                  `/dashboard/products/${id}/build-logs/${data.buildLog.id}`
+                );
               } else {
                 setBuildLogError(data.error || "Unknown error");
               }

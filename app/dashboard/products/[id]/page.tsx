@@ -34,6 +34,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useUsage } from "@/hooks/use-usage";
+import { useRouter } from "next/navigation";
 
 interface ProductFeatures extends Feature {
   id: string;
@@ -64,7 +65,7 @@ export default function ProductDetailPage({
       ? usage.blocked
       : { roadmap: false, mvp: false, buildlog: false };
   const usageLoading = usage.loading;
-
+  const router = useRouter();
   const { data, isLoading, error } = useQuery<ProductDetail, Error>({
     queryKey: ["product", id],
     queryFn: async () => {
@@ -115,17 +116,20 @@ export default function ProductDetailPage({
       deadline: string;
       dailyCommitmentHrs: number;
     }) => {
-      const res = await axios.post(`/api/products/generate/roadmap`, {
+      await axios.post(`/api/products/generate/roadmap`, {
         productId,
         startDate,
         deadline,
         dailyCommitmentHrs,
       });
-      if (!res.data.success) throw new Error(res.data.error);
-      return res.data;
+      router.push(`/dashboard/products/${id}/roadmap`);
     },
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["product", id] }),
+    onMutate: () => {
+      queryClient.invalidateQueries({ queryKey: ["product", id] });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["product", id] });
+    },
   });
 
   if (isLoading || usageLoading)
@@ -384,7 +388,7 @@ export default function ProductDetailPage({
             </div>
           </CardContent>
         </Card>
-      ): null}
+      ) : null}
     </div>
   );
 }

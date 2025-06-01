@@ -10,6 +10,7 @@ const isPublicRoute = createRouteMatcher([
   "/coming_soon(.*)",
   "/api/join-waitlist(.*)",
   "/api/webhook(.*)",
+  "/api/inngest(.*)",
   "/([^/]+)", // Match any top-level path (for [slug])
 ]);
 
