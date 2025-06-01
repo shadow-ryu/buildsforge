@@ -52,6 +52,9 @@ export async function GET() {
     buildlog:
       // @ts-expect-error string comparison
       limits.buildlog === "unlimited" || usage.buildlog < limits.buildlog,
+    project:
+      // @ts-expect-error string comparison
+      limits.project === "unlimited" || usage.project < limits.project,
   };
 
   return NextResponse.json({
