@@ -69,7 +69,7 @@ export function useDeleteTask(productId: string) {
 
   return useMutation({
     mutationFn: async (taskId: string) => {
-      const res = await axios.delete("/api/products/delete-task", {
+      const res = await axios.delete(`/api/products/${productId}/delete-task`, {
         data: {
           productId,
           taskId,
