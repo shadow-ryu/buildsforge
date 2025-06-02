@@ -62,7 +62,7 @@ export default function ProductsPage() {
           No products yet.
           <div className="mt-4">
             <Link
-              href="/products/new"
+              href="/dashboard/products/new"
               className="text-purple-400 underline text-sm"
             >
               Create your first product →
@@ -72,7 +72,6 @@ export default function ProductsPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((product) => {
-            // @ts-expect-error progress is not a property of Product
             const progress = Number(product.progress ?? 0);
             return (
               <Link key={product.id} href={`/dashboard/products/${product.id}`}>
