@@ -12,7 +12,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import Image from "next/image";
-
+import Link from "next/link";
+import { DiscordIcon } from "@/components/icons/discord";
 const buildsForgeNav = {
   navMain: [
     {
@@ -77,10 +78,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="bg-[#0f0f11]">
-        <NavMain items={buildsForgeNav.navMain} />
-      </SidebarContent>
+      <SidebarContent className="bg-[#0f0f11] flex flex-col justify-between h-full">
+        <div>
+          <NavMain items={buildsForgeNav.navMain} />
+        </div>
 
+        <div className="p-4 border-t border-purple-900/20">
+          <Link
+            href="https://discord.gg/bR4k3Jx4"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-white transition-colors"
+          >
+            <DiscordIcon className="w-4 h-4" />
+            <span>Join our Discord</span>
+          </Link>
+        </div>
+      </SidebarContent>
       <SidebarRail />
     </Sidebar>
   );
