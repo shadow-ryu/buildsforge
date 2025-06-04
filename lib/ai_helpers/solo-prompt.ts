@@ -222,7 +222,7 @@ You're a lean solo founder building a production-grade MVP using scalable, moder
 - Include authentication and billing system
 - Suggest only essential features
 
-Respond with a valid JSON object:
+Output format (as valid JSON):
 {
   "product_name": string,
   "one_liner": string,
