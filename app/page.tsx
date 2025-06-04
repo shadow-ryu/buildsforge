@@ -200,10 +200,10 @@ export default function BuildsForgeLanding() {
             </Button>
           </Link>
           <div className="flex justify-center gap-6 pt-8">
-            <a href="https://discord.gg/your-invite" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-white transition" aria-label="Discord">
+            <a href="https://discord.gg/bR4k3Jx4" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-white transition" aria-label="Discord">
               <MessageCircle size={22} />
             </a>
-            <a href="https://x.com/yourhandle" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-white transition" aria-label="Twitter/X">
+            <a href="https://x.com/shadow_ryuga" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-white transition" aria-label="Twitter/X">
               <Twitter size={22} />
             </a>
           </div>
