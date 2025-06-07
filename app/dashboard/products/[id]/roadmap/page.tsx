@@ -56,6 +56,7 @@ interface Day {
   tasks: Task[];
 }
 
+
 interface RoadmapDisplayProps {
   days: Day[];
   onTaskComplete: (taskId: string) => void;

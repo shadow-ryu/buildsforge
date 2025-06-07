@@ -64,6 +64,7 @@
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.56.3",
     "react-markdown": "^10.1.0",
+    "reactflow": "^11.11.4",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
     "resend": "^4.5.1",
