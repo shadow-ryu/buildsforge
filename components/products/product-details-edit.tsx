@@ -1,5 +1,7 @@
 "use client";
 import { useState } from "react";
+import axios from "axios";
+import { useMutation } from "@tanstack/react-query";
 import {
   Dialog,
   DialogTrigger,
@@ -36,9 +38,28 @@ export function EditProductDetails({
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
+  const updateProduct = async (form: Partial<Product>) => {
+    const res = await axios.patch(`/api/products/${product.id}`, form);
+    const result = res.data;
+    if (!result.success) {
+      throw new Error(result.error || "Failed to update product.");
+    }
+    return result.product;
+  };
+
+  const mutation = useMutation({
+    mutationFn: updateProduct,
+    onSuccess: (updatedProduct) => {
+      onSave(updatedProduct);
+      setOpen(false);
+    },
+    onError: (error: Error) => {
+      alert(error.message || "Failed to update product.");
+    },
+  });
+
   function handleSave() {
-    onSave(form);
-    setOpen(false);
+    mutation.mutate(form);
   }
 
   return (
